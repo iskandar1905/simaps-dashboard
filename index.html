@@ -3,325 +3,521 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIMAPS - Sistem Informasi Manajemen Pertanahan & Spasial</title>
-
-    <!-- Tailwind CSS (CDN untuk tampilan) -->
+    <title>SIMAPS | Kantor Pertanahan Nasional Spatial Control Center</title>
+    
+    <!-- Enterprise CSS Framework & Asset Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Leaflet CSS & JS (Untuk Peta WebGIS) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <!-- Supabase JS (Untuk koneksi Database) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/shpjs@latest/dist/shp.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        #map { height: 100vh; width: 100%; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-slate-900 text-slate-100 flex h-screen overflow-hidden">
 
-    <!-- Wrapper Utama -->
-    <div class="flex h-screen overflow-hidden">
-
-        <!-- Sidebar / Menu Samping -->
-        <div class="w-64 bg-slate-800 text-white flex flex-col shadow-lg z-20">
-            <div class="p-5 flex items-center justify-center border-b border-slate-700">
-                <h1 class="text-2xl font-bold tracking-wider text-emerald-400">SIMAPS</h1>
+    <!-- SIDEBAR KONTROL UTAMA -->
+    <aside class="w-[420px] bg-slate-800 border-r border-slate-700 flex flex-col h-full z-10 shadow-2xl transition-all duration-300" id="sidebar">
+        <!-- Brand Identity Panel -->
+        <div class="p-6 bg-slate-950 border-b border-slate-700 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-amber-500 rounded-lg text-slate-950 font-bold text-xl tracking-wider shadow-md shadow-amber-500/20">
+                    BPN
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-white leading-tight">SIMAPS v2.0</h1>
+                    <p class="text-xs text-slate-400">Sistem Administrasi & Masalah Spasial</p>
+                </div>
             </div>
-            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-                <button onclick="bukaHalaman('dashboard')" class="w-full text-left px-4 py-3 rounded bg-slate-700 hover:bg-slate-600 transition shadow">📊 Dashboard Utama</button>
+            <button onclick="handleLogout()" id="btnLogout" class="hidden text-slate-400 hover:text-red-400 p-2 rounded-lg transition-colors">
+                <i class="fas fa-power-off text-lg"></i>
+            </button>
+        </div>
+
+        <!-- AUTHENTICATION CARD (STATE: SIGN IN) -->
+        <div id="authSection" class="p-6 flex flex-col justify-center flex-1">
+            <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-700">
+                <h2 class="text-xl font-bold text-white mb-2">Secure Gateway</h2>
+                <p class="text-xs text-slate-400 mb-6">Masukkan kredensial internal ekosistem ATR/BPN untuk mengakses data spasial.</p>
                 
-                <div class="pt-4 pb-1 text-xs text-slate-400 uppercase font-semibold">Data Kanal</div>
-                <button onclick="bukaKanal('PTSL')" class="w-full text-left px-4 py-2 rounded hover:bg-slate-700 transition">📂 Kanal PTSL</button>
-                <button onclick="bukaKanal('Redistribusi')" class="w-full text-left px-4 py-2 rounded hover:bg-slate-700 transition">📂 Kanal Redistribusi</button>
-                <button onclick="bukaKanal('Pengadaan Tanah')" class="w-full text-left px-4 py-2 rounded hover:bg-slate-700 transition">📂 Pengadaan Tanah</button>
-                <button onclick="bukaKanal('Sengketa')" class="w-full text-left px-4 py-2 rounded hover:bg-slate-700 transition">📂 Kanal Sengketa</button>
-                
-                <div class="pt-4 pb-1 text-xs text-slate-400 uppercase font-semibold">Spasial</div>
-                <button onclick="bukaHalaman('peta')" class="w-full text-left px-4 py-2 rounded hover:bg-slate-700 transition">🗺️ WebGIS Peta</button>
-            </nav>
-            <div class="p-4 border-t border-slate-700 text-xs text-slate-400 text-center">
-                Versi 1.0 (Beta)
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider block mb-1.5">Email Perusahaan</label>
+                        <input type="email" id="txtEmail" placeholder="nama@bpn.go.id" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider block mb-1.5">Kata Sandi</label>
+                        <input type="password" id="txtPassword" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors">
+                    </div>
+                    <button onclick="handleLogin()" class="w-full bg-amber-500 text-slate-950 font-bold p-3 rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/10 mt-2">
+                        Autentikasi Masuk
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Area Konten Utama -->
-        <div class="flex-1 flex flex-col overflow-hidden relative">
+        <!-- WORKSPACE DASHBOARD (STATE: LOGGED IN) -->
+        <div id="workspaceSection" class="hidden flex-1 flex-col overflow-hidden">
+            <!-- Profil Operator -->
+            <div class="p-4 bg-slate-900/40 border-b border-slate-700 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold border border-slate-600">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <p class="text-sm font-semibold text-white truncate" id="lblUserEmail">staf.spasial@bpn.go.id</p>
+                    <span id="lblUserRole" class="inline-block text-[10px] uppercase font-bold tracking-widest bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 mt-0.5">Staf Utama</span>
+                </div>
+            </div>
+
+            <!-- Menu Kontrol Saluran (RBAC Terbuka Otomatis) -->
+            <div class="p-6 space-y-4 flex-1 overflow-y-auto custom-scrollbar">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Saluran Administrasi Masalah</h3>
+                
+                <button id="node_surat_sp" onclick="triggerOpenModal('surat')" class="hidden w-full text-left p-4 bg-slate-900 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-xl transition-all flex items-center gap-4 group">
+                    <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg group-hover:bg-blue-500 group-hover:text-slate-950 transition-all"><i class="fas fa-envelope text-lg"></i></div>
+                    <div><h4 class="font-bold text-sm text-white">Surat Masuk SP</h4><p class="text-xs text-slate-400">Pencatatan nota dinas sengketa</p></div>
+                </button>
+
+                <button id="node_aduan" onclick="triggerOpenModal('aduan')" class="hidden w-full text-left p-4 bg-slate-900 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-xl transition-all flex items-center gap-4 group">
+                    <div class="p-3 bg-amber-500/10 text-amber-400 rounded-lg group-hover:bg-amber-500 group-hover:text-slate-950 transition-all"><i class="fas fa-bullhorn text-lg"></i></div>
+                    <div><h4 class="font-bold text-sm text-white">Aduan Masyarakat</h4><p class="text-xs text-slate-400">Laporan tumpang tindih berkas warga</p></div>
+                </button>
+
+                <button id="node_masalah_sp" onclick="triggerOpenModal('masalah_sp')" class="hidden w-full text-left p-4 bg-slate-900 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-xl transition-all flex items-center gap-4 group">
+                    <div class="p-3 bg-rose-500/10 text-rose-400 rounded-lg group-hover:bg-rose-50 group-hover:text-slate-950 transition-all"><i class="fas fa-folder-open text-lg"></i></div>
+                    <div><h4 class="font-bold text-sm text-white">Masalah Spasial Internal</h4><p class="text-xs text-slate-400">Pemberkasan bendel sengketa fisik</p></div>
+                </button>
+
+                <button id="node_masalah_pps" onclick="triggerOpenModal('masalah_pps')" class="hidden w-full text-left p-4 bg-slate-900 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-xl transition-all flex items-center gap-4 group">
+                    <div class="p-3 bg-purple-500/10 text-purple-400 rounded-lg group-hover:bg-purple-500 group-hover:text-slate-950 transition-all"><i class="fas fa-gavel text-lg"></i></div>
+                    <div><h4 class="font-bold text-sm text-white">Kanal Sengketa Hukum PPS</h4><p class="text-xs text-slate-400">Sinkronisasi data perkara & pengadilan</p></div>
+                </button>
+
+                <!-- Alat Integrasi Data Spasial -->
+                <div id="adminPanel" class="pt-4 border-t border-slate-700 mt-6 hidden">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Pusat Sinkronisasi Spasial</h3>
+                    <button onclick="document.getElementById('uploadFileShp').click()" class="w-full bg-slate-950 border border-dashed border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 p-4 rounded-xl font-medium text-sm transition-all text-center flex items-center justify-center gap-2">
+                        <i class="fas fa-map-marked-alt"></i> Unggah Paket SHP (.ZIP)
+                    </button>
+                    <input type="file" id="uploadFileShp" accept=".zip" class="hidden" onchange="processShapefileInput(this)">
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- KANVAS UTAMA WEBGIS -->
+    <main class="flex-1 relative bg-slate-950">
+        <div id="map"></div>
+    </main>
+
+    <!-- DIALOG MODAL INPUT DATA ADMINISTRASI -->
+    <div id="formModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4 animate-fade-in">
+        <div class="bg-slate-900 w-full max-w-xl rounded-xl border border-slate-700 shadow-2xl flex flex-col overflow-hidden">
+            <!-- Modal Header -->
+            <div class="p-5 bg-slate-950 border-b border-slate-700 flex justify-between items-center">
+                <div class="flex items-center gap-2 text-amber-500">
+                    <i class="fas fa-edit"></i>
+                    <h3 class="text-lg font-bold text-white" id="modalFormTitle">Form Registrasi Data</h3>
+                </div>
+                <button onclick="triggerCloseModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fas fa-times text-lg"></i></button>
+            </div>
             
-            <!-- Header Atas -->
-            <header class="bg-white shadow-sm p-4 flex justify-between items-center z-10">
-                <h2 id="judul-halaman" class="text-xl font-bold text-gray-800">Dashboard Utama</h2>
-                <div class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full border">
-                    Login sebagai: <span class="font-bold text-emerald-600">Admin</span>
+            <!-- Modal Form Body -->
+            <div class="p-6 space-y-4 overflow-y-auto max-h-[75vh] custom-scrollbar">
+                <!-- Bidang Masukan Atribut Utama -->
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5" id="lblFormDesc">Deskripsi Berkas / Dokumen</label>
+                    <textarea id="formInputPrimaryDesc" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors" placeholder="Tuliskan keterangan lengkap di sini..."></textarea>
                 </div>
-            </header>
 
-            <!-- Container Halaman -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-6">
-
-                <!-- ============================================== -->
-                <!-- HALAMAN 1: DASHBOARD STATISTIK & KONEKSI       -->
-                <!-- ============================================== -->
-                <div id="halaman-dashboard" class="halaman-konten block">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-blue-500">
-                            <div class="text-sm text-gray-500 uppercase font-semibold">Total Berkas PTSL</div>
-                            <div class="text-3xl font-bold text-gray-800 mt-2" id="stat-ptsl">...</div>
-                        </div>
-                        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-green-500">
-                            <div class="text-sm text-gray-500 uppercase font-semibold">Total Redistribusi</div>
-                            <div class="text-3xl font-bold text-gray-800 mt-2" id="stat-redis">...</div>
-                        </div>
-                        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-orange-500">
-                            <div class="text-sm text-gray-500 uppercase font-semibold">Pengadaan Tanah</div>
-                            <div class="text-3xl font-bold text-gray-800 mt-2" id="stat-pengadaan">...</div>
-                        </div>
-                        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-red-500">
-                            <div class="text-sm text-gray-500 uppercase font-semibold">Kasus Sengketa</div>
-                            <div class="text-3xl font-bold text-gray-800 mt-2" id="stat-sengketa">...</div>
-                        </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Kode Desa / Kelurahan</label>
+                        <input type="text" id="formInputDesa" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors" placeholder="Ex: 32.01.04.1001">
                     </div>
-
-                    <div class="bg-white rounded-lg shadow p-5">
-                        <h3 class="text-lg font-bold border-b pb-2 mb-4 text-gray-800">Informasi Koneksi Antar Kanal</h3>
-                        <ul class="space-y-3" id="list-koneksi-dashboard">
-                            <li class="flex items-center text-gray-600">
-                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                Memuat data koneksi...
-                            </li>
-                        </ul>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Nomor Identifikasi Bidang (NIB)</label>
+                        <input type="text" id="formInputNib" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors" placeholder="Ex: 09402">
                     </div>
                 </div>
 
-                <!-- ============================================== -->
-                <!-- HALAMAN 2: TABEL KANAL                         -->
-                <!-- ============================================== -->
-                <div id="halaman-tabel-kanal" class="halaman-konten hidden">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-gray-800" id="nama-kanal-aktif">Data Kanal</h3>
-                        <!-- Tombol Tambah Data -->
-                        <button onclick="tambahDataBaru()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded shadow flex items-center transition">
-                            <span class="mr-2 text-xl font-bold">+</span> Tambah Data
-                        </button>
+                <!-- Bagian Opsional (Khusus untuk PPS atau Administrasi Lanjutan) -->
+                <div id="additionalFields" class="grid grid-cols-2 gap-4 hidden">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Nomor Perkara / Dokumen</label>
+                        <input type="text" id="formInputOpsionalNo" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors" placeholder="Ex: 124/Pdt.G/2026/PN">
                     </div>
-                    
-                    <div class="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-                        <table class="min-w-full text-left border-collapse">
-                            <thead class="bg-slate-100 text-slate-700">
-                                <tr>
-                                    <th class="py-3 px-4 border-b font-semibold">ID / NIB</th>
-                                    <th class="py-3 px-4 border-b font-semibold">Nama Pemohon</th>
-                                    <th class="py-3 px-4 border-b font-semibold">Status Berkas</th>
-                                    <th class="py-3 px-4 border-b font-semibold text-center">Aksi / Tindakan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabel-body-kanal" class="text-gray-600 divide-y divide-gray-200">
-                                <!-- Data Tabel Dimuat Melalui JS -->
-                            </tbody>
-                        </table>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Pihak Bersengketa / Pelapor</label>
+                        <input type="text" id="formInputOpsionalPihak" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors" placeholder="Ex: PT. A vs Sdr. B">
                     </div>
                 </div>
 
-                <!-- ============================================== -->
-                <!-- HALAMAN 3: PETA WEBGIS                         -->
-                <!-- ============================================== -->
-                <div id="halaman-peta" class="halaman-konten hidden h-full min-h-[500px] flex flex-col">
-                    <div class="bg-white p-3 rounded-lg shadow flex-1 flex flex-col border border-gray-200">
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="font-bold text-gray-800">Peta Persebaran Bidang Tanah Master</h3>
-                            <button onclick="sinkronisasiDataSHP()" class="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow transition">
-                                🔄 Sinkronisasi Data SHP
-                            </button>
-                        </div>
-                        <!-- Container Peta (Tinggi Fleksibel) -->
-                        <div id="map" class="flex-1 rounded border border-gray-300 w-full z-0"></div>
+                <!-- Unggah Dokumen Digital Sebagai Bukti Fisik -->
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Dokumen Warkah Digital (PDF)</label>
+                    <div class="border-2 border-dashed border-slate-700 bg-slate-950 rounded-lg p-5 text-center hover:border-slate-500 transition-all cursor-pointer relative" onclick="document.getElementById('formFileNative').click()">
+                        <i class="fas fa-file-pdf text-3xl text-slate-500 mb-2 block" id="fileStatusIcon"></i>
+                        <span class="text-sm font-medium text-slate-300 block" id="lblFileNameDisplay">Pilih dokumen resmi dari komputer Anda</span>
+                        <span class="text-xs text-slate-500 block mt-1">Maksimal ukuran file: 15MB</span>
+                        <input type="file" id="formFileNative" class="hidden" accept=".pdf">
                     </div>
                 </div>
+            </div>
 
-            </main>
+            <!-- Modal Footer Controls -->
+            <div class="p-4 bg-slate-950 border-t border-slate-700 flex justify-end gap-3">
+                <button onclick="triggerCloseModal()" class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors">Batal</button>
+                <button onclick="executeSubmissionData()" class="px-5 py-2 text-sm font-bold bg-amber-500 text-slate-950 rounded-lg hover:bg-amber-400 transition-all shadow-md shadow-amber-500/10">Validasi & Kirim</button>
+            </div>
         </div>
     </div>
 
-    <!-- ========================================================== -->
-    <!-- SCRIPT LOGIKA APLIKASI                                     -->
-    <!-- ========================================================== -->
+    <!-- SCRIPT LOGIC ENGINE INTEGRATION -->
     <script>
-        // ---------------------------------------------------------
-        // 1. KONFIGURASI KONEKSI (Supabase & Google Apps Script)
-        // ---------------------------------------------------------
-        const CONFIG_SUPABASE_URL = "https://MASUKKAN_URL_SUPABASE_ANDA.supabase.co"; 
-        const CONFIG_SUPABASE_KEY = "sb_publishable_RIPbaAwHEdGTv5V1826ZMA_NQIjQ52f"; 
-        const CONFIG_GAS_ENGINE_URL = "https://script.google.com/macros/s/MASUKKAN_ID_WEB_APP_GAS_ANDA/exec";
+        // =========================================================================
+        // 1. ENDPOINT CONFIGURATION & INITIALIZATION
+        // =========================================================================
+        const CONFIG_SUPABASE_URL = "https://lnmypoqzhzbwcyhuvuqg.supabase.co";
+        const CONFIG_SUPABASE_KEY = "sb_publishable_RIPbaAwHEdGTv5V1826ZMA_NQIjQ52f";
+        const CONFIG_GAS_ENGINE_URL = "https://script.google.com/macros/s/AKfycbwEmOpVMoRa3BoI6jpPmmv9J7E9K45ovAxYpMpCVA2tTMo1ytzA7WwX7gp4kmFLvheB/exec";
 
-        // Inisialisasi Klien Supabase
         const supabaseClient = supabase.createClient(CONFIG_SUPABASE_URL, CONFIG_SUPABASE_KEY);
+        let appCurrentActiveKanal = "";
+        let appAuthenticatedUserSession = null;
 
-        // ---------------------------------------------------------
-        // 2. INISIALISASI PETA LEAFLET
-        // ---------------------------------------------------------
-        const map = L.map('map').setView([-2.5489, 118.0149], 5);
+        // =========================================================================
+        // 2. CORE WEBGIS COMPONENT ENGINE (LEAFLET)
+        // =========================================================================
+        const mapObject = L.map('map', { zoomControl: false }).setView([-6.2000, 106.8166], 11); 
         
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap - SIMAPS'
-        }).addTo(map);
+        // Pilihan Layer Peta Satelit Satuan Kerja Internasional (Google Hybrid Stack)
+        L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+            maxZoom: 22,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '© ATR/BPN | Google Maps Imagery'
+        }).addTo(mapObject);
+        L.control.zoom({ position: 'bottomright' }).addTo(mapObject);
 
-        const layerGroupMasterBidang = L.geoJSON(null, {
-            style: function (feature) {
-                return { color: "#ff7800", weight: 2, opacity: 1, fillOpacity: 0.4 };
-            },
-            onEachFeature: function (feature, layer) {
-                const props = feature.properties;
-                let popupContent = `<b>Data Bidang Tanah</b><br>
-                                    NIB: ${props.nib || '-'}<br>
-                                    Desa: ${props.kode_desa || '-'}<br>
-                                    No Hak: ${props.no_hak || '-'}`;
-                layer.bindPopup(popupContent);
+        let layerGroupMasterBidang = L.geoJSON(null, {
+            style: { color: '#e2e8f0', weight: 1.5, fillColor: '#334155', fillOpacity: 0.35 },
+            onEachFeature: function(feature, layer) {
+                if (feature.properties) {
+                    layer.bindPopup(`
+                        <div class="text-slate-900 p-2 font-sans">
+                            <h4 class="font-bold border-b border-slate-200 pb-1 text-sm">Bidang Tanah BPN</h4>
+                            <table class="text-xs mt-2 w-full">
+                                <tr><td class="font-semibold pr-2">NIB:</td><td>${feature.properties.nib || '-'}</td></tr>
+                                <tr><td class="font-semibold pr-2">Desa:</td><td>${feature.properties.kode_desa || '-'}</td></tr>
+                            </table>
+                        </div>
+                    `);
+                }
             }
-        }).addTo(map);
+        }).addTo(mapObject);
 
-        // ---------------------------------------------------------
-        // 3. LOGIKA NAVIGASI HALAMAN & SIDEBAR
-        // ---------------------------------------------------------
-        
-        // Memastikan Tampilan Awal Adalah Dashboard (Sesuai Permintaan)
-        window.onload = () => {
-            bukaHalaman('dashboard'); 
-        };
+        // =========================================================================
+        // 3. ENGINE SEKURITI & VALIDASI PERAN (RBAC)
+        // =========================================================================
+        async function handleLogin() {
+            const email = document.getElementById('txtEmail').value;
+            const password = document.getElementById('txtPassword').value;
 
-        function bukaHalaman(idHalaman) {
-            // Sembunyikan semua section yang memiliki kelas .halaman-konten
-            document.querySelectorAll('.halaman-konten').forEach(el => el.classList.add('hidden'));
+            if(!email || !password) return Swal.fire("Perhatian", "Kredensial wajib diisi!", "warning");
+
+            Swal.fire({ title: 'Melakukan Autentikasi...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (authError) return Swal.fire("Gagal Masuk", authError.message, "error");
+
+            const { data: rbacData, error: rbacError } = await supabaseClient
+                .from('user_roles')
+                .select('*')
+                .eq('id', authData.user.id)
+                .single();
+
+            if (rbacError || !rbacData) {
+                return Swal.fire("Akses Ditolak", "Konfigurasi hak akses (user_roles) belum didaftarkan di DB.", "error");
+            }
+
+            appAuthenticatedUserSession = rbacData;
+            renderSecuredWorkspace();
+            Swal.close();
+        }
+
+        function renderSecuredWorkspace() {
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('workspaceSection').classList.remove('hidden');
+            document.getElementById('btnLogout').classList.remove('hidden');
             
-            if(idHalaman === 'dashboard') {
-                document.getElementById('halaman-dashboard').classList.remove('hidden');
-                document.getElementById('judul-halaman').innerText = "Dashboard Statistik Kanal";
-                muatStatistikDashboard();
-            } else if (idHalaman === 'peta') {
-                document.getElementById('halaman-peta').classList.remove('hidden');
-                document.getElementById('judul-halaman').innerText = "WebGIS SIMAPS";
-                
-                setTimeout(() => {
-                    map.invalidateSize();
-                    fetchAndRenderSpatialMaster(); 
-                }, 400);
+            document.getElementById('lblUserEmail').innerText = appAuthenticatedUserSession.email;
+            document.getElementById('lblUserRole').innerText = `${appAuthenticatedUserSession.role.toUpperCase()} - CANAL: ${appAuthenticatedUserSession.akses_kanal.toUpperCase()}`;
+
+            const userKanal = appAuthenticatedUserSession.akses_kanal;
+            const isAdmin = appAuthenticatedUserSession.role === 'admin';
+
+            if (userKanal === 'all' || userKanal === 'surat_sp' || isAdmin) document.getElementById('node_surat_sp').classList.remove('hidden');
+            if (userKanal === 'all' || userKanal === 'aduan' || isAdmin) document.getElementById('node_aduan').classList.remove('hidden');
+            if (userKanal === 'all' || userKanal === 'masalah_sp' || isAdmin) document.getElementById('node_masalah_sp').classList.remove('hidden');
+            if (userKanal === 'all' || userKanal === 'masalah_pps' || isAdmin) document.getElementById('node_masalah_pps').classList.remove('hidden');
+            if (isAdmin) document.getElementById('adminPanel').classList.remove('hidden');
+
+            fetchAndRenderSpatialMaster();
+        }
+
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+
+        // =========================================================================
+        // 4. MESIN DETEKSI SILANG DOKUMEN & IRISAN (CROSS-REF VALIDATION)
+        // =========================================================================
+        async function runCrossReferenceDetection(kodeDesa, nib) {
+            const { data, error } = await supabaseClient.rpc('cek_riwayat_bidang', {
+                p_kode_desa: kodeDesa,
+                p_nib: nib,
+                p_no_hak: null,
+                p_no_su: null
+            });
+
+            if (error) {
+                console.error("Deteksi silang error:", error);
+                return true; 
+            }
+
+            if (data && data.length > 0) {
+                let alertHtml = `
+                    <div class="text-left text-xs bg-slate-900 text-slate-100 p-3 rounded-lg border border-slate-700 max-h-48 overflow-y-auto custom-scrollbar">
+                        <p class="font-bold text-amber-400 mb-2"><i class="fas fa-exclamation-triangle"></i> Ditemukan ${data.length} Histori Kasus Terkait:</p>
+                        <ul class="space-y-1.5 divide-y divide-slate-800">
+                `;
+                data.forEach((item, index) => {
+                    alertHtml += `<li class="pt-1.5"><span class="font-bold text-rose-400">[${item.kanal_sumber}]</span>: ${item.informasi_tambahan}</li>`;
+                });
+                alertHtml += `</ul></div><p class="text-xs text-slate-400 mt-3 text-center">Apakah Anda ingin tetap mengabaikan sistem pengaman dan mendaftarkan data baru?</p>`;
+
+                const modalConfirmation = await Swal.fire({
+                    title: 'Sinyal Bahaya Spasial!',
+                    html: alertHtml,
+                    icon: 'warning',
+                    background: '#1e293b',
+                    color: '#f8fafc',
+                    showCancelButton: true,
+                    confirmButtonColor: '#f59e0b',
+                    cancelButtonColor: '#475569',
+                    confirmButtonText: 'Ya, bypass system',
+                    cancelButtonText: 'Batalkan Registrasi'
+                });
+                return modalConfirmation.isConfirmed;
+            }
+            return true;
+        }
+
+        // =========================================================================
+        // 5. INTERFACES CONTROL WORKFLOW (MODAL & FORMS)
+        // =========================================================================
+        function triggerOpenModal(kanal) {
+            appCurrentActiveKanal = kanal;
+            resetModalFields();
+            
+            document.getElementById('modalFormTitle').innerText = `INPUT DOKUMEN BARU: KANAL ${kanal.toUpperCase()}`;
+            document.getElementById('additionalFields').classList.add('hidden');
+            
+            if (kanal === 'masalah_pps') {
+                document.getElementById('additionalFields').classList.remove('hidden');
+            }
+            document.getElementById('formModal').classList.remove('hidden');
+        }
+
+        function triggerCloseModal() {
+            document.getElementById('formModal').classList.add('hidden');
+        }
+
+        function resetModalFields() {
+            document.getElementById('formInputPrimaryDesc').value = "";
+            document.getElementById('formInputDesa').value = "";
+            document.getElementById('formInputNib').value = "";
+            document.getElementById('formInputOpsionalNo').value = "";
+            document.getElementById('formInputOpsionalPihak').value = "";
+            document.getElementById('formFileNative').value = "";
+            document.getElementById('lblFileNameDisplay').innerText = "Pilih dokumen resmi dari komputer Anda";
+            document.getElementById('fileStatusIcon').className = "fas fa-file-pdf text-3xl text-slate-500 mb-2 block";
+        }
+
+        document.getElementById('formFileNative').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                document.getElementById('lblFileNameDisplay').innerText = e.target.files[0].name;
+                document.getElementById('fileStatusIcon').className = "fas fa-file-pdf text-3xl text-emerald-400 mb-2 block";
+            }
+        });
+
+        // =========================================================================
+        // 6. PIPELINE UNGGAH FILE & PENYIMPANAN DATA UTUH (ONE-TO-MANY INSERTION)
+        // =========================================================================
+        async function executeSubmissionData() {
+            const txtPrimaryDesc = document.getElementById('formInputPrimaryDesc').value;
+            const txtDesa = document.getElementById('formInputDesa').value;
+            const txtNib = document.getElementById('formInputNib').value;
+            const fileElement = document.getElementById('formFileNative').files[0];
+
+            if (!txtPrimaryDesc || !txtDesa || !txtNib) {
+                return Swal.fire("Kesalahan Input", "Bidang utama (Deskripsi, Desa, NIB) tidak boleh kosong.", "error");
+            }
+
+            // Jalankan Mesin Deteksi Spasial Terlebih Dahulu
+            const isCleared = await runCrossReferenceDetection(txtDesa, txtNib);
+            if (!isCleared) return;
+
+            Swal.fire({ title: 'Memproses Berkas...', text:'Sedang mengunggah dokumen bukti warkah ke cloud storage...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            let uploadedFileUrl = "";
+            if (fileElement) {
+                try {
+                    const base64Content = await convertFileToBase64(fileElement);
+                    const cloudResponse = await fetch(CONFIG_GAS_ENGINE_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            fileName: `${Date.now()}_${fileElement.name}`,
+                            mimeType: fileElement.type,
+                            fileBase64: base64Content.split(',')[1]
+                        })
+                    });
+                    const cloudResult = await cloudResponse.json();
+                    if (cloudResult.status === 'success') {
+                        uploadedFileUrl = cloudResult.fileUrl;
+                    } else {
+                        throw new Error(cloudResult.message);
+                    }
+                } catch (err) {
+                    return Swal.fire("Gagal Unggah Berkas", "Sistem penyimpanan Google Drive bermasalah: " + err.message, "error");
+                }
+            }
+
+            // Eksekusi Pemetaan Relasi One-to-Many ke Dalam Kanal Tabel
+            try {
+                if (appCurrentActiveKanal === 'surat') {
+                    const { data: mainRow, error: mainErr } = await supabaseClient.from('surat_masuk_sp').insert([
+                        { perihal: txtPrimaryDesc, link_arsip: uploadedFileUrl }
+                    ]).select().single();
+                    if(mainErr) throw mainErr;
+
+                    await supabaseClient.from('detail_surat_sp').insert([
+                        { id_surat: mainRow.id_surat, kode_desa: txtDesa, nib: txtNib }
+                    ]);
+
+                } else if (appCurrentActiveKanal === 'aduan') {
+                    const { data: mainRow, error: mainErr } = await supabaseClient.from('aduan_masyarakat').insert([
+                        { isi_laporan: txtPrimaryDesc, link_arsip: uploadedFileUrl }
+                    ]).select().single();
+                    if(mainErr) throw mainErr;
+
+                    await supabaseClient.from('detail_aduan').insert([
+                        { id_aduan: mainRow.id_aduan, kode_desa: txtDesa, nib: txtNib }
+                    ]);
+
+                } else if (appCurrentActiveKanal === 'masalah_sp') {
+                    const { data: mainRow, error: mainErr } = await supabaseClient.from('masalah_sp').insert([
+                        { deskripsi_permasalahan: txtPrimaryDesc, link_arsip: uploadedFileUrl }
+                    ]).select().single();
+                    if(mainErr) throw mainErr;
+
+                    await supabaseClient.from('detail_masalah_sp').insert([
+                        { id_masalah_sp: mainRow.id_masalah_sp, kode_desa: txtDesa, nib: txtNib }
+                    ]);
+
+                } else if (appCurrentActiveKanal === 'masalah_pps') {
+                    const noPerkara = document.getElementById('formInputOpsionalNo').value;
+                    const pihakSengketa = document.getElementById('formInputOpsionalPihak').value;
+
+                    const { data: mainRow, error: mainErr } = await supabaseClient.from('masalah_pps').insert([
+                        { deskripsi_permasalahan: txtPrimaryDesc, nomor_perkara: noPerkara, pihak_bersengketa: pihakSengketa, link_arsip: uploadedFileUrl }
+                    ]).select().single();
+                    if(mainErr) throw mainErr;
+
+                    await supabaseClient.from('detail_masalah_pps').insert([
+                        { id_masalah_pps: mainRow.id_masalah_pps, kode_desa: txtDesa, nib: txtNib }
+                    ]);
+                }
+
+                Swal.fire("Berhasil", "Data administrasi dan deteksi spasial berhasil diselaraskan.", "success");
+                triggerCloseModal();
+            } catch(dbErr) {
+                Swal.fire("Gagal Sinkronisasi DB", dbErr.message, "error");
             }
         }
 
-        let kanalAktifSekarang = "";
+        // =========================================================================
+        // 7. CLIENT SIDE SHAPEFILE PROCESSING (FITUR UPDATE SHP DI BROWSER)
+        // =========================================================================
+        async function processShapefileInput(element) {
+            const file = element.files[0];
+            if (!file) return;
 
-        function bukaKanal(namaKanal) {
-            kanalAktifSekarang = namaKanal;
-            
-            // Sembunyikan dashboard, tampilkan tabel
-            document.querySelectorAll('.halaman-konten').forEach(el => el.classList.add('hidden'));
-            document.getElementById('halaman-tabel-kanal').classList.remove('hidden');
-            
-            document.getElementById('judul-halaman').innerText = `Manajemen Kanal: ${namaKanal}`;
-            document.getElementById('nama-kanal-aktif').innerText = `Daftar Berkas - ${namaKanal}`;
-            
-            muatDataTabel(namaKanal);
-        }
+            Swal.fire({ title: 'Mengekstrak Data Spasial...', text: 'Mengonversi koordinat proyeksi peta secara lokal di browser...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-        // ---------------------------------------------------------
-        // 4. FUNGSI MEMUAT DATA (TABEL & DASHBOARD)
-        // ---------------------------------------------------------
-        async function muatDataTabel(namaKanal) {
-            const tbody = document.getElementById('tabel-body-kanal');
-            tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-gray-500">Memuat data tabel untuk kanal ${namaKanal}...</td></tr>`;
-            
-            // Simulasi pengambilan data per kanal
-            setTimeout(() => {
-                const dummyData = [
-                    { id: "12345", pemohon: "Budi Santoso", status: "Pemberkasan" },
-                    { id: "12346", pemohon: "Siti Aminah", status: "Pengukuran" },
-                    { id: "12347", pemohon: "Ahmad Dahlan", status: "Penerbitan SK" }
-                ];
-
-                tbody.innerHTML = "";
-                dummyData.forEach(item => {
-                    const tr = document.createElement('tr');
-                    tr.classList.add("hover:bg-slate-50", "transition");
+            const arrayBufferReader = new FileReader();
+            arrayBufferReader.onload = async function(e) {
+                try {
+                    // Konversi arsip zip SHP ke format GeoJSON standard langsung di browser klien
+                    const singleGeoJsonParsed = await shp(e.target.result);
                     
-                    // Membuat struktur baris dan tombol aksi masing-masing (Sesuai Permintaan)
-                    tr.innerHTML = `
-                        <td class="py-3 px-4 font-medium text-gray-700">${item.id}</td>
-                        <td class="py-3 px-4">${item.pemohon}</td>
-                        <td class="py-3 px-4"><span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full border border-yellow-200 font-semibold">${item.status}</span></td>
-                        <td class="py-3 px-4 text-center space-x-1">
-                            <button onclick="editData('${item.id}')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 px-3 py-1 rounded text-sm transition">✏️ Edit</button>
-                            <button onclick="tindakLanjut('${item.id}')" class="bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-200 px-3 py-1 rounded text-sm transition">🔄 Tindak Lanjut</button>
-                            <button onclick="infoKoneksi('${item.id}')" class="bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-200 px-3 py-1 rounded text-sm transition">🔗 Koneksi Lintas Kanal</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }, 600);
+                    layerGroupMasterBidang.clearLayers();
+                    layerGroupMasterBidang.addData(singleGeoJsonParsed);
+                    mapObject.fitBounds(layerGroupMasterBidang.getBounds());
+
+                    const totalFeaturesParsed = singleGeoJsonParsed.features ? singleGeoJsonParsed.features.length : 1;
+
+                    const userConfirmation = await Swal.fire({
+                        title: 'Validasi Geometri Berhasil',
+                        text: `Terbaca ${totalFeaturesParsed} geometri bidang tanah dari berkas SHP. Lakukan proses UPSERT massal ke database?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Sinkronkan Data Spasial'
+                    });
+
+                    if (userConfirmation.isConfirmed) {
+                        Swal.fire({ title: 'Mengunggah Geometri...', text:'Mentransfer koordinat spasial ke Supabase PostGIS...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                        
+                        const featuresList = Array.isArray(singleGeoJsonParsed) ? singleGeoJsonParsed[0].features : singleGeoJsonParsed.features;
+
+                        for (let feature of featuresList) {
+                            const attrs = feature.properties;
+                            // Pastikan parameter tidak kosong agar tidak merusak konstrain database
+                            if (attrs.kode_desa && attrs.nib) {
+                                await supabaseClient.rpc('upsert_bidang_geojson', {
+                                    p_kode_desa: String(attrs.kode_desa),
+                                    p_nib: String(attrs.nib),
+                                    p_no_hak: attrs.no_hak ? String(attrs.no_hak) : null,
+                                    p_no_su: attrs.no_su ? String(attrs.no_su) : null,
+                                    p_geojson: JSON.stringify(feature.geometry)
+                                });
+                            }
+                        }
+                        Swal.fire("Sinkronisasi Selesai", "Master Data Spasial berhasil diperbarui.", "success");
+                        fetchAndRenderSpatialMaster();
+                    }
+                } catch(err) {
+                    Swal.fire("Gagal Membaca SHP", "Pastikan file ZIP berisi ekstensi file .shp, .shx, dan .dbf", "error");
+                }
+            };
+            arrayBufferReader.readAsArrayBuffer(file);
         }
 
-        async function muatStatistikDashboard() {
-            // Pengisian nilai statistik tiap kanal
-            document.getElementById('stat-ptsl').innerText = "1,245";
-            document.getElementById('stat-redis').innerText = "320";
-            document.getElementById('stat-pengadaan').innerText = "84";
-            document.getElementById('stat-sengketa').innerText = "12";
-
-            // Pengisian informasi koneksi/tumpang tindih antar kanal
-            document.getElementById('list-koneksi-dashboard').innerHTML = `
-                <li class="flex items-center text-gray-700 bg-slate-50 p-2 rounded border border-slate-100">
-                    <span class="w-3 h-3 bg-red-500 rounded-full mr-3 shadow"></span> 
-                    <b>15 Bidang PTSL</b>&nbsp;terdeteksi tumpang tindih dengan data Sengketa aktif.
-                </li>
-                <li class="flex items-center text-gray-700 bg-slate-50 p-2 rounded border border-slate-100 mt-2">
-                    <span class="w-3 h-3 bg-blue-500 rounded-full mr-3 shadow"></span> 
-                    <b>3 Bidang Redistribusi</b>&nbsp;terhubung dengan Riwayat Pengadaan Tanah.
-                </li>
-            `;
-        }
-
-        // ---------------------------------------------------------
-        // 5. FUNGSI TOMBOL AKSI TABEL
-        // ---------------------------------------------------------
-        function tambahDataBaru() {
-            alert(`Menampilkan Form Input Data Baru untuk kanal: [${kanalAktifSekarang}]`);
-        }
-
-        function editData(idData) {
-            alert(`Membuka menu Edit untuk berkas ID: ${idData}`);
-        }
-
-        function tindakLanjut(idData) {
-            alert(`Menjalankan Tindak Lanjut / Update Status untuk berkas ID: ${idData}`);
-        }
-
-        function infoKoneksi(idData) {
-            alert(`Menampilkan Informasi Koneksi: Mengecek riwayat dan keterkaitan ID ${idData} dengan kanal operasional lainnya...`);
-        }
-
-        // ---------------------------------------------------------
-        // 6. FUNGSI WEBGIS & DATABASE SPASIAL (FIX GEOJSON)
-        // ---------------------------------------------------------
-        function sinkronisasiDataSHP() {
-            const btn = document.querySelector('button[onclick="sinkronisasiDataSHP()"]');
-            btn.innerHTML = "⏳ Sinkronisasi Berjalan...";
-            btn.classList.add("opacity-50", "cursor-not-allowed");
-            
-            alert("Memulai sinkronisasi! Sistem akan membaca file di Google Drive dan memindahkannya ke Supabase. Mohon tunggu notifikasi selanjutnya.");
-
-            fetch(CONFIG_GAS_ENGINE_URL)
-                .then(response => response.json())
-                .then(result => {
-                    btn.innerHTML = "🔄 Sinkronisasi Data SHP";
-                    btn.classList.remove("opacity-50", "cursor-not-allowed");
-                    alert("Sinkronisasi Selesai: " + result.message);
-                    fetchAndRenderSpatialMaster(); 
-                })
-                .catch(error => {
-                    btn.innerHTML = "🔄 Sinkronisasi Data SHP";
-                    btn.classList.remove("opacity-50", "cursor-not-allowed");
-                    alert("Gagal melakukan sinkronisasi. Cek console browser.");
-                    console.error(error);
-                });
-        }
-
+        // =========================================================================
+        // 8. DATA RETRIEVAL ENGINE FOR VISUALS (POSTGIS TO GEOJSON MAP)
+        // =========================================================================
         async function fetchAndRenderSpatialMaster() {
+            // 1. Panggil fungsi RPC yang baru kita buat agar format koordinatnya sesuai
             const { data, error } = await supabaseClient.rpc('ambil_master_bidang_geojson');
             
             if (error) {
@@ -329,11 +525,7 @@
                 return;
             }
 
-            if (!data || data.length === 0) {
-                console.log("Belum ada data bidang tanah di tabel master_bidang_tanah.");
-                return;
-            }
-
+            // 2. Susun ulang struktur datanya menjadi format GeoJSON murni
             const compiledGeoJsonStructure = {
                 type: "FeatureCollection",
                 features: data.map(item => ({
@@ -345,17 +537,22 @@
                         no_hak: item.no_hak, 
                         no_su: item.no_su 
                     },
-                    geometry: item.geom_json 
+                    geometry: item.geom_json // Sekarang nilainya sudah berupa objek GeoJSON murni
                 }))
             };
 
+            // 3. Bersihkan sisa renderan lama dan gambar bidang tanah yang baru
             layerGroupMasterBidang.clearLayers();
             layerGroupMasterBidang.addData(compiledGeoJsonStructure);
-            
-            if (layerGroupMasterBidang.getLayers().length > 0) {
-                map.fitBounds(layerGroupMasterBidang.getBounds(), { padding: [50, 50] });
-            }
         }
+
+        // Helper global untuk konversi biner ke string Base64
+        const convertFileToBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
     </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GRID SP | Geospatial Risk and Integrated Data</title>
+    <title>SIMAPS | Kantor Pertanahan Nasional Spatial Control Center</title>
     
     <!-- Enterprise Assets & Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -120,9 +120,8 @@
                     BPN
                 </div>
                 <div>
-                    <h1 class="text-md font-extrabold tracking-tight text-slate-900 leading-tight">GRID SP</h1>
-                    <p class="text-[11px] font-medium text-slate-500">Geospatial Risk and Integrated Data</p>
-                    <p class="text-[11px] font-medium text-slate-500">Seksi Survei dan Pemetaan Kantah Badung</p>
+                    <h1 class="text-md font-extrabold tracking-tight text-slate-900 leading-tight">SIMAPS v2.5</h1>
+                    <p class="text-[11px] font-medium text-slate-500">Spatial Control & Monitor</p>
                 </div>
             </div>
             <button onclick="handleLogout()" id="btnLogout" class="hidden text-slate-400 hover:text-rose-600 p-2 rounded-xl hover:bg-rose-500/10 transition-all duration-300">
@@ -137,16 +136,16 @@
                     <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
                         <i class="fas fa-key text-amber-500 text-sm"></i> Secure Gateway
                     </h2>
-                    <p class="text-[11px] text-slate-500 mt-0.5">Seksi Survei dan Pemetaan</p>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Ekosistem administrasi internal ATR/BPN.</p>
                 </div>
                 
                 <div class="space-y-3.5">
                     <div>
-                        <label class="text-[10px] font-bold text-slate-600 tracking-wider block mb-1">Email Pengguna</label>
+                        <label class="text-[10px] font-bold text-slate-600 uppercase tracking-wider block mb-1">Email Dinas</label>
                         <input type="email" id="txtEmail" placeholder="nama@bpn.go.id" class="w-full bg-white/60 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all">
                     </div>
                     <div>
-                        <label class="text-[10px] font-bold text-slate-600 uppercase tracking-wider block mb-1">Kata Sandi</label>
+                        <label class="text-[10px] font-bold text-slate-600 uppercase tracking-wider block mb-1">Password</label>
                         <input type="password" id="txtPassword" placeholder="••••••••" class="w-full bg-white/60 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all">
                     </div>
                     <button onclick="handleLogin()" class="w-full bg-slate-900 text-white font-bold p-2.5 rounded-xl hover:bg-slate-800 active:scale-[0.98] transition-all shadow-md shadow-slate-900/10 mt-2 text-xs tracking-wide">
@@ -164,7 +163,7 @@
                     <i class="fas fa-user-shield text-xs"></i>
                 </div>
                 <div class="overflow-hidden">
-                    <p class="text-xs font-bold text-slate-900 truncate" id="lblUserEmail">staf@atrbpn.go.id</p>
+                    <p class="text-xs font-bold text-slate-900 truncate" id="lblUserEmail">staf@bpn.go.id</p>
                     <span id="lblUserRole" class="inline-block text-[9px] uppercase font-extrabold tracking-widest bg-emerald-600/10 text-emerald-700 px-1.5 py-0.5 rounded-md border border-emerald-500/20 mt-0.5">Staf Utama</span>
                 </div>
             </div>
@@ -183,33 +182,33 @@
                     Peta Spasial WebGIS
                 </button>
 
-                <h3 class="text-[10px] font-extrabold text-slate-400  tracking-widest px-2 mb-1 pt-4">Kanal Monitoring</h3>
+                <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2 mb-1 pt-4">Kanal Monitoring</h3>
                 
                 <button id="node_surat_sp" onclick="switchView('table', 'surat')" class="hidden w-full text-left p-3 hover:bg-white/50 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40">
                     <i class="fas fa-envelope text-indigo-500 text-sm w-5 text-center"></i>
-                    Manajemen Persuratan SP
+                    Surat Masuk SP
                 </button>
 
                 <button id="node_aduan" onclick="switchView('table', 'aduan')" class="hidden w-full text-left p-3 hover:bg-white/50 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40">
                     <i class="fas fa-bullhorn text-orange-500 text-sm w-5 text-center"></i>
-                    Laporan Mandiri
+                    Aduan Masyarakat
                 </button>
 
                 <button id="node_masalah_sp" onclick="switchView('table', 'masalah_sp')" class="hidden w-full text-left p-3 hover:bg-white/50 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40">
                     <i class="fas fa-folder-open text-rose-500 text-sm w-5 text-center"></i>
-                    Manajemen Risiko Permasalahan SP
+                    Masalah Internal
                 </button>
 
                 <button id="node_masalah_pps" onclick="switchView('table', 'masalah_pps')" class="hidden w-full text-left p-3 hover:bg-white/50 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40">
                     <i class="fas fa-gavel text-violet-500 text-sm w-5 text-center"></i>
-                    Database Sengketa Hukum PPS
+                    Sengketa Hukum PPS
                 </button>
 
                 <!-- Admin Toolset Box -->
                 <div id="adminPanel" class="pt-4 border-t border-white/40 mt-4 hidden">
-                    <h3 class="text-[10px] font-extrabold text-slate-400 tracking-widest px-2 mb-2">Manajemen Data Spasial</h3>
+                    <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2 mb-2">Integrasi Spasial</h3>
                     <button onclick="document.getElementById('uploadFileShp').click()" class="w-full bg-white/40 border border-dashed border-slate-300 text-slate-700 hover:bg-white/70 p-2.5 rounded-xl font-bold text-[11px] transition-all flex items-center justify-center gap-2">
-                        <i class="fas fa-cloud-upload-alt text-slate-500"></i> Update Data Spasial (.zip)
+                        <i class="fas fa-cloud-upload-alt text-slate-500"></i> Unggah File SHP (.zip)
                     </button>
                     <input type="file" id="uploadFileShp" accept=".zip" class="hidden" onchange="processShapefileInput(this)">
                 </div>
@@ -234,7 +233,7 @@
                     <div class="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-600 mb-4 group-hover:scale-110 transition-transform">
                         <i class="fas fa-envelope text-base"></i>
                     </div>
-                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Manajemen Persuratan SP</h4>
+                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Surat Masuk SP</h4>
                     <p class="text-2xl font-black text-slate-900 mt-1" id="stat_surat">...</p>
                     <div class="absolute right-0 bottom-0 translate-x-2 translate-y-2 opacity-5 text-slate-900 text-6xl font-black"><i class="fas fa-envelope"></i></div>
                 </div>
@@ -243,7 +242,7 @@
                     <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-orange-600 mb-4 group-hover:scale-110 transition-transform">
                         <i class="fas fa-bullhorn text-base"></i>
                     </div>
-                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Laporan Mandiri</h4>
+                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Aduan Masyarakat</h4>
                     <p class="text-2xl font-black text-slate-900 mt-1" id="stat_aduan">...</p>
                     <div class="absolute right-0 bottom-0 translate-x-2 translate-y-2 opacity-5 text-slate-900 text-6xl font-black"><i class="fas fa-bullhorn"></i></div>
                 </div>
@@ -252,7 +251,7 @@
                     <div class="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center text-rose-600 mb-4 group-hover:scale-110 transition-transform">
                         <i class="fas fa-folder-open text-base"></i>
                     </div>
-                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Manajemen Risiko Permasalahan SP</h4>
+                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Masalah Internal</h4>
                     <p class="text-2xl font-black text-slate-900 mt-1" id="stat_masalah_sp">...</p>
                     <div class="absolute right-0 bottom-0 translate-x-2 translate-y-2 opacity-5 text-slate-900 text-6xl font-black"><i class="fas fa-folder-open"></i></div>
                 </div>
@@ -261,7 +260,7 @@
                     <div class="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center text-violet-600 mb-4 group-hover:scale-110 transition-transform">
                         <i class="fas fa-gavel text-base"></i>
                     </div>
-                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Database Sengketa Hukum PPS</h4>
+                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Sengketa Hukum PPS</h4>
                     <p class="text-2xl font-black text-slate-900 mt-1" id="stat_masalah_pps">...</p>
                     <div class="absolute right-0 bottom-0 translate-x-2 translate-y-2 opacity-5 text-slate-900 text-6xl font-black"><i class="fas fa-gavel"></i></div>
                 </div>
@@ -354,40 +353,54 @@
             </div>
             
             <!-- Modal Form Body -->
-            <div class="p-6 space-y-4 overflow-y-auto max-h-[70vh] custom-scrollbar">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5" id="lblFormDesc">Deskripsi Berkas / Dokumen</label>
-                    <textarea id="formInputPrimaryDesc" rows="3" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Tulis rincian perihal atau deskripsi kasus secara lengkap..."></textarea>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Kode Desa / Kelurahan</label>
-                        <input type="text" id="formInputDesa" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Contoh: 32.01.04.1001">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nomor Identifikasi Bidang (NIB)</label>
-                        <input type="text" id="formInputNib" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Contoh: 09402">
-                    </div>
-                </div>
-
-                <div id="additionalFields" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nomor Perkara / Dokumen</label>
-                        <input type="text" id="formInputOpsionalNo" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Contoh: 124/Pdt.G/2026/PN">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Pihak Bersengketa / Pelapor</label>
-                        <input type="text" id="formInputOpsionalPihak" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Contoh: PT. Sumber Maju vs Sdr. B">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Dokumen Warkah Digital (PDF)</label>
-                    <div class="border-2 border-dashed border-slate-300 bg-white/40 rounded-xl p-5 text-center hover:bg-white/60 hover:border-slate-400 transition-all cursor-pointer relative" onclick="document.getElementById('formFileNative').click()">
-                        <i class="fas fa-file-pdf text-2xl text-slate-400 mb-2 block" id="fileStatusIcon"></i>
-                        <span class="text-xs font-semibold text-slate-600 block" id="lblFileNameDisplay">Unggah dokumen resmi sistem warkah</span>
+            <div class="p-6 overflow-y-auto max-h-[70vh] custom-scrollbar">
+                
+                <!-- STEP 1: UPLOAD WARKAH TERLEBIH DAHULU -->
+                <div id="step1Upload" class="flex flex-col items-center justify-center py-6">
+                    <p class="text-xs text-slate-500 mb-4 text-center max-w-sm">Tahap 1: Silakan unggah dokumen PDF warkah terlebih dahulu. AI akan membaca dan mengekstrak data secara otomatis.</p>
+                    <div class="w-full border-2 border-dashed border-slate-300 bg-white/40 rounded-xl p-8 text-center hover:bg-white/60 hover:border-amber-400 transition-all cursor-pointer relative group" onclick="document.getElementById('formFileNative').click()">
+                        <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all shadow-sm"><i class="fas fa-cloud-upload-alt text-2xl"></i></div>
+                        <span class="text-sm font-bold text-slate-700 block mb-1">Pilih Dokumen PDF</span>
+                        <span class="text-[10px] text-slate-500 block" id="lblFileNameDisplay">Maksimal ukuran file 10MB</span>
                         <input type="file" id="formFileNative" class="hidden" accept=".pdf">
+                    </div>
+                </div>
+
+                <!-- STEP 2: FORM ISIAN (Muncul setelah upload berhasil) -->
+                <div id="step2Form" class="hidden space-y-4">
+                    <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl flex gap-3 items-start mb-4">
+                        <div class="mt-0.5 text-emerald-500"><i class="fas fa-robot text-sm"></i></div>
+                        <div>
+                            <p class="text-[11px] font-bold text-emerald-800 uppercase tracking-wide">Analisis Selesai</p>
+                            <p class="text-[10px] text-emerald-600 mt-0.5 leading-relaxed">Sistem telah memetakan data dari dokumen. <b>Anda dapat mengedit dan melengkapi data secara manual di bawah ini sebelum menyimpan.</b></p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5" id="lblFormDesc">Deskripsi Berkas / Dokumen</label>
+                        <textarea id="formInputPrimaryDesc" rows="3" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Tulis rincian perihal atau deskripsi kasus secara lengkap..."></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Kode Desa / Kelurahan</label>
+                            <input type="text" id="formInputDesa" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Contoh: 32.01.04.1001">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nomor Identifikasi Bidang (NIB)</label>
+                            <input type="text" id="formInputNib" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Contoh: 09402">
+                        </div>
+                    </div>
+
+                    <div id="additionalFields" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nomor Perkara / Dokumen</label>
+                            <input type="text" id="formInputOpsionalNo" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Contoh: 124/Pdt.G/2026/PN">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Pihak Bersengketa / Pelapor</label>
+                            <input type="text" id="formInputOpsionalPihak" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Contoh: PT. Maju vs Sdr. B">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -395,7 +408,7 @@
             <!-- Modal Footer Buttons -->
             <div class="p-4 bg-white/40 border-t border-white/60 flex justify-end gap-2.5">
                 <button onclick="triggerCloseModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition-all">Batal</button>
-                <button onclick="executeSubmissionData()" class="px-5 py-2 text-xs font-bold bg-slate-900 text-white rounded-xl hover:bg-slate-800 active:scale-[0.98] transition-all shadow-md">Validasi & Kirim</button>
+                <button id="btnSubmitForm" onclick="executeSubmissionData()" class="hidden px-5 py-2 text-xs font-bold bg-slate-900 text-white rounded-xl hover:bg-slate-800 active:scale-[0.98] transition-all shadow-md">Validasi & Kirim</button>
             </div>
         </div>
     </div>
@@ -404,7 +417,7 @@
     <script>
         const CONFIG_SUPABASE_URL = "https://lnmypoqzhzbwcyhuvuqg.supabase.co";
         const CONFIG_SUPABASE_KEY = "sb_publishable_RIPbaAwHEdGTv5V1826ZMA_NQIjQ52f";
-        const CONFIG_GAS_ENGINE_URL = "https://script.google.com/macros/s/AKfycbwEmOpVMoRa3BoI6jpPmmv9J7E9K45ovAxYpMpCVA2tTMo1ytzA7WwX7gp4kmFLvheB/exec";
+        const CONFIG_GAS_ENGINE_URL = "https://script.google.com/macros/s/AKfycbwEmOpVMoRa3BoI6jpPmmv9J7E9K45ovAxYpMpCVA2tTMo1ytzA7WwX7gp4kmFLvheB/exec"; // JANGAN LUPA UPDATE JIKA ADA DEPLOY BARU
 
         const supabaseClient = supabase.createClient(CONFIG_SUPABASE_URL, CONFIG_SUPABASE_KEY);
         let appCurrentActiveKanal = "";
@@ -417,7 +430,6 @@
             document.getElementById('viewTable').classList.add('hidden');
             document.getElementById('viewMap').classList.add('hidden');
 
-            // Reset navigation active state styling
             document.getElementById('btn_nav_dashboard').classList.remove('bg-white/60', 'border-white/40');
             document.getElementById('btn_nav_map').classList.remove('bg-white/60', 'border-white/40');
 
@@ -450,8 +462,8 @@
 
         async function setupTableView(kanal) {
             const tableTitle = {
-                'surat': 'Manajemen Persuratan SP', 'aduan': 'Laporan Mandiri', 
-                'masalah_sp': 'Masalah Spasial Internal', 'masalah_pps': 'Database Sengketa Hukum PPS'
+                'surat': 'Surat Masuk SP', 'aduan': 'Aduan Masyarakat', 
+                'masalah_sp': 'Masalah Spasial Internal', 'masalah_pps': 'Sengketa Hukum PPS'
             };
             document.getElementById('tableTitle').innerText = tableTitle[kanal];
             document.getElementById('tableBody').innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-xl mb-2"></i><br>Sinkronisasi data...</td></tr>`;
@@ -499,7 +511,6 @@
             }
         }
 
-        // Row Operations Action Callbacks
         function actionEdit(id) {
             Swal.fire({ title: "Fitur Sunting", text: "Modul pengeditan data ID #" + id + " sedang disiapkan.", icon: "info", background: "rgba(255,255,255,0.9)", customClass: { popup: 'rounded-2xl border border-white' } });
         }
@@ -529,7 +540,6 @@
             }
         }
 
-        // Map Base Initializer (Leaflet Canvas)
         const mapObject = L.map('map', { zoomControl: false }).setView([-6.2000, 106.8166], 11); 
         L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 22, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '© ATR/BPN | Google Maps WebGIS' }).addTo(mapObject);
         L.control.zoom({ position: 'bottomright' }).addTo(mapObject);
@@ -543,7 +553,6 @@
             }
         }).addTo(mapObject);
 
-        // Security Authentication System
         async function handleLogin() {
             const email = document.getElementById('txtEmail').value;
             const password = document.getElementById('txtPassword').value;
@@ -588,15 +597,26 @@
             window.location.reload();
         }
 
-        // Form Registration Control Flow
+        // ==========================================
+        // ALUR MODAL 2 TAHAP (WIZARD UPLOAD & FORM)
+        // ==========================================
         function triggerOpenModal() {
             if (!appCurrentActiveKanal) return Swal.fire("Peringatan", "Silakan tentukan kanal monitoring terlebih dahulu pada menu navigasi.", "warning");
             
+            // KOSONGKAN SEMUA NILAI FORM
             document.getElementById('formInputPrimaryDesc').value = "";
             document.getElementById('formInputDesa').value = "";
             document.getElementById('formInputNib').value = "";
             document.getElementById('formFileNative').value = "";
-            document.getElementById('lblFileNameDisplay').innerText = "Unggah dokumen resmi sistem warkah";
+            document.getElementById('lblFileNameDisplay').innerText = "Maksimal ukuran file 10MB";
+            
+            if(document.getElementById('formInputOpsionalNo')) document.getElementById('formInputOpsionalNo').value = "";
+            if(document.getElementById('formInputOpsionalPihak')) document.getElementById('formInputOpsionalPihak').value = "";
+            
+            // ATUR TAMPILAN: MUNCULKAN UPLOAD (STEP 1), SEMBUNYIKAN FORM (STEP 2)
+            document.getElementById('step1Upload').classList.remove('hidden');
+            document.getElementById('step2Form').classList.add('hidden');
+            document.getElementById('btnSubmitForm').classList.add('hidden'); 
             
             document.getElementById('modalFormTitle').innerText = `INPUT DOKUMEN BARU: ${appCurrentActiveKanal.toUpperCase()}`;
             document.getElementById('additionalFields').classList.toggle('hidden', appCurrentActiveKanal !== 'masalah_pps');
@@ -605,9 +625,75 @@
 
         function triggerCloseModal() { document.getElementById('formModal').classList.add('hidden'); }
 
-        document.getElementById('formFileNative').addEventListener('change', function(e) {
-            if (e.target.files.length > 0) document.getElementById('lblFileNameDisplay').innerText = e.target.files[0].name;
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        document.getElementById('formFileNative').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            document.getElementById('lblFileNameDisplay').innerText = file.name;
+
+            Swal.fire({ 
+                title: 'Menganalisis Spasial...', 
+                html: 'Mengunggah warkah ke GDrive & memproses AI...<br><br><span style="font-size: 11px; color: #666;">Proses ini membutuhkan waktu 5-10 detik.</span>',
+                allowOutsideClick: false, 
+                didOpen: () => Swal.showLoading() 
+            });
+
+            try {
+                const base64Data = await toBase64(file);
+                
+                const payload = {
+                    fileName: file.name,
+                    mimeType: file.type,
+                    fileBase64: base64Data
+                };
+
+                const response = await fetch(CONFIG_GAS_ENGINE_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.status !== "success") throw new Error(result.message);
+
+                // Auto-Fill Form Modal dari hasil OCR
+                if (result.ocrData) {
+                    document.getElementById('formInputPrimaryDesc').value = result.ocrData.deskripsi || '';
+                    document.getElementById('formInputDesa').value = result.ocrData.kode_desa || '';
+                    document.getElementById('formInputNib').value = result.ocrData.nib || '';
+                }
+
+                // Simpan tautan FOLDER secara global untuk disisipkan ke Supabase
+                window.tempUploadedFileUrl = result.folderUrl; 
+
+                // TRANSISI UI KE STEP 2 (Munculkan Form & Tombol Simpan)
+                document.getElementById('step1Upload').classList.add('hidden');
+                document.getElementById('step2Form').classList.remove('hidden');
+                document.getElementById('btnSubmitForm').classList.remove('hidden');
+
+                Swal.fire({ 
+                    title: "Warkah Diproses!", 
+                    text: "Silakan periksa, edit, dan lengkapi data form di bawah ini sebelum menyimpan.", 
+                    icon: "success"
+                });
+
+            } catch (err) {
+                Swal.fire("Gagal Memproses", err.message, "error");
+                document.getElementById('formFileNative').value = "";
+                document.getElementById('lblFileNameDisplay').innerText = "Pilih Dokumen PDF";
+            }
         });
+
+        // ==========================================
 
         async function runCrossReferenceDetection(kodeDesa, nib) {
             const { data, error } = await supabaseClient.rpc('cek_riwayat_bidang', { p_kode_desa: kodeDesa, p_nib: nib, p_no_hak: null, p_no_su: null });
@@ -631,7 +717,9 @@
             if (!isCleared) return;
 
             Swal.fire({ title: 'Menyimpan Entri...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            let uploadedFileUrl = ""; 
+            
+            // Mengambil URL Folder Drive dari memori sementara
+            let uploadedFileUrl = window.tempUploadedFileUrl || ""; 
             
             try {
                 let mainRow, mainErr;
@@ -653,6 +741,9 @@
 
                 if(mainErr) throw mainErr;
                 
+                // Reset temporary url setelah berhasil disubmit
+                window.tempUploadedFileUrl = ""; 
+
                 Swal.fire({ title: "Berhasil", text: "Data administrasi spasial berhasil diverifikasi dan disimpan.", icon: "success" });
                 triggerCloseModal();
                 setupTableView(appCurrentActiveKanal);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIMAPS | Kantor Pertanahan Nasional Spatial Control Center</title>
+    <title>GRID | Seksi SP Kantah Badung </title>
     
     <!-- Enterprise CSS Framework & Asset Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -34,8 +34,8 @@
                     BPN
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-tight text-white leading-tight">SIMAPS v2.0</h1>
-                    <p class="text-xs text-slate-400">Sistem Administrasi & Masalah Spasial</p>
+                    <h1 class="text-lg font-bold tracking-tight text-white leading-tight">GRID v1.0</h1>
+                    <p class="text-xs text-slate-400">Geospatial Risk and Integrated Data</p>
                 </div>
             </div>
             <button onclick="handleLogout()" id="btnLogout" class="hidden text-slate-400 hover:text-red-400 p-2 rounded-lg transition-colors">
@@ -47,11 +47,11 @@
         <div id="authSection" class="p-6 flex flex-col justify-center flex-1">
             <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-700">
                 <h2 class="text-xl font-bold text-white mb-2">Secure Gateway</h2>
-                <p class="text-xs text-slate-400 mb-6">Masukkan kredensial internal ekosistem ATR/BPN untuk mengakses data spasial.</p>
+                <p class="text-xs text-slate-400 mb-6">Masukkan kredensial untuk mengakses data.</p>
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider block mb-1.5">Email Perusahaan</label>
+                        <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider block mb-1.5">Email Petugas</label>
                         <input type="email" id="txtEmail" placeholder="nama@bpn.go.id" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors">
                     </div>
                     <div>
@@ -73,40 +73,39 @@
                     <i class="fas fa-user-shield"></i>
                 </div>
                 <div class="overflow-hidden">
-                    <p class="text-sm font-semibold text-white truncate" id="lblUserEmail">staf.spasial@bpn.go.id</p>
+                    <p class="text-sm font-semibold text-white truncate" id="lblUserEmail">staf.spasial@atrbpn.go.id</p>
                     <span id="lblUserRole" class="inline-block text-[10px] uppercase font-bold tracking-widest bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 mt-0.5">Staf Utama</span>
                 </div>
             </div>
 
             <!-- Menu Kontrol Saluran (RBAC Terbuka Otomatis) -->
             <div class="p-6 space-y-4 flex-1 overflow-y-auto custom-scrollbar">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Saluran Administrasi Masalah</h3>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Kanal Administrasi</h3>
                 
                 <button id="node_surat_sp" onclick="triggerOpenModal('surat')" class="hidden w-full text-left p-4 bg-slate-900 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-xl transition-all flex items-center gap-4 group">
                     <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg group-hover:bg-blue-500 group-hover:text-slate-950 transition-all"><i class="fas fa-envelope text-lg"></i></div>
-                    <div><h4 class="font-bold text-sm text-white">Surat Masuk SP</h4><p class="text-xs text-slate-400">Pencatatan nota dinas sengketa</p></div>
+                    <div><h4 class="font-bold text-sm text-white">Persuratan SP</h4><p class="text-xs text-slate-400">Manajemen Persuratan Seksi Survei dan Pemetaan</p></div>
+                </button>
+                <button id="node_masalah_sp" onclick="triggerOpenModal('masalah_sp')" class="hidden w-full text-left p-4 bg-slate-900 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-xl transition-all flex items-center gap-4 group">
+                    <div class="p-3 bg-rose-500/10 text-rose-400 rounded-lg group-hover:bg-rose-50 group-hover:text-slate-950 transition-all"><i class="fas fa-folder-open text-lg"></i></div>
+                    <div><h4 class="font-bold text-sm text-white">Persuratan PPS</h4><p class="text-xs text-slate-400">Manajemen Persuratan Seksi PPS</p></div>
                 </button>
 
                 <button id="node_aduan" onclick="triggerOpenModal('aduan')" class="hidden w-full text-left p-4 bg-slate-900 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-xl transition-all flex items-center gap-4 group">
                     <div class="p-3 bg-amber-500/10 text-amber-400 rounded-lg group-hover:bg-amber-500 group-hover:text-slate-950 transition-all"><i class="fas fa-bullhorn text-lg"></i></div>
-                    <div><h4 class="font-bold text-sm text-white">Aduan Masyarakat</h4><p class="text-xs text-slate-400">Laporan tumpang tindih berkas warga</p></div>
-                </button>
-
-                <button id="node_masalah_sp" onclick="triggerOpenModal('masalah_sp')" class="hidden w-full text-left p-4 bg-slate-900 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-xl transition-all flex items-center gap-4 group">
-                    <div class="p-3 bg-rose-500/10 text-rose-400 rounded-lg group-hover:bg-rose-50 group-hover:text-slate-950 transition-all"><i class="fas fa-folder-open text-lg"></i></div>
-                    <div><h4 class="font-bold text-sm text-white">Masalah Spasial Internal</h4><p class="text-xs text-slate-400">Pemberkasan bendel sengketa fisik</p></div>
+                    <div><h4 class="font-bold text-sm text-white">Laporan Mandiri</h4><p class="text-xs text-slate-400">Laporan Mandiri Indikasi Permasalahan</p></div>
                 </button>
 
                 <button id="node_masalah_pps" onclick="triggerOpenModal('masalah_pps')" class="hidden w-full text-left p-4 bg-slate-900 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-xl transition-all flex items-center gap-4 group">
                     <div class="p-3 bg-purple-500/10 text-purple-400 rounded-lg group-hover:bg-purple-500 group-hover:text-slate-950 transition-all"><i class="fas fa-gavel text-lg"></i></div>
-                    <div><h4 class="font-bold text-sm text-white">Kanal Sengketa Hukum PPS</h4><p class="text-xs text-slate-400">Sinkronisasi data perkara & pengadilan</p></div>
+                    <div><h4 class="font-bold text-sm text-white">Kanal Sengketa Hukum </h4><p class="text-xs text-slate-400">>Registrasi dan Pemberkasan Sengketa, Konflik dan Perkara</p></div>
                 </button>
 
                 <!-- Alat Integrasi Data Spasial -->
                 <div id="adminPanel" class="pt-4 border-t border-slate-700 mt-6 hidden">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Pusat Sinkronisasi Spasial</h3>
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Pusat Sinkronisasi Data Spasial</h3>
                     <button onclick="document.getElementById('uploadFileShp').click()" class="w-full bg-slate-950 border border-dashed border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 p-4 rounded-xl font-medium text-sm transition-all text-center flex items-center justify-center gap-2">
-                        <i class="fas fa-map-marked-alt"></i> Unggah Paket SHP (.ZIP)
+                        <i class="fas fa-map-marked-alt"></i> Unggah Data SHP (.ZIP)
                     </button>
                     <input type="file" id="uploadFileShp" accept=".zip" class="hidden" onchange="processShapefileInput(this)">
                 </div>

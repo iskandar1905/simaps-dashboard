@@ -32,7 +32,7 @@
     </script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap');
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -57,7 +57,6 @@
         @keyframes float-blob-reverse { 0% { transform: translate(0px, 0px) scale(1.1); } 100% { transform: translate(-60px, -30px) scale(1); } }
 
         .glass-panel { background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(24px) saturate(190%); -webkit-backdrop-filter: blur(24px) saturate(190%); border: 1px solid rgba(255, 255, 255, 0.65); box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.04); }
-        .glass-panel-dark { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .glass-card-hover { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .glass-card-hover:hover { transform: translateY(-4px); background: rgba(255, 255, 255, 0.6); border-color: rgba(255, 255, 255, 0.9); box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08); }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -84,7 +83,7 @@
             <button onclick="handleLogout()" id="btnLogout" class="hidden text-slate-400 hover:text-rose-600 p-2 rounded-xl hover:bg-rose-500/10 transition-all duration-300"><i class="fas fa-power-off text-sm"></i></button>
         </div>
 
-        <!-- AUTH STATE -->
+        <!-- AUTH SECTION -->
         <div id="authSection" class="p-6 flex flex-col justify-center flex-1">
             <div class="bg-white/40 border border-white/60 p-5 rounded-2xl shadow-sm">
                 <div class="mb-4">
@@ -123,8 +122,8 @@
                 <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2 mb-1 pt-4">Kanal Monitoring</h3>
                 <button id="node_surat_sp" onclick="switchView('table', 'surat')" class="hidden w-full text-left p-3 hover:bg-white/50 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40"><i class="fas fa-envelope text-indigo-500 text-sm w-5 text-center"></i>Manajemen Persuratan SP</button>
                 <button id="node_aduan" onclick="switchView('table', 'aduan')" class="hidden w-full text-left p-3 hover:bg-white/50 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40"><i class="fas fa-bullhorn text-orange-500 text-sm w-5 text-center"></i>Laporan Mandiri</button>
-                <button id="node_masalah_sp" onclick="switchView('table', 'masalah_sp')" class="hidden w-full text-left p-3 hover:bg-white/50 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40"><i class="fas fa-folder-open text-rose-500 text-sm w-5 text-center"></i>Manajemen Risiko Spasial</button>
-                <button id="node_masalah_pps" onclick="switchView('table', 'masalah_pps')" class="hidden w-full text-left p-3 hover:bg-white/50 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40"><i class="fas fa-gavel text-violet-500 text-sm w-5 text-center"></i>Manajemen Data PPS</button>
+                <button id="node_masalah_sp" onclick="switchView('table', 'masalah_sp')" class="hidden w-full text-left p-3 hover:bg-white/50 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40"><i class="fas fa-folder-open text-rose-500 text-sm w-5 text-center"></i>Penanganan Risiko SP</button>
+                <button id="node_masalah_pps" onclick="switchView('table', 'masalah_pps')" class="hidden w-full text-left p-3 hover:bg-white/50 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40"><i class="fas fa-gavel text-violet-500 text-sm w-5 text-center"></i>Pengendalian & Sengketa PPS</button>
 
                 <div id="adminPanel" class="pt-4 border-t border-white/40 mt-4 hidden">
                     <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2 mb-2">Integrasi Spasial</h3>
@@ -149,22 +148,22 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div class="bg-white/50 border border-white/60 p-5 rounded-2xl glass-card-hover flex flex-col relative overflow-hidden group">
                     <div class="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-600 mb-4 group-hover:scale-110 transition-transform"><i class="fas fa-envelope text-base"></i></div>
-                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Surat SP</h4>
+                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Persuratan SP</h4>
                     <p class="text-2xl font-black text-slate-900 mt-1" id="stat_surat">...</p>
                 </div>
                 <div class="bg-white/50 border border-white/60 p-5 rounded-2xl glass-card-hover flex flex-col relative overflow-hidden group">
                     <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-orange-600 mb-4 group-hover:scale-110 transition-transform"><i class="fas fa-bullhorn text-base"></i></div>
-                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Aduan</h4>
+                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Laporan Mandiri</h4>
                     <p class="text-2xl font-black text-slate-900 mt-1" id="stat_aduan">...</p>
                 </div>
                 <div class="bg-white/50 border border-white/60 p-5 rounded-2xl glass-card-hover flex flex-col relative overflow-hidden group">
                     <div class="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center text-rose-600 mb-4 group-hover:scale-110 transition-transform"><i class="fas fa-folder-open text-base"></i></div>
-                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Masalah SP</h4>
+                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Risiko SP</h4>
                     <p class="text-2xl font-black text-slate-900 mt-1" id="stat_masalah_sp">...</p>
                 </div>
                 <div class="bg-white/50 border border-white/60 p-5 rounded-2xl glass-card-hover flex flex-col relative overflow-hidden group">
                     <div class="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center text-violet-600 mb-4 group-hover:scale-110 transition-transform"><i class="fas fa-gavel text-base"></i></div>
-                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Data PPS</h4>
+                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Sengketa PPS</h4>
                     <p class="text-2xl font-black text-slate-900 mt-1" id="stat_masalah_pps">...</p>
                 </div>
             </div>
@@ -174,14 +173,14 @@
                     <div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
                     <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Status Interkoneksi Lintas Kanal</h3>
                 </div>
-                <p class="text-xs text-slate-600 leading-relaxed mb-4">Sistem otomatis mendeteksi korelasi berkas berdasarkan NIB dan Kode Desa.</p>
+                <p class="text-xs text-slate-600 leading-relaxed mb-4">Sistem otomatis mendeteksi korelasi berkas berdasarkan NIB, Kode Desa, No Hak, dan No SU.</p>
                 <div class="flex-1 border border-white/60 rounded-xl bg-white/20 p-6 flex flex-col justify-center items-center text-center">
                     <div class="flex items-center justify-center gap-6 mb-4">
-                        <div class="p-3 bg-white rounded-xl shadow-sm text-center w-24 border border-slate-100"><i class="fas fa-envelope text-indigo-500 mb-1 block"></i><span class="text-[10px] font-bold">Surat SP</span></div>
+                        <div class="p-3 bg-white rounded-xl shadow-sm text-center w-28 border border-slate-100"><i class="fas fa-envelope text-indigo-500 mb-1 block"></i><span class="text-[10px] font-bold">Persuratan SP</span></div>
                         <i class="fas fa-link text-slate-400 animate-pulse"></i>
-                        <div class="p-3 bg-white rounded-xl shadow-sm text-center w-24 border border-slate-100"><i class="fas fa-bullhorn text-orange-500 mb-1 block"></i><span class="text-[10px] font-bold">Aduan</span></div>
+                        <div class="p-3 bg-white rounded-xl shadow-sm text-center w-28 border border-slate-100"><i class="fas fa-bullhorn text-orange-500 mb-1 block"></i><span class="text-[10px] font-bold">Laporan Mandiri</span></div>
                         <i class="fas fa-link text-slate-400 animate-pulse"></i>
-                        <div class="p-3 bg-white rounded-xl shadow-sm text-center w-24 border border-slate-100"><i class="fas fa-gavel text-violet-500 mb-1 block"></i><span class="text-[10px] font-bold">PPS</span></div>
+                        <div class="p-3 bg-white rounded-xl shadow-sm text-center w-28 border border-slate-100"><i class="fas fa-gavel text-violet-500 mb-1 block"></i><span class="text-[10px] font-bold">Sengketa PPS</span></div>
                     </div>
                 </div>
             </div>
@@ -203,7 +202,7 @@
                     <table class="w-full text-left border-collapse whitespace-nowrap">
                         <thead>
                             <tr id="tableHeaderRow" class="bg-white/40 border-b border-white/60 text-[10px] uppercase font-bold tracking-wider text-slate-500">
-                                <!-- HEADER DINAMIS DARI JAVASCRIPT -->
+                                <!-- HEADER DINAMIS -->
                             </tr>
                         </thead>
                         <tbody id="tableBody" class="divide-y divide-white/40 text-xs text-slate-700">
@@ -220,9 +219,9 @@
         </div>
     </main>
 
-    <!-- MODAL REGISTRASI -->
+    <!-- MODAL INTEGRASI REGISTRASI -->
     <div id="formModal" class="fixed inset-0 bg-slate-900/30 backdrop-blur-md z-50 hidden flex justify-center items-center p-4">
-        <div class="bg-white/70 backdrop-blur-2xl border border-white/80 w-full max-w-xl rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-[fadeIn_0.3s_ease-out]">
+        <div class="bg-white/70 backdrop-blur-2xl border border-white/80 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col overflow-hidden">
             <div class="p-5 bg-white/40 border-b border-white/60 flex justify-between items-center">
                 <div class="flex items-center gap-2.5 text-slate-900">
                     <div class="w-8 h-8 bg-amber-500/10 text-amber-600 rounded-lg flex items-center justify-center"><i class="fas fa-folder-plus text-xs"></i></div>
@@ -231,7 +230,7 @@
                 <button onclick="triggerCloseModal()" class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-800 hover:bg-white/60 transition-all"><i class="fas fa-times text-sm"></i></button>
             </div>
             
-            <div class="p-6 overflow-y-auto max-h-[70vh] custom-scrollbar">
+            <div class="p-6 overflow-y-auto max-h-[75vh] custom-scrollbar space-y-4">
                 
                 <!-- STEP 1: UPLOAD AI OCR -->
                 <div id="step1Upload" class="flex flex-col items-center justify-center py-6">
@@ -244,42 +243,125 @@
                     </div>
                 </div>
 
-                <!-- STEP 2: FORM ISIAN -->
+                <!-- STEP 2: FORM ISIAN SPASIAL DYNAMIC -->
                 <div id="step2Form" class="hidden space-y-4">
-                    <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl flex gap-3 items-start mb-4">
+                    <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl flex gap-3 items-start">
                         <div class="mt-0.5 text-emerald-500"><i class="fas fa-robot text-sm"></i></div>
                         <div>
                             <p class="text-[11px] font-bold text-emerald-800 uppercase tracking-wide">Analisis Selesai</p>
-                            <p class="text-[10px] text-emerald-600 mt-0.5 leading-relaxed">Sistem memetakan data. <b>Anda dapat memodifikasi data ini.</b></p>
+                            <p class="text-[10px] text-emerald-600 mt-0.5 leading-relaxed">Sistem memetakan data sesuai struktur master klaster spasial.</p>
                         </div>
                     </div>
 
+                    <!-- KONTEN UTAMA ADAPTIF -->
                     <div>
-                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5" id="lblFormDesc">Deskripsi Berkas / Perihal</label>
-                        <textarea id="formInputPrimaryDesc" rows="3" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Rincian rincian / deskripsi..."></textarea>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5" id="lblFormDesc">Deskripsi Utama</label>
+                        <textarea id="formInputPrimaryDesc" rows="2" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Rincian..."></textarea>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- GRUP DINAMIS KANAL PERSURATAN SP -->
+                    <div id="group_fields_surat" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-200/50 pt-3">
                         <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Kode Desa</label>
-                            <input type="text" id="formInputDesa" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Misal: 32.01.04.1001">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nomor Surat</label>
+                            <input type="text" id="formSuratNomor" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">NIB</label>
-                            <input type="text" id="formInputNib" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Misal: 09402">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Pengirim</label>
+                            <input type="text" id="formSuratPengirim" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Alamat Pengirim</label>
+                            <input type="text" id="formSuratAlamat" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Kontak Pengirim</label>
+                            <input type="text" id="formSuratKontak" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Otorisasi</label>
+                            <input type="text" id="formSuratOtorisasi" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">PIC</label>
+                            <input type="text" id="formSuratPic" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Isi Ringkas Surat</label>
+                            <textarea id="formSuratIsi" rows="2" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs"></textarea>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tindak Lanjut</label>
+                            <textarea id="formSuratTindakLanjut" rows="2" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs"></textarea>
                         </div>
                     </div>
 
-                    <div id="additionalFields" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
-                        <div id="containerOpsionalNo">
-                            <label id="lblOpsionalNo" class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nomor Perkara</label>
-                            <input type="text" id="formInputOpsionalNo" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="...">
-                        </div>
-                        <div id="containerOpsionalPihak">
-                            <label id="lblOpsionalPihak" class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Pihak Bersengketa</label>
-                            <input type="text" id="formInputOpsionalPihak" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="...">
+                    <!-- GRUP DINAMIS KANAL LAPORAN MANDIRI -->
+                    <div id="group_fields_aduan" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-200/50 pt-3">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nama Pelapor</label>
+                            <input type="text" id="formAduanPelapor" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
                         </div>
                     </div>
+
+                    <!-- GRUP DINAMIS KANAL RISIKO PERMASALAHAN SP -->
+                    <div id="group_fields_masalah_sp" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-200/50 pt-3">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Sumber Data Masalah</label>
+                            <input type="text" id="formRisikoSumber" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs" placeholder="Misal: Seksi 5">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Kode Bendel Fisik</label>
+                            <input type="text" id="formRisikoBendel" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
+                        </div>
+                    </div>
+
+                    <!-- GRUP DINAMIS KANAL SENGKETA PPS -->
+                    <div id="group_fields_masalah_pps" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-200/50 pt-3">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Sumber Data Masalah</label>
+                            <input type="text" id="formPpsSumber" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nomor Perkara</label>
+                            <input type="text" id="formPpsPerkara" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Pihak Bersengketa</label>
+                            <textarea id="formPpsPihak" rows="2" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- INTEGRASI PARAMETER GEOSPASIAL (DETAIL MULTI-KANAL) -->
+                    <div class="border-t border-slate-300 pt-3">
+                        <h4 class="text-[11px] font-extrabold text-slate-900 uppercase tracking-wider mb-3"><i class="fas fa-map-marker-alt text-amber-600"></i> Informasi Geometrik & Atribut Hak</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Kode Desa</label>
+                                <input type="text" id="formInputDesa" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 font-semibold">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">NIB</label>
+                                <input type="text" id="formInputNib" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 font-semibold">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nomor Hak</label>
+                                <input type="text" id="formInputNoHak" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nomor SU</label>
+                                <input type="text" id="formInputNoSu" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Koordinat X (Easting)</label>
+                                <input type="number" step="any" id="formInputX" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 font-mono">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Koordinat Y (Northing)</label>
+                                <input type="number" step="any" id="formInputY" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 font-mono">
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -326,38 +408,43 @@
 
         async function loadDashboardStats() {
             const fetchCount = async (table) => {
-                const { count } = await supabaseClient.from(table).select('*', { count: 'exact', head: true });
+                const { count, error } = await supabaseClient.from(table).select('*', { count: 'exact', head: true });
+                if (error) console.error(`Error fetching count for ${table}:`, error.message);
                 return count || 0;
             };
-            document.getElementById('stat_surat').innerText = await fetchCount('surat_masuk_sp');
-            document.getElementById('stat_aduan').innerText = await fetchCount('aduan_masyarakat');
-            document.getElementById('stat_masalah_sp').innerText = await fetchCount('masalah_sp');
-            document.getElementById('stat_masalah_pps').innerText = await fetchCount('masalah_pps');
+            document.getElementById('stat_surat').innerText = await fetchCount('manajemen_persuratan_sp');
+            document.getElementById('stat_aduan').innerText = await fetchCount('laporan_mandiri');
+            document.getElementById('stat_masalah_sp').innerText = await fetchCount('penanganan_risiko_permasalahan_sp');
+            document.getElementById('stat_masalah_pps').innerText = await fetchCount('pengendalian_penanganan_sengketa');
         }
 
         async function setupTableView(kanal) {
-            const tableTitle = { 'surat': 'Surat Masuk SP', 'aduan': 'Laporan Mandiri', 'masalah_sp': 'Risiko Spasial', 'masalah_pps': 'Manajemen Data PPS' };
+            const tableTitle = { 
+                'surat': 'Manajemen Persuratan SP', 
+                'aduan': 'Laporan Mandiri', 
+                'masalah_sp': 'Penanganan Risiko & Permasalahan SP', 
+                'masalah_pps': 'Pengendalian & Penanganan Sengketa PPS' 
+            };
             document.getElementById('tableTitle').innerText = tableTitle[kanal];
-            document.getElementById('tableBody').innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-xl mb-2"></i><br>Sinkronisasi server...</td></tr>`;
+            document.getElementById('tableBody').innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-xl mb-2"></i><br>Sinkronisasi server...</td></tr>`;
 
             let mainTable, detailTable, fkeyMain;
             let headerHTML = `<th class="p-4 font-bold">ID</th>`;
             
-            // Render Header Dinamis Sesuai Kolom Database Supabase
             if (kanal === 'surat') { 
-                mainTable = 'surat_masuk_sp'; detailTable = 'detail_surat_sp'; fkeyMain = 'id_surat';
+                mainTable = 'manajemen_persuratan_sp'; detailTable = 'detail_persuratan_sp'; fkeyMain = 'id_surat';
                 headerHTML += `<th class="p-4 font-bold">Perihal</th><th class="p-4 font-bold">No. Surat</th><th class="p-4 font-bold">Pengirim</th>`;
             } else if (kanal === 'aduan') { 
-                mainTable = 'aduan_masyarakat'; detailTable = 'detail_aduan'; fkeyMain = 'id_aduan';
-                headerHTML += `<th class="p-4 font-bold">Isi Laporan</th><th class="p-4 font-bold">Pelapor</th>`;
+                mainTable = 'laporan_mandiri'; detailTable = 'detail_laporan_mandiri'; fkeyMain = 'id_laporan';
+                headerHTML += `<th class="p-4 font-bold">Isi Laporan</th><th class="p-4 font-bold">Pelapor</th><th class="p-4 font-bold">Status</th>`;
             } else if (kanal === 'masalah_sp') { 
-                mainTable = 'masalah_sp'; detailTable = 'detail_masalah_sp'; fkeyMain = 'id_masalah_sp';
-                headerHTML += `<th class="p-4 font-bold">Deskripsi</th><th class="p-4 font-bold">Kode Bendel</th>`;
+                mainTable = 'penanganan_risiko_permasalahan_sp'; detailTable = 'detail_penanganan_risiko_permasalahan_sp'; fkeyMain = 'id_risiko_sp';
+                headerHTML += `<th class="p-4 font-bold">Deskripsi Permasalahan</th><th class="p-4 font-bold">Sumber</th><th class="p-4 font-bold">Kode Bendel</th>`;
             } else if (kanal === 'masalah_pps') { 
-                mainTable = 'masalah_pps'; detailTable = 'detail_masalah_pps'; fkeyMain = 'id_masalah_pps';
-                headerHTML += `<th class="p-4 font-bold">Deskripsi</th><th class="p-4 font-bold">No. Perkara</th><th class="p-4 font-bold">Pihak Terkait</th>`;
+                mainTable = 'pengendalian_penanganan_sengketa'; detailTable = 'detail_pengendalian_penanganan_sengketa'; fkeyMain = 'id_pps';
+                headerHTML += `<th class="p-4 font-bold">Deskripsi Permasalahan</th><th class="p-4 font-bold">No. Perkara</th><th class="p-4 font-bold">Pihak Sengketa</th>`;
             }
-            headerHTML += `<th class="p-4 font-bold">Kode Desa</th><th class="p-4 font-bold">NIB</th><th class="p-4 font-bold text-center">Aksi</th>`;
+            headerHTML += `<th class="p-4 font-bold">Desa / NIB</th><th class="p-4 font-bold">No. Hak / SU</th><th class="p-4 font-bold text-center">Aksi</th>`;
             document.getElementById('tableHeaderRow').innerHTML = headerHTML;
 
             try {
@@ -366,40 +453,44 @@
                 
                 let htmlRows = '';
                 if(mainData.length === 0) {
-                    htmlRows = `<tr><td colspan="7" class="p-8 text-center text-slate-400">Belum ada rekod.</td></tr>`;
+                    htmlRows = `<tr><td colspan="8" class="p-8 text-center text-slate-400">Belum ada rekod data di tabel ini.</td></tr>`;
                 } else {
                     for (let row of mainData) {
                         const rowId = row[fkeyMain];
-                        const { data: detData } = await supabaseClient.from(detailTable).select('*').eq(fkeyMain, rowId).limit(1).single();
+                        const { data: detData } = await supabaseClient.from(detailTable).select('*').eq(fkeyMain, rowId).limit(1).maybeSingle();
+                        
                         const desa = detData ? detData.kode_desa : '-';
                         const nib = detData ? detData.nib : '-';
+                        const no_hak = detData && detData.no_hak ? detData.no_hak : '-';
+                        const no_su = detData && detData.no_su ? detData.no_su : '-';
                         
                         htmlRows += `<tr class="hover:bg-white/40 transition-colors">`;
-                        htmlRows += `<td class="p-4 border-b border-white/40 font-mono text-[11px] font-bold text-slate-500">#${rowId}</td>`;
+                        htmlRows += `<td class="p-4 border-b border-white/40 font-mono text-[11px] font-bold text-slate-500">#${rowId.substring(0,8)}...</td>`;
                         
-                        // Render Baris Data Dinamis
                         if (kanal === 'surat') {
                             htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 max-w-[150px] truncate" title="${row.perihal}">${row.perihal}</td>`;
-                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900">${row.nomor_surat || '-'}</td>`;
+                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 font-mono">${row.nomor_surat || '-'}</td>`;
                             htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900">${row.pengirim || '-'}</td>`;
                         } else if (kanal === 'aduan') {
                             htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 max-w-[200px] truncate" title="${row.isi_laporan}">${row.isi_laporan}</td>`;
                             htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900">${row.pelapor || '-'}</td>`;
+                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900"><span class="px-2 py-0.5 rounded text-[10px] bg-amber-100 text-amber-800 font-bold">${row.status || 'Open'}</span></td>`;
                         } else if (kanal === 'masalah_sp') {
                             htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 max-w-[200px] truncate" title="${row.deskripsi_permasalahan}">${row.deskripsi_permasalahan}</td>`;
+                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900">${row.sumber_data_masalah || '-'}</td>`;
                             htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 font-mono">${row.kode_bendel_fisik || '-'}</td>`;
                         } else if (kanal === 'masalah_pps') {
                             htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 max-w-[150px] truncate" title="${row.deskripsi_permasalahan}">${row.deskripsi_permasalahan}</td>`;
                             htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 font-mono">${row.nomor_perkara || '-'}</td>`;
-                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900">${row.pihak_bersengketa || '-'}</td>`;
+                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 max-w-[120px] truncate" title="${row.pihak_bersengketa}">${row.pihak_bersengketa || '-'}</td>`;
                         }
 
-                        htmlRows += `<td class="p-4 border-b border-white/40 font-semibold text-slate-600">${desa}</td>`;
-                        htmlRows += `<td class="p-4 border-b border-white/40 font-semibold text-slate-600">${nib}</td>`;
+                        htmlRows += `<td class="p-4 border-b border-white/40 font-semibold text-slate-600">${desa} <br><span class="text-[11px] font-mono font-bold text-indigo-600">NIB: ${nib}</span></td>`;
+                        htmlRows += `<td class="p-4 border-b border-white/40 text-slate-600 font-medium">Hak: ${no_hak} <br><span class="text-[11px] text-slate-500">SU: ${no_su}</span></td>`;
                         htmlRows += `
                                 <td class="p-4 border-b border-white/40 text-center space-x-1.5">
                                     <button onclick="window.open('${row.link_arsip || '#'}', '_blank')" title="Lihat Berkas" class="w-8 h-8 inline-flex items-center justify-center text-slate-500 hover:bg-slate-200 rounded-xl"><i class="fas fa-file-pdf text-xs"></i></button>
-                                    <button onclick="actionInfoKoneksi('${desa}', '${nib}')" title="Informasi Koneksi" class="w-8 h-8 inline-flex items-center justify-center text-amber-600 hover:bg-amber-500/10 rounded-xl"><i class="fas fa-project-diagram text-xs"></i></button>
+                                    <button onclick="actionInfoKoneksi('${desa}', '${nib}', '${no_hak}', '${no_su}')" title="Informasi Koneksi" class="w-8 h-8 inline-flex items-center justify-center text-amber-600 hover:bg-amber-500/10 rounded-xl"><i class="fas fa-project-diagram text-xs"></i></button>
                                 </td>
                             </tr>
                         `;
@@ -407,39 +498,47 @@
                 }
                 document.getElementById('tableBody').innerHTML = htmlRows;
             } catch(e) {
-                document.getElementById('tableBody').innerHTML = `<tr><td colspan="7" class="text-center text-rose-500 p-8">Gagal Memuat: ${e.message}</td></tr>`;
+                document.getElementById('tableBody').innerHTML = `<tr><td colspan="8" class="text-center text-rose-500 p-8">Gagal Memuat: ${e.message}</td></tr>`;
             }
         }
 
-        async function actionInfoKoneksi(desa, nib) {
-            if (!desa || !nib || desa === '-' || nib === '-') return Swal.fire("Peringatan", "Data NIB/Desa tidak lengkap.", "warning");
-            Swal.fire({ title: 'Menganalisis Relasi...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            const { data, error } = await supabaseClient.rpc('cek_riwayat_bidang', { p_kode_desa: desa, p_nib: nib, p_no_hak: null, p_no_su: null });
-            if(error) return Swal.fire("Gagal", "Gagal query fungsi.", "error");
+        async function actionInfoKoneksi(desa, nib, no_hak, no_su) {
+            if (!desa || desa === '-') return Swal.fire("Peringatan", "Minimal informasi Kode Desa harus ada untuk analisis relasi.", "warning");
+            Swal.fire({ title: 'Menganalisis Relasi Spasial...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            
+            const pHak = (no_hak && no_hak !== '-') ? no_hak : null;
+            const pSu = (no_su && no_su !== '-') ? no_su : null;
+            const pNib = (nib && nib !== '-') ? nib : null;
+
+            const { data, error } = await supabaseClient.rpc('cek_riwayat_bidang', { p_kode_desa: desa, p_nib: pNib, p_no_hak: pHak, p_no_su: pSu });
+            if(error) return Swal.fire("Gagal", "Gagal mengeksekusi fungsi relasi data silang.", "error");
             
             if(data && data.length > 0) {
-                let html = `<ul class="space-y-2 max-h-48 overflow-y-auto text-left text-xs">`;
-                data.forEach(item => { html += `<li class="p-2 bg-slate-50 border rounded-xl"><span class="font-bold text-amber-700">[${item.kanal_sumber.toUpperCase()}]</span> ${item.informasi_tambahan}</li>`; });
+                let html = `<ul class="space-y-2 max-h-52 overflow-y-auto text-left text-xs">`;
+                data.forEach(item => { html += `<li class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl"><span class="font-extrabold text-amber-700">[${item.kanal_sumber.toUpperCase()}]</span> ${item.informasi_tambahan}</li>`; });
                 html += `</ul>`;
-                Swal.fire({ title: 'Koneksi Ditemukan', html: html, icon: 'info' });
+                Swal.fire({ title: 'Koneksi Tumpang Tindih Ditemukan', html: html, icon: 'info' });
             } else {
-                Swal.fire("Koneksi Bersih", "Tidak ada sengketa di kanal lain.", "success");
+                Swal.fire("Koneksi Bersih", "Tidak ada korelasi sengketa, sengketa PPS atau risiko spasial di kanal lain untuk bidang tanah ini.", "success");
             }
         }
 
-        const mapObject = L.map('map', { zoomControl: false }).setView([-6.2000, 106.8166], 11); 
+        const mapObject = L.map('map', { zoomControl: false }).setView([-8.6500, 115.2166], 11);
         L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 22, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'] }).addTo(mapObject);
         L.control.zoom({ position: 'bottomright' }).addTo(mapObject);
         let layerGroupMasterBidang = L.geoJSON(null, { style: { color: '#4f46e5', weight: 1.5, fillColor: '#818cf8', fillOpacity: 0.3 } }).addTo(mapObject);
 
         async function handleLogin() {
             const email = document.getElementById('txtEmail').value, password = document.getElementById('txtPassword').value;
-            if(!email || !password) return Swal.fire("Peringatan", "Email dan password wajib.", "warning");
-            Swal.fire({ title: 'Memproses...', didOpen: () => Swal.showLoading() });
+            if(!email || !password) return Swal.fire("Peringatan", "Email dan password wajib diisi.", "warning");
+            Swal.fire({ title: 'Memproses Autentikasi...', didOpen: () => Swal.showLoading() });
+            
             const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (authError) return Swal.fire("Gagal", authError.message, "error");
+            
             const { data: rbacData } = await supabaseClient.from('user_roles').select('*').eq('id', authData.user.id).single();
-            if (!rbacData) return Swal.fire("Gagal", "Role belum terdaftar.", "error");
+            if (!rbacData) return Swal.fire("Gagal", "User terautentikasi namun hak akses peran (role) belum terdaftar.", "error");
+            
             appAuthenticatedUserSession = rbacData;
             renderSecuredWorkspace();
             Swal.close();
@@ -466,33 +565,49 @@
         function handleLogout() { supabaseClient.auth.signOut(); window.location.reload(); }
 
         function triggerOpenModal() {
-            if (!appCurrentActiveKanal) return Swal.fire("Peringatan", "Pilih kanal dari menu navigasi.", "warning");
-            document.getElementById('formInputPrimaryDesc').value = ""; document.getElementById('formInputDesa').value = "";
-            document.getElementById('formInputNib').value = ""; document.getElementById('formFileNative').value = "";
-            document.getElementById('formInputOpsionalNo').value = ""; document.getElementById('formInputOpsionalPihak').value = "";
-            document.getElementById('step1Upload').classList.remove('hidden'); document.getElementById('step2Form').classList.add('hidden');
+            if (!appCurrentActiveKanal) return Swal.fire("Peringatan", "Pilih salah satu kanal di sidebar navigasi terlebih dahulu.", "warning");
+            
+            // Reset Semua Input Form Utama & Kondisional
+            document.getElementById('formInputPrimaryDesc').value = "";
+            document.getElementById('formInputDesa').value = ""; document.getElementById('formInputNib').value = "";
+            document.getElementById('formInputNoHak').value = ""; document.getElementById('formInputNoSu').value = "";
+            document.getElementById('formInputX').value = ""; document.getElementById('formInputY').value = "";
+            document.getElementById('formFileNative').value = "";
+            
+            document.getElementById('formSuratNomor').value = ""; document.getElementById('formSuratPengirim').value = "";
+            document.getElementById('formSuratAlamat').value = ""; document.getElementById('formSuratKontak').value = "";
+            document.getElementById('formSuratOtorisasi').value = ""; document.getElementById('formSuratPic').value = "";
+            document.getElementById('formSuratIsi').value = ""; document.getElementById('formSuratTindakLanjut').value = "";
+            document.getElementById('formAduanPelapor').value = "";
+            document.getElementById('formRisikoSumber').value = ""; document.getElementById('formRisikoBendel').value = "";
+            document.getElementById('formPpsSumber').value = ""; document.getElementById('formPpsPerkara').value = ""; document.getElementById('formPpsPihak').value = "";
+
+            document.getElementById('step1Upload').classList.remove('hidden');
+            document.getElementById('step2Form').classList.add('hidden');
             document.getElementById('btnSubmitForm').classList.add('hidden'); 
-            document.getElementById('modalFormTitle').innerText = `INPUT DOKUMEN: ${appCurrentActiveKanal.toUpperCase()}`;
             
-            const boxOps = document.getElementById('additionalFields');
-            const contNo = document.getElementById('containerOpsionalNo');
-            const contPihak = document.getElementById('containerOpsionalPihak');
-            const lblNo = document.getElementById('lblOpsionalNo');
-            const lblPihak = document.getElementById('lblOpsionalPihak');
+            document.getElementById('modalFormTitle').innerText = `REGISTRASI BARU: ${document.getElementById('tableTitle').innerText.toUpperCase()}`;
             
-            boxOps.classList.remove('hidden');
-            contNo.classList.remove('hidden');
-            contPihak.classList.remove('hidden');
+            // Atur Visibilitas Konten Form Berdasarkan Kanal Aktif
+            document.getElementById('group_fields_surat').classList.add('hidden');
+            document.getElementById('group_fields_aduan').classList.add('hidden');
+            document.getElementById('group_fields_masalah_sp').classList.add('hidden');
+            document.getElementById('group_fields_masalah_pps').classList.add('hidden');
 
             if (appCurrentActiveKanal === 'surat') {
-                lblNo.innerText = "Nomor Surat"; lblPihak.innerText = "Pengirim";
+                document.getElementById('lblFormDesc').innerText = "Perihal Surat Masuk";
+                document.getElementById('group_fields_surat').classList.remove('hidden');
             } else if (appCurrentActiveKanal === 'aduan') {
-                contNo.classList.add('hidden'); lblPihak.innerText = "Nama Pelapor";
+                document.getElementById('lblFormDesc').innerText = "Isi Laporan / Aduan Masyarakat";
+                document.getElementById('group_fields_aduan').classList.remove('hidden');
             } else if (appCurrentActiveKanal === 'masalah_sp') {
-                lblNo.innerText = "Kode Bendel Fisik"; contPihak.classList.add('hidden');
+                document.getElementById('lblFormDesc').innerText = "Deskripsi Permasalahan / Risiko SP";
+                document.getElementById('group_fields_masalah_sp').classList.remove('hidden');
             } else if (appCurrentActiveKanal === 'masalah_pps') {
-                lblNo.innerText = "Nomor Perkara"; lblPihak.innerText = "Pihak Bersengketa";
+                document.getElementById('lblFormDesc').innerText = "Deskripsi Permasalahan Sengketa PPS";
+                document.getElementById('group_fields_masalah_pps').classList.remove('hidden');
             }
+            
             document.getElementById('formModal').classList.remove('hidden');
         }
 
@@ -502,7 +617,7 @@
         document.getElementById('formFileNative').addEventListener('change', async function(e) {
             const file = e.target.files[0]; if (!file) return;
             document.getElementById('lblFileNameDisplay').innerText = file.name;
-            Swal.fire({ title: 'Menganalisis Spasial...', didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'Menjalankan AI OCR Spasial...', didOpen: () => Swal.showLoading() });
             try {
                 const base64Data = await toBase64(file);
                 const response = await fetch(CONFIG_GAS_ENGINE_URL, { method: 'POST', body: JSON.stringify({ fileName: file.name, mimeType: file.type, fileBase64: base64Data }) });
@@ -513,55 +628,129 @@
                     document.getElementById('formInputPrimaryDesc').value = result.ocrData.deskripsi || '';
                     document.getElementById('formInputDesa').value = result.ocrData.kode_desa || '';
                     document.getElementById('formInputNib').value = result.ocrData.nib || '';
-                    document.getElementById('formInputOpsionalNo').value = result.ocrData.nomor_dokumen || '';
-                    document.getElementById('formInputOpsionalPihak').value = result.ocrData.pihak_terkait || '';
+                    
+                    if (appCurrentActiveKanal === 'surat') {
+                        document.getElementById('formSuratNomor').value = result.ocrData.nomor_dokumen || '';
+                        document.getElementById('formSuratPengirim').value = result.ocrData.pihak_terkait || '';
+                    } else if (appCurrentActiveKanal === 'aduan') {
+                        document.getElementById('formAduanPelapor').value = result.ocrData.pihak_terkait || '';
+                    } else if (appCurrentActiveKanal === 'masalah_sp') {
+                        document.getElementById('formRisikoBendel').value = result.ocrData.nomor_dokumen || '';
+                    } else if (appCurrentActiveKanal === 'masalah_pps') {
+                        document.getElementById('formPpsPerkara').value = result.ocrData.nomor_dokumen || '';
+                        document.getElementById('formPpsPihak').value = result.ocrData.pihak_terkait || '';
+                    }
                 }
                 window.tempUploadedFileUrl = result.folderUrl; 
                 document.getElementById('step1Upload').classList.add('hidden');
                 document.getElementById('step2Form').classList.remove('hidden');
                 document.getElementById('btnSubmitForm').classList.remove('hidden');
-                Swal.fire({ title: "Warkah Diproses!", text: "Periksa data sebelum menyimpan.", icon: "success" });
-            } catch (err) { Swal.fire("Gagal", err.message, "error"); }
+                Swal.fire({ title: "Warkah Diproses!", text: "Rincian dokumen berhasil diekstrak oleh AI. Sempurnakan isian bidang.", icon: "success" });
+            } catch (err) { Swal.fire("Gagal Engine OCR", err.message, "error"); }
         });
 
         async function executeSubmissionData() {
             const txtPrimaryDesc = document.getElementById('formInputPrimaryDesc').value;
             const txtDesa = document.getElementById('formInputDesa').value;
             const txtNib = document.getElementById('formInputNib').value;
-            if (!txtPrimaryDesc || !txtDesa || !txtNib) return Swal.fire("Validasi", "Deskripsi, Kode Desa, dan NIB wajib.", "error");
+            const txtNoHak = document.getElementById('formInputNoHak').value || null;
+            const txtNoSu = document.getElementById('formInputNoSu').value || null;
+            const numX = parseFloat(document.getElementById('formInputX').value) || null;
+            const numY = parseFloat(document.getElementById('formInputY').value) || null;
+
+            if (!txtPrimaryDesc || !txtDesa) return Swal.fire("Validasi Gagal", "Deskripsi Konten Utama dan Kode Desa wajib diisi.", "error");
             
-            const { data: dupData } = await supabaseClient.rpc('cek_riwayat_bidang', { p_kode_desa: txtDesa, p_nib: txtNib, p_no_hak: null, p_no_su: null });
+            // Cek Tumpang Tindih Menggunakan RPC Lintas Kanal Sebelum Insert
+            const { data: dupData } = await supabaseClient.rpc('cek_riwayat_bidang', { 
+                p_kode_desa: txtDesa, 
+                p_nib: txtNib || null, 
+                p_no_hak: txtNoHak, 
+                p_no_su: txtNoSu 
+            });
             if (dupData && dupData.length > 0) {
-                const mod = await Swal.fire({ title: 'Sinyal Duplikasi!', icon: 'warning', showCancelButton: true, confirmButtonText: 'Bypass & Simpan', cancelButtonText: 'Batal' });
+                const mod = await Swal.fire({ title: 'Peringatan Tumpang Tindih!', text: 'Atribut spasial/hak terdeteksi memiliki relasi konflik/aktif di kanal lain. Tetap lanjutkan simpan berkas?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Bypass & Simpan', cancelButtonText: 'Batalkan' });
                 if(!mod.isConfirmed) return;
             }
 
-            Swal.fire({ title: 'Menyimpan...', didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'Sinkronisasi Cloud Supabase...', didOpen: () => Swal.showLoading() });
             let uploadedFileUrl = window.tempUploadedFileUrl || ""; 
-            const txtNoOps = document.getElementById('formInputOpsionalNo').value;
-            const txtPihakOps = document.getElementById('formInputOpsionalPihak').value;
             
             try {
                 let mainRow, mainErr;
+                
+                // KANAL 1: MANAJEMEN PERSURATAN SP
                 if (appCurrentActiveKanal === 'surat') {
-                    ({ data: mainRow, error: mainErr } = await supabaseClient.from('surat_masuk_sp').insert([{ perihal: txtPrimaryDesc, nomor_surat: txtNoOps, pengirim: txtPihakOps, link_arsip: uploadedFileUrl }]).select().single());
-                    if(!mainErr) await supabaseClient.from('detail_surat_sp').insert([{ id_surat: mainRow.id_surat, kode_desa: txtDesa, nib: txtNib }]);
-                } else if (appCurrentActiveKanal === 'aduan') {
-                    ({ data: mainRow, error: mainErr } = await supabaseClient.from('aduan_masyarakat').insert([{ isi_laporan: txtPrimaryDesc, pelapor: txtPihakOps, link_arsip: uploadedFileUrl }]).select().single());
-                    if(!mainErr) await supabaseClient.from('detail_aduan').insert([{ id_aduan: mainRow.id_aduan, kode_desa: txtDesa, nib: txtNib }]);
-                } else if (appCurrentActiveKanal === 'masalah_sp') {
-                    ({ data: mainRow, error: mainErr } = await supabaseClient.from('masalah_sp').insert([{ deskripsi_permasalahan: txtPrimaryDesc, kode_bendel_fisik: txtNoOps, link_arsip: uploadedFileUrl }]).select().single());
-                    if(!mainErr) await supabaseClient.from('detail_masalah_sp').insert([{ id_masalah_sp: mainRow.id_masalah_sp, kode_desa: txtDesa, nib: txtNib }]);
-                } else if (appCurrentActiveKanal === 'masalah_pps') {
-                    ({ data: mainRow, error: mainErr } = await supabaseClient.from('masalah_pps').insert([{ deskripsi_permasalahan: txtPrimaryDesc, nomor_perkara: txtNoOps, pihak_bersengketa: txtPihakOps, link_arsip: uploadedFileUrl }]).select().single());
-                    if(!mainErr) await supabaseClient.from('detail_masalah_pps').insert([{ id_masalah_pps: mainRow.id_masalah_pps, kode_desa: txtDesa, nib: txtNib }]);
+                    const paySurat = {
+                        nomor_surat: document.getElementById('formSuratNomor').value || null,
+                        pengirim: document.getElementById('formSuratPengirim').value || null,
+                        alamat_pengirim: document.getElementById('formSuratAlamat').value || null,
+                        kontak_pengirim: document.getElementById('formSuratKontak').value || null,
+                        otorisasi: document.getElementById('formSuratOtorisasi').value || null,
+                        perihal: txtPrimaryDesc,
+                        isi_surat: document.getElementById('formSuratIsi').value || null,
+                        tindak_lanjut: document.getElementById('formSuratTindakLanjut').value || null,
+                        pic: document.getElementById('formSuratPic').value || null,
+                        link_arsip: uploadedFileUrl
+                    };
+                    ({ data: mainRow, error: mainErr } = await supabaseClient.from('manajemen_persuratan_sp').insert([paySurat]).select().single());
+                    if(!mainErr) {
+                        await supabaseClient.from('detail_persuratan_sp').insert([{ 
+                            id_surat: mainRow.id_surat, kode_desa: txtDesa, nib: txtNib, no_hak: txtNoHak, no_su: txtNoSu, koordinat_x: numX, koordinat_y: numY 
+                        }]);
+                    }
+                } 
+                // KANAL 2: LAPORAN MANDIRI
+                else if (appCurrentActiveKanal === 'aduan') {
+                    const payAduan = {
+                        isi_laporan: txtPrimaryDesc,
+                        pelapor: document.getElementById('formAduanPelapor').value || null,
+                        link_arsip: uploadedFileUrl
+                    };
+                    ({ data: mainRow, error: mainErr } = await supabaseClient.from('laporan_mandiri').insert([payAduan]).select().single());
+                    if(!mainErr) {
+                        await supabaseClient.from('detail_laporan_mandiri').insert([{ 
+                            id_laporan: mainRow.id_laporan, kode_desa: txtDesa, nib: txtNib, no_hak: txtNoHak, no_su: txtNoSu, koordinat_x: numX, koordinat_y: numY 
+                        }]);
+                    }
+                } 
+                // KANAL 3: PENANGANAN RISIKO DAN PERMASALAHAN SP
+                else if (appCurrentActiveKanal === 'masalah_sp') {
+                    const payRisiko = {
+                        sumber_data_masalah: document.getElementById('formRisikoSumber').value || null,
+                        deskripsi_permasalahan: txtPrimaryDesc,
+                        kode_bendel_fisik: document.getElementById('formRisikoBendel').value || null,
+                        link_arsip: uploadedFileUrl
+                    };
+                    ({ data: mainRow, error: mainErr } = await supabaseClient.from('penanganan_risiko_permasalahan_sp').insert([payRisiko]).select().single());
+                    if(!mainErr) {
+                        await supabaseClient.from('detail_penanganan_risiko_permasalahan_sp').insert([{ 
+                            id_risiko_sp: mainRow.id_risiko_sp, kode_desa: txtDesa, nib: txtNib, no_hak: txtNoHak, no_su: txtNoSu, koordinat_x: numX, koordinat_y: numY 
+                        }]);
+                    }
+                } 
+                // KANAL 4: DATABASE PENGENDALIAN DAN PENANGANAN SENGKETA (PPS)
+                else if (appCurrentActiveKanal === 'masalah_pps') {
+                    const payPps = {
+                        sumber_data_masalah: document.getElementById('formPpsSumber').value || null,
+                        deskripsi_permasalahan: txtPrimaryDesc,
+                        nomor_perkara: document.getElementById('formPpsPerkara').value || null,
+                        pihak_bersengketa: document.getElementById('formPpsPihak').value || null,
+                        link_arsip: uploadedFileUrl
+                    };
+                    ({ data: mainRow, error: mainErr } = await supabaseClient.from('pengendalian_penanganan_sengketa').insert([payPps]).select().single());
+                    if(!mainErr) {
+                        await supabaseClient.from('detail_pengendalian_penanganan_sengketa').insert([{ 
+                            id_pps: mainRow.id_pps, kode_desa: txtDesa, nib: txtNib, no_hak: txtNoHak, no_su: txtNoSu, koordinat_x: numX, koordinat_y: numY 
+                        }]);
+                    }
                 }
 
                 if(mainErr) throw mainErr;
                 window.tempUploadedFileUrl = ""; 
-                Swal.fire("Berhasil", "Data tersimpan.", "success");
-                triggerCloseModal(); setupTableView(appCurrentActiveKanal);
-            } catch(dbErr) { Swal.fire("Error Database", dbErr.message, "error"); }
+                Swal.fire("Berhasil Disimpan", "Rekod transaksional beserta relasi atribut spasial detail berhasil diverifikasi dan diunggah.", "success");
+                triggerCloseModal(); 
+                setupTableView(appCurrentActiveKanal);
+            } catch(dbErr) { Swal.fire("Error Postgre Cloud", dbErr.message, "error"); }
         }
 
         async function fetchAndRenderSpatialMaster() {
@@ -573,11 +762,11 @@
 
         function processShapefileInput(element) {
             const file = element.files[0]; if (!file) return;
-            Swal.fire({ title: 'Mengekstrak Layer SHP...', didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'Mengekstrak Objek Layer SHP...', didOpen: () => Swal.showLoading() });
             const reader = new FileReader();
             reader.onload = async (e) => {
-                try { await shp(e.target.result); Swal.fire("Sukses", "Layer spasial terbaca.", "success"); } 
-                catch(err) { Swal.fire("Gagal", "SHP tidak valid.", "error"); }
+                try { await shp(e.target.result); Swal.fire("Sukses", "Format Layer spasial divalidasi dengan benar.", "success"); } 
+                catch(err) { Swal.fire("Gagal", "File ZIP tidak mengandung format struktur SHP yang valid.", "error"); }
             };
             reader.readAsArrayBuffer(file);
         }

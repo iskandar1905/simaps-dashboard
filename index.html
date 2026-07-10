@@ -753,20 +753,70 @@
             } catch(dbErr) { Swal.fire("Error Postgre Cloud", dbErr.message, "error"); }
         }
 
+        // FUNGSI 1: MENGAMBIL DAN MERENDER DATA MASTER DARI DATABASE UNTUK SEMUA USER
         async function fetchAndRenderSpatialMaster() {
             const { data, error } = await supabaseClient.rpc('ambil_master_bidang_geojson');
             if (error || !data) return;
-            const geoJson = { type: "FeatureCollection", features: data.map(i => ({ type: "Feature", properties: { id: i.id_bidang, kode_desa: i.kode_desa, nib: i.nib }, geometry: i.geom_json })) };
-            layerGroupMasterBidang.clearLayers(); layerGroupMasterBidang.addData(geoJson);
+            
+            const geoJson = { 
+                type: "FeatureCollection", 
+                features: data.map(i => ({ 
+                    type: "Feature", 
+                    // PERBAIKAN: Masukkan no_hak dan no_su agar klik informasi relasi berjalan lancar
+                    properties: { 
+                        id: i.id_bidang, 
+                        kode_desa: i.kode_desa, 
+                        nib: i.nib,
+                        no_hak: i.no_hak, 
+                        no_su: i.no_su 
+                    }, 
+                    geometry: i.geom_json 
+                })) 
+            };
+            
+            layerGroupMasterBidang.clearLayers(); 
+            layerGroupMasterBidang.addData(geoJson);
+            
+            // Auto-zoom ke batas wilayah data jika layer tidak kosong
+            if (layerGroupMasterBidang.getLayers().length > 0) {
+                mapObject.fitBounds(layerGroupMasterBidang.getBounds());
+            }
         }
 
-        function processShapefileInput(element) {
+        // FUNGSI 2: ADMIN MENGUNGGAH FILE SHP UNTUK DISIMPAN PERMANEN
+        async function processShapefileInput(element) {
             const file = element.files[0]; if (!file) return;
-            Swal.fire({ title: 'Mengekstrak Objek Layer SHP...', didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'Menyinkronkan Spasial...', text: 'Upload ke database cloud agar dapat diakses semua user...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            
             const reader = new FileReader();
             reader.onload = async (e) => {
-                try { await shp(e.target.result); Swal.fire("Sukses", "Format Layer spasial divalidasi dengan benar.", "success"); } 
-                catch(err) { Swal.fire("Gagal", "File ZIP tidak mengandung format struktur SHP yang valid.", "error"); }
+                try { 
+                    const geojsonData = await shp(e.target.result); 
+                    
+                    // PROSES CLEANING & REMAPPING ATRIBUT
+                    geojsonData.features.forEach(f => {
+                        const p = f.properties;
+                        f.properties = {
+                            kode_desa: (p.DESA || p.desa || '-').toString().trim(),
+                            nib: (p.NIB || p.nib || '-').toString().trim(),
+                            no_hak: (p.NOMORHAK || p.nomorhak || '-').toString().trim(),
+                            no_su: (p.SU || p.su || '-').toString().trim()
+                        };
+                    });
+
+                    // KIRIM KE DATABASE (RPC)
+                    const { error } = await supabaseClient.rpc('upload_bulk_shapefile', { geojson_data: geojsonData });
+                    if (error) throw new Error(error.message);
+                    
+                    // PERBAIKAN: Render ulang peta seketika setelah berhasil di-upload ke server
+                    await fetchAndRenderSpatialMaster();
+                    
+                    Swal.fire("Sukses", "Data spasial berhasil disimpan secara permanen di database dan sekarang aktif untuk semua pengguna.", "success"); 
+                } 
+                catch(err) { 
+                    Swal.fire("Gagal Eksekusi", err.message, "error"); 
+                }
+                element.value = ''; // Reset input agar bisa dipakai kembali
             };
             reader.readAsArrayBuffer(file);
         }

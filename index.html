@@ -485,52 +485,79 @@
             calculateSmartIntersections();
         }
 
-        // -----------------------------------------------------------
-        // FUNGSI TARIK PETA BARU (BISA MEMBACA FILE JSON RAKSASA)
-        // -----------------------------------------------------------
         async function fetchAndRenderSpatialMaster() {
             try {
                 // 1. Tarik data masalah terlebih dahulu untuk pencocokan style peta
                 const { data: masalahData } = await supabaseClient.from('grid_bidang_bermasalah').select('*');
                 globalDataMasalah = masalahData || [];
 
-                // 2. Tarik Peta GeoJSON dari fungsi PostgreSQL yang baru
-                const { data: geoJsonStr, error } = await supabaseClient.rpc('ambil_master_bidang_geojson');
-                if (error) throw error;
-                
-                if (!geoJsonStr) {
+                // --- 2. TEKNIK PAGINASI (MENARIK DATA SECARA BERTAHAP) ---
+                let allFeatures = [];
+                let startPos = 0;
+                const limitStep = 999; // Tarik maksimal 1000 baris per putaran
+                let keepFetching = true;
+
+                // Tampilkan loading khusus untuk memproses ribuan data
+                if (!document.querySelector('.swal2-container')) {
+                    Swal.fire({ title: 'Menyusun Peta...', text: 'Mengunduh data spasial skala besar', didOpen: () => Swal.showLoading() });
+                }
+
+                while (keepFetching) {
+                    const { data, error } = await supabaseClient
+                        .rpc('ambil_master_bidang_geojson')
+                        .range(startPos, startPos + limitStep); // Minta data dari baris ke-X hingga ke-Y
+                    
+                    if (error) throw error;
+                    
+                    if (data && data.length > 0) {
+                        allFeatures = allFeatures.concat(data); // Gabungkan kepingan data
+                        startPos += limitStep + 1; // Maju ke putaran 1000 berikutnya
+                        
+                        // Jika data yang ditarik kurang dari limit, artinya ini halaman terakhir
+                        if (data.length <= limitStep) keepFetching = false; 
+                    } else {
+                        keepFetching = false;
+                    }
+                }
+
+                if (allFeatures.length === 0) {
                     layerGroupMasterBidang.clearLayers();
                     return;
                 }
 
-                // 3. Pastikan ekstrak JSON berjalan benar meskipun dikirim sebagai string
-                let geoJson = typeof geoJsonStr === 'string' ? JSON.parse(geoJsonStr) : geoJsonStr;
-                
-                if (!geoJson.features) geoJson.features = [];
-
                 masterBidangKamus = [];
 
-                // 4. Injeksi properti masalah & simpan ke kamus
-                geoJson.features.forEach(f => {
-                    const p = f.properties;
+                // 3. Rakit FeatureCollection GeoJSON di sisi Client (Browser)
+                const geoJsonFeatures = allFeatures.map(row => {
                     masterBidangKamus.push({
-                        id: p.id_bidang, desa: p.kode_desa, nib: p.nib,
-                        no_hak: p.no_hak, no_su: p.no_su, nibel: p.nibel 
+                        id: row.id_bidang, desa: row.kode_desa, nib: row.nib,
+                        no_hak: row.no_hak, no_su: row.no_su, nibel: row.nibel 
                     });
                     
-                    // Tandai field is_bermasalah agar LayerGroup Leaflet bisa mengecat warna merah/abu
-                    p.is_bermasalah = cekApakahBermasalah(p);
+                    let isProblem = cekApakahBermasalah(row);
+                    
+                    return {
+                        type: "Feature",
+                        properties: { ...row, is_bermasalah: isProblem },
+                        geometry: typeof row.geom_json === 'string' ? JSON.parse(row.geom_json) : row.geom_json
+                    };
                 });
+
+                const finalGeoJson = { type: "FeatureCollection", features: geoJsonFeatures };
                 
+                // 4. Gambar ke peta Leaflet
                 layerGroupMasterBidang.clearLayers(); 
-                layerGroupMasterBidang.addData(geoJson);
+                layerGroupMasterBidang.addData(finalGeoJson);
                 
                 if (layerGroupMasterBidang.getLayers().length > 0) {
                     mapObject.invalidateSize(); 
                     mapObject.fitBounds(layerGroupMasterBidang.getBounds());
                 }
+                
+                Swal.close(); // Tutup loading jika berhasil
             } catch (err) {
                 console.error("Kesalahan Rendering Peta:", err);
+                Swal.fire("Gagal Memuat Peta", err.message, "error");
             }
         }
 

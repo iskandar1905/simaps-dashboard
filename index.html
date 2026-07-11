@@ -2,356 +2,216 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GRID SP | Geospatial Risk and Integrated Data SP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRID SP | One UI Minimalist</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/shpjs@latest/dist/shp.js"></script>
+    
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/venn.js@0.2.20/build/venn.min.js"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        bpn: {
-                            primary: '#0f172a',
-                            accent: '#d97706',
-                            glass: 'rgba(255, 255, 255, 0.45)',
-                            border: 'rgba(255, 255, 255, 0.6)'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,0,0" />
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap');
-        
         body { 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 40%, #cbd5e1 100%);
-            position: relative;
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            background-color: #f7f9fa;
             overflow: hidden;
+            -webkit-tap-highlight-color: transparent; 
         }
 
-        .ambient-blob-1 {
-            position: absolute; width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(147,197,253,0.35) 0%, rgba(255,255,255,0) 70%);
-            top: -10%; left: -10%; z-index: -1; animation: float-blob 25s infinite alternate;
+        .material-symbols-rounded { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 28px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
+        }
+        
+        .glass-input {
+            background: rgba(245, 247, 250, 0.7);
+            border: 1px solid rgba(220, 225, 230, 0.5);
+            border-radius: 9999px;
+            padding: 12px 20px;
+            font-size: 13px;
+            font-weight: 300;
+            color: #1f2937;
+            transition: all 0.3s ease;
+            width: 100%;
+            min-width: 140px;
         }
 
-        .ambient-blob-2 {
-            position: absolute; width: 700px; height: 700px;
-            background: radial-gradient(circle, rgba(253,230,138,0.3) 0%, rgba(255,255,255,0) 70%);
-            bottom: -20%; right: -10%; z-index: -1; animation: float-blob-reverse 30s infinite alternate;
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 1);
+            outline: none;
+            border-color: #007AFF;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
         }
 
-        @keyframes float-blob { 0% { transform: translate(0px, 0px) scale(1); } 100% { transform: translate(50px, 40px) scale(1.1); } }
-        @keyframes float-blob-reverse { 0% { transform: translate(0px, 0px) scale(1.1); } 100% { transform: translate(-60px, -30px) scale(1); } }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .glass-panel { background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(24px) saturate(190%); -webkit-backdrop-filter: blur(24px) saturate(190%); border: 1px solid rgba(255, 255, 255, 0.65); box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.04); }
-        .glass-card-hover { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .glass-card-hover:hover { transform: translateY(-4px); background: rgba(255, 255, 255, 0.6); border-color: rgba(255, 255, 255, 0.9); box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08); }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(15,23,42,0.15); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(15,23,42,0.3); }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+
+        .leaflet-bottom.leaflet-right { bottom: 24px; right: 24px; z-index: 10; }
+        
+        table { border-collapse: separate; border-spacing: 0; }
+        th { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10; font-weight: 400; }
+        tr { transition: background-color 0.2s; }
+        tr:hover td { background: rgba(250,252,255,0.7); }
+
+        .venn-circle path { fill-opacity: 0.15; stroke-width: 1.5; stroke-opacity: 0.8; }
+        .venn-circle text { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; fill: #4b5563; }
+        
+        .badge-kanal { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 500; }
+        .bg-surat { background: #eef2ff; color: #4f46e5; border: 1px solid rgba(99, 102, 241, 0.2); }
+        .bg-aduan { background: #fff7ed; color: #ea580c; border: 1px solid rgba(249, 115, 22, 0.2); }
+        .bg-risiko { background: #fff1f2; color: #e11d48; border: 1px solid rgba(244, 63, 94, 0.2); }
+        .bg-sengketa { background: #f5f3ff; color: #7c3aed; border: 1px solid rgba(139, 92, 246, 0.2); }
     </style>
 </head>
-<body class="text-slate-800 flex h-screen p-4 gap-4 box-border select-none">
+<body class="text-gray-800 w-screen h-screen relative select-none">
 
-    <div class="ambient-blob-1"></div>
-    <div class="ambient-blob-2"></div>
+    <div id="viewMap" class="absolute inset-0 z-0 w-full h-full bg-[#eef1f5]">
+        <div id="map" class="w-full h-full"></div>
+    </div>
 
-    <aside class="w-[300px] glass-panel rounded-2xl flex flex-col h-full z-20 overflow-hidden flex-shrink-0" id="sidebar">
-        <div class="p-6 border-b border-white/40 bg-white/20 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md shadow-amber-600/20">BPN</div>
-                <div>
-                    <h1 class="text-md font-extrabold tracking-tight text-slate-900 leading-tight">GRID SP</h1>
-                    <p class="text-[11px] font-medium text-slate-500">Geospatial Risk and Integrated Data</p>
+    <div id="authSection" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/10 backdrop-blur-md p-4 transition-opacity duration-500">
+        <div class="glass-panel p-10 w-full max-w-sm rounded-[36px]">
+            <div class="text-center mb-10">
+                <div class="w-14 h-14 bg-white/60 text-[#007AFF] rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-white">
+                    <span class="material-symbols-rounded text-2xl">public</span>
                 </div>
+                <h2 class="text-lg font-medium text-gray-800 tracking-wide">GRID SP</h2>
+                <p class="text-[13px] text-gray-500 mt-1 font-light">Sistem Spasial Terpadu</p>
             </div>
-            <button onclick="handleLogout()" id="btnLogout" class="hidden text-slate-400 hover:text-rose-600 p-2 rounded-xl hover:bg-rose-500/10 transition-all duration-300"><i class="fas fa-power-off text-sm"></i></button>
-        </div>
-
-        <div id="authSection" class="p-6 flex flex-col justify-center flex-1">
-            <div class="bg-white/40 border border-white/60 p-5 rounded-2xl shadow-sm">
-                <div class="mb-4">
-                    <h2 class="text-base font-bold text-slate-900 flex items-center gap-2"><i class="fas fa-key text-amber-500 text-sm"></i> Secure Gateway</h2>
-                    <p class="text-[11px] text-slate-500 mt-0.5">Seksi Survei dan Pemetaan Kantah Badung.</p>
-                </div>
-                <div class="space-y-3.5">
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-600 uppercase tracking-wider block mb-1">Email Pengguna</label>
-                        <input type="email" id="txtEmail" placeholder="nama@bpn.go.id" class="w-full bg-white/60 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-600 uppercase tracking-wider block mb-1">Kata Sandi</label>
-                        <input type="password" id="txtPassword" placeholder="••••••••" class="w-full bg-white/60 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all">
-                    </div>
-                    <button onclick="handleLogin()" class="w-full bg-slate-900 text-white font-bold p-2.5 rounded-xl hover:bg-slate-800 active:scale-[0.98] transition-all shadow-md shadow-slate-900/10 mt-2 text-xs tracking-wide">Autentikasi Masuk</button>
-                </div>
+            <div class="space-y-4">
+                <input type="email" id="txtEmail" placeholder="Email instansi" class="glass-input">
+                <input type="password" id="txtPassword" placeholder="Kata sandi" class="glass-input">
+                <button onclick="handleLogin()" class="w-full bg-[#007AFF] text-white font-medium py-3.5 px-4 rounded-full hover:bg-blue-600 active:scale-[0.98] transition-all mt-4 text-[13px] shadow-md shadow-blue-500/20 tracking-wide">Masuk Aplikasi</button>
             </div>
         </div>
+    </div>
 
-        <div id="workspaceSection" class="hidden flex-1 flex-col overflow-hidden">
-            <div class="p-4 mx-4 my-3 bg-white/30 border border-white/50 rounded-xl flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-sm"><i class="fas fa-user-shield text-xs"></i></div>
-                <div class="overflow-hidden">
-                    <p class="text-xs font-bold text-slate-900 truncate" id="lblUserEmail">staf@bpn.go.id</p>
-                    <span id="lblUserRole" class="inline-block text-[9px] uppercase font-extrabold tracking-widest bg-emerald-600/10 text-emerald-700 px-1.5 py-0.5 rounded-md border border-emerald-500/20 mt-0.5">Staf</span>
-                </div>
-            </div>
-
-            <div class="p-4 space-y-1.5 flex-1 overflow-y-auto custom-scrollbar">
-                <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2 mb-1">Menu Utama</h3>
-                <button onclick="switchView('dashboard')" class="w-full text-left p-3 hover:bg-white/50 active:bg-white/80 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40" id="btn_nav_dashboard"><i class="fas fa-chart-pie text-amber-500 text-sm w-5 text-center"></i>Dashboard Statistik</button>
-                <button onclick="switchView('map')" class="w-full text-left p-3 hover:bg-white/50 active:bg-white/80 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40" id="btn_nav_map"><i class="fas fa-map-marked-alt text-blue-500 text-sm w-5 text-center"></i>Peta Spasial WebGIS</button>
-
-                <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2 mb-1 pt-4">Kanal Monitoring</h3>
-                <button id="node_surat_sp" onclick="switchView('table', 'surat')" class="hidden w-full text-left p-3 hover:bg-white/50 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40"><i class="fas fa-envelope text-indigo-500 text-sm w-5 text-center"></i>Manajemen Persuratan SP</button>
-                <button id="node_aduan" onclick="switchView('table', 'aduan')" class="hidden w-full text-left p-3 hover:bg-white/50 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40"><i class="fas fa-bullhorn text-orange-500 text-sm w-5 text-center"></i>Laporan Mandiri</button>
-                <button id="node_masalah_sp" onclick="switchView('table', 'masalah_sp')" class="hidden w-full text-left p-3 hover:bg-white/50 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40"><i class="fas fa-folder-open text-rose-500 text-sm w-5 text-center"></i>Penanganan Risiko SP</button>
-                <button id="node_masalah_pps" onclick="switchView('table', 'masalah_pps')" class="hidden w-full text-left p-3 hover:bg-white/50 rounded-xl transition-all flex items-center gap-3 text-slate-700 font-semibold text-xs border border-transparent hover:border-white/40"><i class="fas fa-gavel text-violet-500 text-sm w-5 text-center"></i>Pengendalian & Sengketa PPS</button>
-
-                <div id="adminPanel" class="pt-4 border-t border-white/40 mt-4 hidden">
-                    <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2 mb-2">Integrasi Spasial</h3>
-                    <button onclick="document.getElementById('uploadFileGeojson').click()" class="w-full bg-white/40 border border-dashed border-slate-300 text-slate-700 hover:bg-white/70 p-2.5 rounded-xl font-bold text-[11px] transition-all flex items-center justify-center gap-2"><i class="fas fa-cloud-upload-alt text-slate-500"></i> Update Spasial (.geojson)</button>
-                    <input type="file" id="uploadFileGeojson" accept=".geojson,.json" class="hidden" onchange="processGeoJsonInput(this)">
-                </div>
-            </div>
+    <header id="floatingMenu" class="hidden fixed top-4 left-4 right-4 z-40 glass-panel px-5 py-3 flex justify-between items-center transition-all shadow-sm rounded-full border-white/80">
+        <div class="flex items-center gap-2 shrink-0">
+            <span class="material-symbols-rounded text-[#007AFF] text-[22px]">public</span>
+            <h1 class="text-[13px] font-medium text-gray-800 tracking-widest uppercase">GRID SP</h1>
         </div>
-    </aside>
+        <nav class="flex items-center gap-2 sm:gap-4 overflow-x-auto no-scrollbar pl-4 ml-auto">
+            <button onclick="switchView('dashboard')" id="btn_nav_dashboard" class="flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] text-gray-500 hover:text-blue-600 hover:bg-blue-50/50 transition-all whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">space_dashboard</span> Statistik</button>
+            <button onclick="switchView('map')" id="btn_nav_map" class="flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] text-gray-500 hover:text-blue-600 hover:bg-blue-50/50 transition-all whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">map</span> Peta Spasial</button>
+            <div class="w-[1px] h-4 bg-gray-300/50 mx-1 hidden sm:block"></div>
+            <button id="node_surat_sp" onclick="switchView('table', 'surat')" class="hidden items-center gap-1.5 px-3 py-2 rounded-full text-[13px] text-gray-500 hover:text-indigo-600 hover:bg-indigo-50/50 transition-all whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">mark_email_unread</span> Persuratan</button>
+            <button id="node_aduan" onclick="switchView('table', 'aduan')" class="hidden items-center gap-1.5 px-3 py-2 rounded-full text-[13px] text-gray-500 hover:text-orange-600 hover:bg-orange-50/50 transition-all whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">campaign</span> Laporan</button>
+            <button id="node_masalah_sp" onclick="switchView('table', 'masalah_sp')" class="hidden items-center gap-1.5 px-3 py-2 rounded-full text-[13px] text-gray-500 hover:text-rose-600 hover:bg-rose-50/50 transition-all whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">folder_open</span> Risiko SP</button>
+            <button id="node_masalah_pps" onclick="switchView('table', 'masalah_pps')" class="hidden items-center gap-1.5 px-3 py-2 rounded-full text-[13px] text-gray-500 hover:text-violet-600 hover:bg-violet-50/50 transition-all whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">gavel</span> Sengketa</button>
+            <div id="adminPanel" class="hidden items-center">
+                <div class="w-[1px] h-4 bg-gray-300/50 mx-1"></div>
+                <button onclick="document.getElementById('uploadFileGeojson').click()" class="flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] text-gray-500 hover:text-blue-600 hover:bg-blue-50/50 transition-all whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">upload_file</span> Update Spasial</button>
+                <input type="file" id="uploadFileGeojson" accept=".geojson,.json" class="hidden" onchange="processGeoJsonInput(this)">
+            </div>
+            <div class="w-[1px] h-4 bg-gray-300/50 mx-1"></div>
+            <div class="flex items-center gap-3 shrink-0 ml-1">
+                <div class="text-right hidden md:block">
+                    <p class="text-[12px] font-medium text-gray-800" id="lblUserEmail">staf@bpn.go.id</p>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-wide" id="lblUserRole">Staf</p>
+                </div>
+                <button onclick="handleLogout()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"><span class="material-symbols-rounded text-[18px]">logout</span></button>
+            </div>
+        </nav>
+    </header>
 
-    <main class="flex-1 relative flex flex-col h-full overflow-hidden">
+    <main id="mainContentOverlay" class="absolute inset-0 z-30 pointer-events-none flex flex-col transition-all pt-24 px-4 md:px-8 pb-6">
         
-        <div id="viewDashboard" class="hidden w-full h-full glass-panel rounded-2xl p-6 overflow-y-auto custom-scrollbar flex flex-col">
-            <div class="mb-6">
-                <span class="text-[10px] font-extrabold tracking-widest text-amber-600 bg-amber-500/10 px-2 py-1 rounded-md border border-amber-500/20 uppercase">Main Analytics</span>
-                <h2 class="text-xl font-extrabold text-slate-900 mt-2">Dashboard Statistik Global</h2>
-                <p class="text-xs text-slate-500">Rangkuman distribusi rekod administrasi spasial dan status sinkronisasi kanal.</p>
+        <div id="viewDashboard" class="hidden pointer-events-auto w-full max-w-6xl mx-auto h-full overflow-y-auto custom-scrollbar flex-col gap-5 relative pb-10">
+            <div class="glass-panel p-6 rounded-3xl shrink-0">
+                <h2 class="text-[16px] font-medium text-gray-800 tracking-wide">Dashboard Analitik</h2>
+                <p class="text-[12px] text-gray-500 mt-0.5 font-light">Kalkulasi relasi dan distribusi sengketa berbasis Objek Bidang Tanah.</p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white/50 border border-white/60 p-5 rounded-2xl glass-card-hover flex flex-col relative overflow-hidden group">
-                    <div class="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-600 mb-4 group-hover:scale-110 transition-transform"><i class="fas fa-envelope text-base"></i></div>
-                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Persuratan SP</h4>
-                    <p class="text-2xl font-black text-slate-900 mt-1" id="stat_surat">...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
+                <div class="glass-panel p-6 rounded-3xl flex flex-col justify-between hover:-translate-y-1 transition-transform cursor-default">
+                    <span class="material-symbols-rounded text-indigo-400 text-[26px] mb-4 block">mark_email_unread</span>
+                    <div><p class="text-[11px] text-gray-400 font-medium mb-0.5 uppercase tracking-wider">Persuratan</p><p class="text-3xl font-light text-gray-800" id="stat_surat">0</p></div>
                 </div>
-                <div class="bg-white/50 border border-white/60 p-5 rounded-2xl glass-card-hover flex flex-col relative overflow-hidden group">
-                    <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-orange-600 mb-4 group-hover:scale-110 transition-transform"><i class="fas fa-bullhorn text-base"></i></div>
-                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Laporan Mandiri</h4>
-                    <p class="text-2xl font-black text-slate-900 mt-1" id="stat_aduan">...</p>
+                <div class="glass-panel p-6 rounded-3xl flex flex-col justify-between hover:-translate-y-1 transition-transform cursor-default">
+                    <span class="material-symbols-rounded text-orange-400 text-[26px] mb-4 block">campaign</span>
+                    <div><p class="text-[11px] text-gray-400 font-medium mb-0.5 uppercase tracking-wider">Laporan</p><p class="text-3xl font-light text-gray-800" id="stat_aduan">0</p></div>
                 </div>
-                <div class="bg-white/50 border border-white/60 p-5 rounded-2xl glass-card-hover flex flex-col relative overflow-hidden group">
-                    <div class="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center text-rose-600 mb-4 group-hover:scale-110 transition-transform"><i class="fas fa-folder-open text-base"></i></div>
-                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Risiko SP</h4>
-                    <p class="text-2xl font-black text-slate-900 mt-1" id="stat_masalah_sp">...</p>
+                <div class="glass-panel p-6 rounded-3xl flex flex-col justify-between hover:-translate-y-1 transition-transform cursor-default">
+                    <span class="material-symbols-rounded text-rose-400 text-[26px] mb-4 block">folder_open</span>
+                    <div><p class="text-[11px] text-gray-400 font-medium mb-0.5 uppercase tracking-wider">Risiko SP</p><p class="text-3xl font-light text-gray-800" id="stat_masalah_sp">0</p></div>
                 </div>
-                <div class="bg-white/50 border border-white/60 p-5 rounded-2xl glass-card-hover flex flex-col relative overflow-hidden group">
-                    <div class="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center text-violet-600 mb-4 group-hover:scale-110 transition-transform"><i class="fas fa-gavel text-base"></i></div>
-                    <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Sengketa PPS</h4>
-                    <p class="text-2xl font-black text-slate-900 mt-1" id="stat_masalah_pps">...</p>
+                <div class="glass-panel p-6 rounded-3xl flex flex-col justify-between hover:-translate-y-1 transition-transform cursor-default">
+                    <span class="material-symbols-rounded text-violet-400 text-[26px] mb-4 block">gavel</span>
+                    <div><p class="text-[11px] text-gray-400 font-medium mb-0.5 uppercase tracking-wider">Sengketa PPS</p><p class="text-3xl font-light text-gray-800" id="stat_masalah_pps">0</p></div>
                 </div>
             </div>
 
-            <div class="bg-white/40 border border-white/60 p-6 rounded-2xl flex-1 flex flex-col">
-                <div class="flex items-center gap-2 mb-4">
-                    <div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
-                    <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Status Interkoneksi Lintas Kanal</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 shrink-0">
+                <div class="glass-panel p-6 rounded-3xl flex flex-col relative min-h-[400px]">
+                    <div class="flex justify-between items-start w-full">
+                        <div>
+                            <h3 class="text-[15px] font-medium text-gray-800 tracking-wide flex items-center gap-2"><span class="material-symbols-rounded text-blue-500 text-[18px]">donut_large</span> Irisan Lintas Kanal</h3>
+                            <p class="text-[12px] text-gray-500 mt-0.5 font-light">Satu bidang yang tercatat di beberapa kanal sekaligus.</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl font-light text-rose-500" id="stat_overlap_count">0</p>
+                            <p class="text-[10px] text-gray-400 font-medium mt-0.5 uppercase tracking-wider">Kasus Beririsan</p>
+                        </div>
+                    </div>
+                    <div id="venn-container" class="mt-auto w-full h-[280px] flex justify-center items-center"></div>
                 </div>
-                <p class="text-xs text-slate-600 leading-relaxed mb-4">Sistem otomatis mendeteksi korelasi berkas berdasarkan NIB, Kode Desa, No Hak, dan No SU.</p>
-                <div class="flex-1 border border-white/60 rounded-xl bg-white/20 p-6 flex flex-col justify-center items-center text-center">
-                    <div class="flex items-center justify-center gap-6 mb-4">
-                        <div class="p-3 bg-white rounded-xl shadow-sm text-center w-28 border border-slate-100"><i class="fas fa-envelope text-indigo-500 mb-1 block"></i><span class="text-[10px] font-bold">Persuratan SP</span></div>
-                        <i class="fas fa-link text-slate-400 animate-pulse"></i>
-                        <div class="p-3 bg-white rounded-xl shadow-sm text-center w-28 border border-slate-100"><i class="fas fa-bullhorn text-orange-500 mb-1 block"></i><span class="text-[10px] font-bold">Laporan Mandiri</span></div>
-                        <i class="fas fa-link text-slate-400 animate-pulse"></i>
-                        <div class="p-3 bg-white rounded-xl shadow-sm text-center w-28 border border-slate-100"><i class="fas fa-gavel text-violet-500 mb-1 block"></i><span class="text-[10px] font-bold">Sengketa PPS</span></div>
+
+                <div class="glass-panel p-6 rounded-3xl flex flex-col h-[400px]">
+                    <div class="flex justify-between items-center mb-4 shrink-0">
+                        <div>
+                            <h3 class="text-[15px] font-medium text-gray-800 tracking-wide flex items-center gap-2"><span class="material-symbols-rounded text-rose-500 text-[18px]">local_fire_department</span> Top Rated Bidang Tanah</h3>
+                            <p class="text-[12px] text-gray-500 mt-0.5 font-light">Bidang dengan frekuensi muncul terbanyak di semua data.</p>
+                        </div>
+                    </div>
+                    <div id="topRatedList" class="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3">
+                        <div class="text-center py-10 text-[12px] text-gray-400">Memindai relasi database...</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="viewTable" class="hidden w-full h-full glass-panel rounded-2xl p-6 overflow-y-auto custom-scrollbar flex-col">
-            <div class="flex justify-between items-center mb-6">
+        <div id="viewTable" class="hidden pointer-events-auto w-full max-w-7xl mx-auto h-full glass-panel p-6 flex-col relative overflow-hidden rounded-3xl">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-5 shrink-0">
                 <div>
-                    <span class="text-[10px] font-extrabold tracking-widest text-indigo-600 bg-indigo-500/10 px-2 py-1 rounded-md border border-indigo-500/20 uppercase">E-Registry</span>
-                    <h2 class="text-xl font-extrabold text-slate-900 mt-2" id="tableTitle">Kanal Data</h2>
-                    <p class="text-xs text-slate-500" id="tableDesc">Kelola, sunting, dan telusuri hubungan linier data spasial di bawah ini.</p>
+                    <h2 class="text-[16px] font-medium text-gray-800 tracking-wide" id="tableTitle">Kanal Data</h2>
+                    <p class="text-[12px] text-gray-500 mt-0.5 font-light">Manajemen rekam jejak atribut dan tautan spasial.</p>
                 </div>
-                <button onclick="triggerOpenModal()" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-slate-900/10 active:scale-[0.98] transition-all flex items-center gap-2"><i class="fas fa-plus text-[10px]"></i> Tambah Data Baru</button>
+                <div class="flex gap-2">
+                    <input type="file" id="ocrPdfInput" accept=".pdf" class="hidden" onchange="processOcrUpload(this)">
+                    <button id="btnTableTambahData" onclick="addNewInlineRow()" class="bg-[#007AFF] hover:bg-blue-600 text-white px-5 py-2.5 rounded-full text-[12px] font-medium transition-all shadow-md shadow-blue-500/20 flex items-center justify-center gap-2"><span class="material-symbols-rounded text-[16px]">add</span> Baris Baru</button>
+                </div>
             </div>
 
-            <div class="border border-white/60 rounded-xl bg-white/20 overflow-hidden flex-1 flex flex-col shadow-sm">
-                <div class="overflow-x-auto flex-1 custom-scrollbar">
-                    <table class="w-full text-left border-collapse whitespace-nowrap">
-                        <thead>
-                            <tr id="tableHeaderRow" class="bg-white/40 border-b border-white/60 text-[10px] uppercase font-bold tracking-wider text-slate-500">
-                                </tr>
-                        </thead>
-                        <tbody id="tableBody" class="divide-y divide-white/40 text-xs text-slate-700">
-                            </tbody>
+            <div class="bg-white/40 border border-white/60 rounded-[24px] overflow-hidden flex-1 flex flex-col shadow-sm">
+                <div class="overflow-auto flex-1 custom-scrollbar">
+                    <table class="w-full text-left border-collapse whitespace-nowrap min-w-max">
+                        <thead><tr id="tableHeaderRow" class="border-b border-gray-200/50 text-[11px] font-medium text-gray-500 uppercase tracking-widest"></tr></thead>
+                        <tbody id="tableBody" class="divide-y divide-gray-100/50 text-[13px] text-gray-700 font-light"></tbody>
                     </table>
                 </div>
             </div>
         </div>
-
-        <div id="viewMap" class="hidden w-full h-full relative overflow-hidden rounded-2xl border border-white/60 shadow-inner">
-            <div id="map" class="w-full h-full z-10"></div>
-        </div>
     </main>
-
-    <div id="formModal" class="fixed inset-0 bg-slate-900/30 backdrop-blur-md z-50 hidden flex justify-center items-center p-4">
-        <div class="bg-white/70 backdrop-blur-2xl border border-white/80 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-            <div class="p-5 bg-white/40 border-b border-white/60 flex justify-between items-center">
-                <div class="flex items-center gap-2.5 text-slate-900">
-                    <div class="w-8 h-8 bg-amber-500/10 text-amber-600 rounded-lg flex items-center justify-center"><i class="fas fa-folder-plus text-xs"></i></div>
-                    <h3 class="text-sm font-bold text-slate-900" id="modalFormTitle">Registrasi Dokumen Spasial</h3>
-                </div>
-                <button onclick="triggerCloseModal()" class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-800 hover:bg-white/60 transition-all"><i class="fas fa-times text-sm"></i></button>
-            </div>
-            
-            <div class="p-6 overflow-y-auto max-h-[75vh] custom-scrollbar space-y-4">
-                
-                <div id="step1Upload" class="flex flex-col items-center justify-center py-6">
-                    <p class="text-xs text-slate-500 mb-4 text-center max-w-sm">Tahap 1: Silakan unggah dokumen PDF warkah. AI akan membaca dan mengekstrak rincian secara otomatis.</p>
-                    <div class="w-full border-2 border-dashed border-slate-300 bg-white/40 rounded-xl p-8 text-center hover:bg-white/60 hover:border-amber-400 transition-all cursor-pointer relative group" onclick="document.getElementById('formFileNative').click()">
-                        <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all shadow-sm"><i class="fas fa-cloud-upload-alt text-2xl"></i></div>
-                        <span class="text-sm font-bold text-slate-700 block mb-1">Pilih Dokumen PDF</span>
-                        <span class="text-[10px] text-slate-500 block" id="lblFileNameDisplay">Maks. 10MB</span>
-                        <input type="file" id="formFileNative" class="hidden" accept=".pdf">
-                    </div>
-                </div>
-
-                <div id="step2Form" class="hidden space-y-4">
-                    <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl flex gap-3 items-start">
-                        <div class="mt-0.5 text-emerald-500"><i class="fas fa-robot text-sm"></i></div>
-                        <div>
-                            <p class="text-[11px] font-bold text-emerald-800 uppercase tracking-wide">Analisis Selesai</p>
-                            <p class="text-[10px] text-emerald-600 mt-0.5 leading-relaxed">Sistem memetakan data sesuai struktur master klaster spasial.</p>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5" id="lblFormDesc">Deskripsi Utama</label>
-                        <textarea id="formInputPrimaryDesc" rows="2" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" placeholder="Rincian..."></textarea>
-                    </div>
-
-                    <div id="group_fields_surat" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-200/50 pt-3">
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nomor Surat</label>
-                            <input type="text" id="formSuratNomor" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Pengirim</label>
-                            <input type="text" id="formSuratPengirim" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Alamat Pengirim</label>
-                            <input type="text" id="formSuratAlamat" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Kontak Pengirim</label>
-                            <input type="text" id="formSuratKontak" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Otorisasi</label>
-                            <input type="text" id="formSuratOtorisasi" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">PIC</label>
-                            <input type="text" id="formSuratPic" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
-                        </div>
-                        <div class="sm:col-span-2">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Isi Ringkas Surat</label>
-                            <textarea id="formSuratIsi" rows="2" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs"></textarea>
-                        </div>
-                        <div class="sm:col-span-2">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tindak Lanjut</label>
-                            <textarea id="formSuratTindakLanjut" rows="2" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs"></textarea>
-                        </div>
-                    </div>
-
-                    <div id="group_fields_aduan" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-200/50 pt-3">
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nama Pelapor</label>
-                            <input type="text" id="formAduanPelapor" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
-                        </div>
-                    </div>
-
-                    <div id="group_fields_masalah_sp" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-200/50 pt-3">
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Sumber Data Masalah</label>
-                            <input type="text" id="formRisikoSumber" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs" placeholder="Misal: Seksi 5">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Kode Bendel Fisik</label>
-                            <input type="text" id="formRisikoBendel" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
-                        </div>
-                    </div>
-
-                    <div id="group_fields_masalah_pps" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-200/50 pt-3">
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Sumber Data Masalah</label>
-                            <input type="text" id="formPpsSumber" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nomor Perkara</label>
-                            <input type="text" id="formPpsPerkara" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs">
-                        </div>
-                        <div class="sm:col-span-2">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Pihak Bersengketa</label>
-                            <textarea id="formPpsPihak" rows="2" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="border-t border-slate-300 pt-3">
-                        <h4 class="text-[11px] font-extrabold text-slate-900 uppercase tracking-wider mb-3"><i class="fas fa-map-marker-alt text-amber-600"></i> Informasi Geometrik & Atribut Hak</h4>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Kode Desa</label>
-                                <input type="text" id="formInputDesa" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 font-semibold">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">NIB</label>
-                                <input type="text" id="formInputNib" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 font-semibold">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nomor Hak</label>
-                                <input type="text" id="formInputNoHak" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nomor SU</label>
-                                <input type="text" id="formInputNoSu" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Koordinat X (Easting)</label>
-                                <input type="number" step="any" id="formInputX" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 font-mono">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Koordinat Y (Northing)</label>
-                                <input type="number" step="any" id="formInputY" class="w-full bg-white/50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 font-mono">
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="p-4 bg-white/40 border-t border-white/60 flex justify-end gap-2.5">
-                <button onclick="triggerCloseModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition-all">Batal</button>
-                <button id="btnSubmitForm" onclick="executeSubmissionData()" class="hidden px-5 py-2 text-xs font-bold bg-slate-900 text-white rounded-xl hover:bg-slate-800 active:scale-[0.98] transition-all shadow-md">Validasi & Kirim</button>
-            </div>
-        </div>
-    </div>
 
     <script>
         const CONFIG_SUPABASE_URL = "https://lnmypoqzhzbwcyhuvuqg.supabase.co";
@@ -361,466 +221,667 @@
         const supabaseClient = supabase.createClient(CONFIG_SUPABASE_URL, CONFIG_SUPABASE_KEY);
         let appCurrentActiveKanal = "";
         let appAuthenticatedUserSession = null;
+        let loadedTableData = []; 
+        let tempOcrData = null; 
+        let tempUploadedUrl = null;
+        
+        let masterBidangKamus = []; 
+        let globalDataMasalah = [];
+
+        // -----------------------------------------------------------
+        // INISIALISASI PETA BERSAMA STYLING (ABU-ABU vs MERAH HATCH)
+        // -----------------------------------------------------------
+        const mapObject = L.map('map', { zoomControl: false }).setView([-8.6500, 115.2166], 11);
+        L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 22, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'] }).addTo(mapObject);
+        L.control.zoom({ position: 'bottomright' }).addTo(mapObject);
+        
+        let layerGroupMasterBidang = L.geoJSON(null, { 
+            style: function(feature) {
+                // Beri warna merah hatch jika fitur memiliki data di tabel grid_bidang_bermasalah
+                if (feature.properties && feature.properties.is_bermasalah) {
+                    return { 
+                        color: '#ef4444',     // Merah outline
+                        weight: 2, 
+                        fillColor: '#ef4444', // Merah fill
+                        fillOpacity: 0.45, 
+                        dashArray: '5, 5'     // Garis putus-putus/hatch
+                    };
+                }
+                // Jika normal, beri warna abu-abu transparan
+                return { 
+                    color: '#9ca3af', 
+                    weight: 1, 
+                    fillColor: '#f3f4f6', 
+                    fillOpacity: 0.05, 
+                    dashArray: '' 
+                };
+            },
+            onEachFeature: function(feature, layer) {
+                // Event klik untuk membuka pop-up relasi antar kanal
+                layer.on('click', function() {
+                    const p = feature.properties;
+                    actionInfoKoneksi(p.kode_desa || '-', p.nib || '-', p.no_hak || '-', p.no_su || '-');
+                });
+            }
+        }).addTo(mapObject);
+
+        const SPATIAL_FIELDS = [
+            { key: 'desa', label: 'Kode Desa', type: 'text', spatial: true, req: true },
+            { key: 'nibel', label: 'NIBEL', type: 'text', spatial: true },
+            { key: 'nib', label: 'NIB', type: 'text', spatial: true },
+            { key: 'no_hak', label: 'No Hak', type: 'text', spatial: true },
+            { key: 'no_su', label: 'No SU', type: 'text', spatial: true },
+            { key: 'koordinat_x', label: 'X (Lng)', type: 'number', spatial: true },
+            { key: 'koordinat_y', label: 'Y (Lat)', type: 'number', spatial: true }
+        ];
+
+        const SCHEMA_CONFIG = {
+            surat: {
+                mainTable: 'manajemen_persuratan', pk: 'id_surat', title: 'Persuratan',
+                fields: [
+                    { key: 'nomor_surat', label: 'No Surat', type: 'text' },
+                    { key: 'tanggal_surat', label: 'Tgl Surat', type: 'date' },
+                    { key: 'tanggal_diterima', label: 'Tgl Diterima', type: 'date' },
+                    { key: 'pengirim', label: 'Pengirim', type: 'text' },
+                    { key: 'perihal', label: 'Perihal (Wajib)', type: 'text', req: true },
+                    { key: 'isi_surat', label: 'Isi Surat', type: 'text' },
+                    ...SPATIAL_FIELDS
+                ]
+            },
+            aduan: {
+                mainTable: 'laporan_mandiri', pk: 'id_laporan', title: 'Laporan Mandiri',
+                fields: [
+                    { key: 'pelapor', label: 'Pelapor', type: 'text' },
+                    { key: 'isi_laporan', label: 'Isi Laporan (Wajib)', type: 'text', req: true },
+                    ...SPATIAL_FIELDS
+                ]
+            },
+            masalah_sp: {
+                mainTable: 'seksi1_kasus', pk: 'id_kasus', title: 'Risiko Teknis (SP)',
+                fields: [
+                    { key: 'sumber_data_masalah', label: 'Sumber Masalah', type: 'text' },
+                    { key: 'kode_bendel_fisik', label: 'Kode Bendel', type: 'text' },
+                    { key: 'deskripsi_permasalahan', label: 'Deskripsi (Wajib)', type: 'text', req: true },
+                    ...SPATIAL_FIELDS
+                ]
+            },
+            masalah_pps: {
+                mainTable: 'seksi5_sengketa', pk: 'id_sengketa', title: 'Sengketa Hukum (PPS)',
+                fields: [
+                    { key: 'nomor_perkara', label: 'Nomor Perkara', type: 'text' },
+                    { key: 'pihak_bersengketa', label: 'Pihak Bersengketa', type: 'text' },
+                    { key: 'deskripsi_permasalahan', label: 'Deskripsi (Wajib)', type: 'text', req: true },
+                    ...SPATIAL_FIELDS
+                ]
+            }
+        };
+
+        // Fungsi pintar pendeteksi relasi masalah berdasarkan NIB/HAK/SU
+        function cekApakahBermasalah(props) {
+            if (!globalDataMasalah || globalDataMasalah.length === 0) return false;
+            return globalDataMasalah.some(row => {
+                if (!row.desa || !props.kode_desa) return false;
+                if (String(row.desa).toLowerCase().trim() !== String(props.kode_desa).toLowerCase().trim()) return false;
+                
+                let match = false;
+                if (row.nib && props.nib && String(row.nib).trim() === String(props.nib).trim()) match = true;
+                if (row.no_hak && props.no_hak && String(row.no_hak).trim() === String(props.no_hak).trim()) match = true;
+                if (row.no_su && props.no_su && String(row.no_su).trim() === String(props.no_su).trim()) match = true;
+                if (row.nibel && props.nibel && String(row.nibel).trim() === String(props.nibel).trim()) match = true;
+                
+                return match;
+            });
+        }
+
+        async function actionInfoKoneksi(desa, nib, no_hak, no_su) {
+            if (!desa || desa === '-') return Swal.fire("Perhatian", "Data desa belum lengkap.", "warning");
+            Swal.fire({ title: 'Melacak Relasi...', didOpen: () => Swal.showLoading() });
+            
+            const { data, error } = await supabaseClient.rpc('cek_riwayat_bidang', { p_kode_desa: desa, p_nib: nib!=='-'?nib:null, p_no_hak: no_hak!=='-'?no_hak:null, p_no_su: no_su!=='-'?no_su:null });
+            if(error) return Swal.fire("Error", "Gagal memuat relasi.", "error");
+            
+            if(data && data.length > 0) {
+                let html = `<div class="space-y-2 mt-4 text-left text-sm max-h-[40vh] overflow-auto custom-scrollbar">`;
+                data.forEach(item => { html += `<div class="p-4 bg-gray-50 border border-gray-100/50 rounded-[20px]"><span class="font-semibold text-[11px] tracking-wide text-blue-600 uppercase block mb-1">${item.kanal_sumber.replace('_',' ')}</span> <span class="text-gray-700 leading-relaxed">${item.informasi_tambahan}</span></div>`; });
+                html += `</div>`;
+                Swal.fire({ title: 'Relasi Ditemukan', html: html, customClass: { popup: 'glass-panel rounded-[28px]' } });
+            } else { Swal.fire({ title: "Bersih", text: "Tidak ada relasi atau masalah di kanal lain.", icon: "success", customClass: { popup: 'glass-panel rounded-[28px]' }}); }
+        }
+
+        async function calculateSmartIntersections() {
+            if (masterBidangKamus.length === 0) await fetchAndRenderSpatialMaster();
+
+            const { data, error } = await supabaseClient.from('grid_bidang_bermasalah').select('*');
+            if (error || !data) return;
+
+            let groups = {};
+
+            data.forEach(row => {
+                if (!row.desa) return;
+
+                let matchedId = null;
+                let master = null;
+
+                if (masterBidangKamus.length > 0) {
+                    master = masterBidangKamus.find(m => {
+                        if (String(m.desa).toLowerCase().trim() !== String(row.desa).toLowerCase().trim()) return false;
+                        let match = false;
+                        if (row.nib && m.nib && String(m.nib).trim() === String(row.nib).trim()) match = true;
+                        if (row.no_hak && m.no_hak && String(m.no_hak).trim() === String(row.no_hak).trim()) match = true;
+                        if (row.no_su && m.no_su && String(m.no_su).trim() === String(row.no_su).trim()) match = true;
+                        if (row.nibel && m.nibel && String(m.nibel).trim() === String(row.nibel).trim()) match = true;
+                        return match;
+                    });
+                    
+                    if (master) matchedId = master.id; 
+                }
+
+                if (!matchedId) {
+                    matchedId = "UNMAPPED_" + row.desa + "_" + (row.nib || row.no_hak || row.no_su || row.nibel || Math.random());
+                }
+
+                if (!groups[matchedId]) {
+                    groups[matchedId] = {
+                        desa: master ? master.desa : row.desa,
+                        kanals: new Set(), nibs: new Set(), haks: new Set(), sus: new Set(), count: 0
+                    };
+                    
+                    if (master) {
+                        if (master.nib && master.nib !== '-') groups[matchedId].nibs.add(master.nib);
+                        if (master.no_hak && master.no_hak !== '-') groups[matchedId].haks.add(master.no_hak);
+                        if (master.no_su && master.no_su !== '-') groups[matchedId].sus.add(master.no_su);
+                    }
+                }
+
+                let g = groups[matchedId];
+                g.kanals.add(row.sumber_kanal); 
+                
+                if(row.nib && row.nib !== '-') g.nibs.add(row.nib);
+                if(row.no_hak && row.no_hak !== '-') g.haks.add(row.no_hak);
+                if(row.no_su && row.no_su !== '-') g.sus.add(row.no_su);
+                g.count++; 
+            });
+
+            let groupArray = Object.values(groups);
+
+            const overlapList = groupArray.filter(item => item.kanals.size > 1);
+            document.getElementById('stat_overlap_count').innerText = overlapList.length;
+
+            let kanalMap = { 'PERSURATAN':'Surat', 'LAPORAN_MANDIRI':'Lapor', 'SEKSI_1':'Risiko', 'SEKSI_5':'Sengketa' };
+            function getSubsets(array) { return array.reduce((subs, val) => subs.concat(subs.map(set => [val,...set])), [[]]).filter(s => s.length > 0); }
+
+            let vennCounts = {};
+            groupArray.forEach(g => {
+                let kArray = Array.from(g.kanals).map(k => kanalMap[k] || k).sort();
+                let subsets = getSubsets(kArray);
+                subsets.forEach(sub => {
+                    let key = sub.join('||');
+                    vennCounts[key] = (vennCounts[key] || 0) + 1; 
+                });
+            });
+
+            let vennData = Object.keys(vennCounts).map(k => ({ sets: k.split('||'), size: vennCounts[k] }));
+
+            document.getElementById('venn-container').innerHTML = '';
+            if(vennData.length > 0) {
+                var chart = venn.VennDiagram().width(350).height(250);
+                d3.select("#venn-container").datum(vennData).call(chart);
+                
+                d3.selectAll("#venn-container .venn-circle path")
+                  .style("fill-opacity", 0.15).style("stroke-width", 1.5).style("stroke-opacity", 0.8);
+                d3.selectAll("#venn-container text")
+                  .style("font-family", "Inter").style("font-size", "11px").style("font-weight", "500").style("fill", "#1f2937");
+            } else {
+                document.getElementById('venn-container').innerHTML = '<p class="text-[12px] text-gray-400">Tidak ada irisan data lintas kanal.</p>';
+            }
+
+            groupArray.sort((a, b) => b.count - a.count);
+            let topRatedHtml = '';
+            
+            if(groupArray.length === 0) {
+                topRatedHtml = `<div class="text-center py-10 text-[12px] text-gray-400 border border-dashed border-gray-200 rounded-2xl">Belum ada rekam bidang tanah.</div>`;
+            } else {
+                groupArray.slice(0, 10).forEach(g => {
+                    let ids = [];
+                    if(g.nibs.size > 0) ids.push(`NIB ${Array.from(g.nibs).join(', ')}`);
+                    if(g.haks.size > 0) ids.push(`Hak ${Array.from(g.haks).join(', ')}`);
+                    if(g.sus.size > 0) ids.push(`SU ${Array.from(g.sus).join(', ')}`);
+                    let idText = ids.length > 0 ? ids.join(' • ') : 'Identitas Peta Belum Lengkap';
+
+                    let badgesHtml = '';
+                    g.kanals.forEach(kanal => {
+                        let bg = 'bg-gray-100 text-gray-600', lbl = kanal;
+                        if(kanal === 'PERSURATAN') { bg = 'bg-surat'; lbl = 'Surat'; }
+                        else if(kanal === 'LAPORAN_MANDIRI') { bg = 'bg-aduan'; lbl = 'Laporan'; }
+                        else if(kanal === 'SEKSI_1') { bg = 'bg-risiko'; lbl = 'Risiko'; }
+                        else if(kanal === 'SEKSI_5') { bg = 'bg-sengketa'; lbl = 'Sengketa'; }
+                        badgesHtml += `<span class="badge-kanal ${bg}">${lbl}</span>`;
+                    });
+
+                    topRatedHtml += `
+                        <div class="bg-white rounded-2xl p-4 flex justify-between items-center hover:bg-blue-50/50 transition-colors border border-gray-100/80 cursor-default shadow-sm">
+                            <div class="overflow-hidden">
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <span class="text-[13px] font-medium text-gray-800 truncate max-w-[150px]">Desa ${g.desa}</span>
+                                    <span class="text-[10px] bg-red-50 text-red-600 border border-red-100 px-2 py-0.5 rounded-full font-medium shrink-0">Muncul ${g.count}x</span>
+                                </div>
+                                <p class="text-[11px] text-gray-500 truncate max-w-[280px] mb-2 font-mono">${idText}</p>
+                                <div class="flex gap-1.5 flex-wrap">${badgesHtml}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('topRatedList').innerHTML = topRatedHtml;
+        }
+
+        async function loadDashboardStats() {
+            const fetchCount = async (table) => { const { count } = await supabaseClient.from(table).select('*', { count: 'exact', head: true }); return count || 0; };
+            document.getElementById('stat_surat').innerText = await fetchCount('manajemen_persuratan');
+            document.getElementById('stat_aduan').innerText = await fetchCount('laporan_mandiri');
+            document.getElementById('stat_masalah_sp').innerText = await fetchCount('seksi1_kasus');
+            document.getElementById('stat_masalah_pps').innerText = await fetchCount('seksi5_sengketa');
+            
+            calculateSmartIntersections();
+        }
+
+        // -----------------------------------------------------------
+        // FUNGSI TARIK PETA BARU (BISA MEMBACA FILE JSON RAKSASA)
+        // -----------------------------------------------------------
+        async function fetchAndRenderSpatialMaster() {
+            try {
+                // 1. Tarik data masalah terlebih dahulu untuk pencocokan style peta
+                const { data: masalahData } = await supabaseClient.from('grid_bidang_bermasalah').select('*');
+                globalDataMasalah = masalahData || [];
+
+                // 2. Tarik Peta GeoJSON dari fungsi PostgreSQL yang baru
+                const { data: geoJsonStr, error } = await supabaseClient.rpc('ambil_master_bidang_geojson');
+                if (error) throw error;
+                
+                if (!geoJsonStr) {
+                    layerGroupMasterBidang.clearLayers();
+                    return;
+                }
+
+                // 3. Pastikan ekstrak JSON berjalan benar meskipun dikirim sebagai string
+                let geoJson = typeof geoJsonStr === 'string' ? JSON.parse(geoJsonStr) : geoJsonStr;
+                
+                if (!geoJson.features) geoJson.features = [];
+
+                masterBidangKamus = [];
+
+                // 4. Injeksi properti masalah & simpan ke kamus
+                geoJson.features.forEach(f => {
+                    const p = f.properties;
+                    masterBidangKamus.push({
+                        id: p.id_bidang, desa: p.kode_desa, nib: p.nib,
+                        no_hak: p.no_hak, no_su: p.no_su, nibel: p.nibel 
+                    });
+                    
+                    // Tandai field is_bermasalah agar LayerGroup Leaflet bisa mengecat warna merah/abu
+                    p.is_bermasalah = cekApakahBermasalah(p);
+                });
+                
+                layerGroupMasterBidang.clearLayers(); 
+                layerGroupMasterBidang.addData(geoJson);
+                
+                if (layerGroupMasterBidang.getLayers().length > 0) {
+                    mapObject.invalidateSize(); 
+                    mapObject.fitBounds(layerGroupMasterBidang.getBounds());
+                }
+            } catch (err) {
+                console.error("Kesalahan Rendering Peta:", err);
+            }
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('txtEmail').value, password = document.getElementById('txtPassword').value;
+            if(!email || !password) return;
+            Swal.fire({ title: 'Memproses...', didOpen: () => Swal.showLoading() });
+            
+            const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (authError) return Swal.fire("Gagal", authError.message, "error");
+            
+            const { data: rbacData } = await supabaseClient.from('user_roles').select('*').eq('id', authData.user.id).single();
+            if (!rbacData) return Swal.fire("Gagal", "Hak akses tidak ditemukan.", "error");
+            
+            appAuthenticatedUserSession = rbacData;
+            document.getElementById('authSection').classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('floatingMenu').classList.remove('hidden'); 
+            
+            document.getElementById('lblUserEmail').innerText = appAuthenticatedUserSession.email;
+            
+            let displayRole = "Pegawai Lapangan";
+            if(rbacData.role === 'admin') displayRole = "Administrator";
+            if(rbacData.role === 'kasi_sp') displayRole = "Kepala Seksi SP";
+            if(rbacData.role === 'kasi_pps') displayRole = "Kepala Seksi PPS";
+            document.getElementById('lblUserRole').innerText = displayRole;
+
+            const role = rbacData.role.toLowerCase();
+            document.getElementById('btn_nav_dashboard').style.display = 'none';
+            ['node_surat_sp','node_masalah_sp','node_masalah_pps','adminPanel'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['node_surat_sp','node_masalah_sp','node_masalah_pps','adminPanel'].forEach(id => document.getElementById(id).classList.remove('flex'));
+
+            if (role === 'admin') {
+                document.getElementById('btn_nav_dashboard').style.display = 'flex';
+                ['node_surat_sp','node_masalah_sp','node_masalah_pps','adminPanel'].forEach(id => {
+                    document.getElementById(id).classList.remove('hidden');
+                    document.getElementById(id).classList.add('flex');
+                });
+            } 
+            else if (role === 'kasi_sp') {
+                document.getElementById('btn_nav_dashboard').style.display = 'flex';
+                ['node_surat_sp','node_masalah_sp','node_masalah_pps'].forEach(id => {
+                    document.getElementById(id).classList.remove('hidden');
+                    document.getElementById(id).classList.add('flex');
+                });
+            } 
+            else if (role === 'kasi_pps') {
+                document.getElementById('node_masalah_pps').classList.remove('hidden');
+                document.getElementById('node_masalah_pps').classList.add('flex');
+            }
+
+            await fetchAndRenderSpatialMaster();
+            switchView('dashboard'); 
+            Swal.close();
+        }
 
         function switchView(viewName, kanalName = null) {
             document.getElementById('viewDashboard').classList.add('hidden');
             document.getElementById('viewTable').classList.remove('flex');
             document.getElementById('viewTable').classList.add('hidden');
-            document.getElementById('viewMap').classList.add('hidden');
-            document.getElementById('btn_nav_dashboard').classList.remove('bg-white/60', 'border-white/40');
-            document.getElementById('btn_nav_map').classList.remove('bg-white/60', 'border-white/40');
+            
+            document.getElementById('btn_nav_dashboard').classList.remove('text-blue-600', 'bg-blue-50/50');
+            document.getElementById('btn_nav_map').classList.remove('text-blue-600', 'bg-blue-50/50');
+            document.getElementById('btn_nav_dashboard').classList.add('text-gray-500');
+            document.getElementById('btn_nav_map').classList.add('text-gray-500');
 
-            if (viewName === 'dashboard') {
+            if (viewName === 'map') {
+                document.getElementById('btn_nav_map').classList.remove('text-gray-500');
+                document.getElementById('btn_nav_map').classList.add('text-blue-600', 'bg-blue-50/50');
+                setTimeout(() => mapObject.invalidateSize(), 300);
+            } else if (viewName === 'dashboard') {
                 document.getElementById('viewDashboard').classList.remove('hidden');
-                document.getElementById('btn_nav_dashboard').classList.add('bg-white/60', 'border-white/40');
+                document.getElementById('viewDashboard').classList.add('flex');
+                document.getElementById('btn_nav_dashboard').classList.remove('text-gray-500');
+                document.getElementById('btn_nav_dashboard').classList.add('text-blue-600', 'bg-blue-50/50');
                 loadDashboardStats();
             } else if (viewName === 'table') {
                 document.getElementById('viewTable').classList.remove('hidden');
                 document.getElementById('viewTable').classList.add('flex');
                 appCurrentActiveKanal = kanalName;
                 setupTableView(kanalName);
-            } else if (viewName === 'map') {
-                document.getElementById('viewMap').classList.remove('hidden');
-                document.getElementById('btn_nav_map').classList.add('bg-white/60', 'border-white/40');
-                setTimeout(() => mapObject.invalidateSize(), 300);
             }
-        }
-
-        async function loadDashboardStats() {
-            const fetchCount = async (table) => {
-                const { count, error } = await supabaseClient.from(table).select('*', { count: 'exact', head: true });
-                if (error) console.error(`Error fetching count for ${table}:`, error.message);
-                return count || 0;
-            };
-            document.getElementById('stat_surat').innerText = await fetchCount('manajemen_persuratan_sp');
-            document.getElementById('stat_aduan').innerText = await fetchCount('laporan_mandiri');
-            document.getElementById('stat_masalah_sp').innerText = await fetchCount('penanganan_risiko_permasalahan_sp');
-            document.getElementById('stat_masalah_pps').innerText = await fetchCount('pengendalian_penanganan_sengketa');
-        }
-
-        async function setupTableView(kanal) {
-            const tableTitle = { 
-                'surat': 'Manajemen Persuratan SP', 
-                'aduan': 'Laporan Mandiri', 
-                'masalah_sp': 'Penanganan Risiko & Permasalahan SP', 
-                'masalah_pps': 'Pengendalian & Penanganan Sengketa PPS' 
-            };
-            document.getElementById('tableTitle').innerText = tableTitle[kanal];
-            document.getElementById('tableBody').innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-xl mb-2"></i><br>Sinkronisasi server...</td></tr>`;
-
-            let mainTable, detailTable, fkeyMain;
-            let headerHTML = `<th class="p-4 font-bold">ID</th>`;
-            
-            if (kanal === 'surat') { 
-                mainTable = 'manajemen_persuratan_sp'; detailTable = 'detail_persuratan_sp'; fkeyMain = 'id_surat';
-                headerHTML += `<th class="p-4 font-bold">Perihal</th><th class="p-4 font-bold">No. Surat</th><th class="p-4 font-bold">Pengirim</th>`;
-            } else if (kanal === 'aduan') { 
-                mainTable = 'laporan_mandiri'; detailTable = 'detail_laporan_mandiri'; fkeyMain = 'id_laporan';
-                headerHTML += `<th class="p-4 font-bold">Isi Laporan</th><th class="p-4 font-bold">Pelapor</th><th class="p-4 font-bold">Status</th>`;
-            } else if (kanal === 'masalah_sp') { 
-                mainTable = 'penanganan_risiko_permasalahan_sp'; detailTable = 'detail_penanganan_risiko_permasalahan_sp'; fkeyMain = 'id_risiko_sp';
-                headerHTML += `<th class="p-4 font-bold">Deskripsi Permasalahan</th><th class="p-4 font-bold">Sumber</th><th class="p-4 font-bold">Kode Bendel</th>`;
-            } else if (kanal === 'masalah_pps') { 
-                mainTable = 'pengendalian_penanganan_sengketa'; detailTable = 'detail_pengendalian_penanganan_sengketa'; fkeyMain = 'id_pps';
-                headerHTML += `<th class="p-4 font-bold">Deskripsi Permasalahan</th><th class="p-4 font-bold">No. Perkara</th><th class="p-4 font-bold">Pihak Sengketa</th>`;
-            }
-            headerHTML += `<th class="p-4 font-bold">Desa / NIB</th><th class="p-4 font-bold">No. Hak / SU</th><th class="p-4 font-bold text-center">Aksi</th>`;
-            document.getElementById('tableHeaderRow').innerHTML = headerHTML;
-
-            try {
-                const { data: mainData, error: errMain } = await supabaseClient.from(mainTable).select('*').order('created_at', { ascending: false }).limit(50);
-                if(errMain) throw errMain;
-                
-                let htmlRows = '';
-                if(mainData.length === 0) {
-                    htmlRows = `<tr><td colspan="8" class="p-8 text-center text-slate-400">Belum ada rekod data di tabel ini.</td></tr>`;
-                } else {
-                    for (let row of mainData) {
-                        const rowId = row[fkeyMain];
-                        const { data: detData } = await supabaseClient.from(detailTable).select('*').eq(fkeyMain, rowId).limit(1).maybeSingle();
-                        
-                        const desa = detData ? detData.kode_desa : '-';
-                        const nib = detData ? detData.nib : '-';
-                        const no_hak = detData && detData.no_hak ? detData.no_hak : '-';
-                        const no_su = detData && detData.no_su ? detData.no_su : '-';
-                        
-                        htmlRows += `<tr class="hover:bg-white/40 transition-colors">`;
-                        htmlRows += `<td class="p-4 border-b border-white/40 font-mono text-[11px] font-bold text-slate-500">#${rowId.substring(0,8)}...</td>`;
-                        
-                        if (kanal === 'surat') {
-                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 max-w-[150px] truncate" title="${row.perihal}">${row.perihal}</td>`;
-                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 font-mono">${row.nomor_surat || '-'}</td>`;
-                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900">${row.pengirim || '-'}</td>`;
-                        } else if (kanal === 'aduan') {
-                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 max-w-[200px] truncate" title="${row.isi_laporan}">${row.isi_laporan}</td>`;
-                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900">${row.pelapor || '-'}</td>`;
-                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900"><span class="px-2 py-0.5 rounded text-[10px] bg-amber-100 text-amber-800 font-bold">${row.status || 'Open'}</span></td>`;
-                        } else if (kanal === 'masalah_sp') {
-                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 max-w-[200px] truncate" title="${row.deskripsi_permasalahan}">${row.deskripsi_permasalahan}</td>`;
-                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900">${row.sumber_data_masalah || '-'}</td>`;
-                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 font-mono">${row.kode_bendel_fisik || '-'}</td>`;
-                        } else if (kanal === 'masalah_pps') {
-                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 max-w-[150px] truncate" title="${row.deskripsi_permasalahan}">${row.deskripsi_permasalahan}</td>`;
-                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 font-mono">${row.nomor_perkara || '-'}</td>`;
-                            htmlRows += `<td class="p-4 border-b border-white/40 text-slate-900 max-w-[120px] truncate" title="${row.pihak_bersengketa}">${row.pihak_bersengketa || '-'}</td>`;
-                        }
-
-                        htmlRows += `<td class="p-4 border-b border-white/40 font-semibold text-slate-600">${desa} <br><span class="text-[11px] font-mono font-bold text-indigo-600">NIB: ${nib}</span></td>`;
-                        htmlRows += `<td class="p-4 border-b border-white/40 text-slate-600 font-medium">Hak: ${no_hak} <br><span class="text-[11px] text-slate-500">SU: ${no_su}</span></td>`;
-                        htmlRows += `
-                                <td class="p-4 border-b border-white/40 text-center space-x-1.5">
-                                    <button onclick="window.open('${row.link_arsip || '#'}', '_blank')" title="Lihat Berkas" class="w-8 h-8 inline-flex items-center justify-center text-slate-500 hover:bg-slate-200 rounded-xl"><i class="fas fa-file-pdf text-xs"></i></button>
-                                    <button onclick="actionInfoKoneksi('${desa}', '${nib}', '${no_hak}', '${no_su}')" title="Informasi Koneksi" class="w-8 h-8 inline-flex items-center justify-center text-amber-600 hover:bg-amber-500/10 rounded-xl"><i class="fas fa-project-diagram text-xs"></i></button>
-                                </td>
-                            </tr>
-                        `;
-                    }
-                }
-                document.getElementById('tableBody').innerHTML = htmlRows;
-            } catch(e) {
-                document.getElementById('tableBody').innerHTML = `<tr><td colspan="8" class="text-center text-rose-500 p-8">Gagal Memuat: ${e.message}</td></tr>`;
-            }
-        }
-
-        async function actionInfoKoneksi(desa, nib, no_hak, no_su) {
-            if (!desa || desa === '-') return Swal.fire("Peringatan", "Minimal informasi Kode Desa harus ada untuk analisis relasi.", "warning");
-            Swal.fire({ title: 'Menganalisis Relasi Spasial...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            
-            const pHak = (no_hak && no_hak !== '-') ? no_hak : null;
-            const pSu = (no_su && no_su !== '-') ? no_su : null;
-            const pNib = (nib && nib !== '-') ? nib : null;
-
-            const { data, error } = await supabaseClient.rpc('cek_riwayat_bidang', { p_kode_desa: desa, p_nib: pNib, p_no_hak: pHak, p_no_su: pSu });
-            if(error) return Swal.fire("Gagal", "Gagal mengeksekusi fungsi relasi data silang.", "error");
-            
-            if(data && data.length > 0) {
-                let html = `<ul class="space-y-2 max-h-52 overflow-y-auto text-left text-xs">`;
-                data.forEach(item => { html += `<li class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl"><span class="font-extrabold text-amber-700">[${item.kanal_sumber.toUpperCase()}]</span> ${item.informasi_tambahan}</li>`; });
-                html += `</ul>`;
-                Swal.fire({ title: 'Koneksi Tumpang Tindih Ditemukan', html: html, icon: 'info' });
-            } else {
-                Swal.fire("Koneksi Bersih", "Tidak ada korelasi sengketa, sengketa PPS atau risiko spasial di kanal lain untuk bidang tanah ini.", "success");
-            }
-        }
-
-        const mapObject = L.map('map', { zoomControl: false }).setView([-8.6500, 115.2166], 11);
-        L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 22, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'] }).addTo(mapObject);
-        L.control.zoom({ position: 'bottomright' }).addTo(mapObject);
-        let layerGroupMasterBidang = L.geoJSON(null, { style: { color: '#4f46e5', weight: 1.5, fillColor: '#818cf8', fillOpacity: 0.3 } }).addTo(mapObject);
-
-        async function handleLogin() {
-            const email = document.getElementById('txtEmail').value, password = document.getElementById('txtPassword').value;
-            if(!email || !password) return Swal.fire("Peringatan", "Email dan password wajib diisi.", "warning");
-            Swal.fire({ title: 'Memproses Autentikasi...', didOpen: () => Swal.showLoading() });
-            
-            const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (authError) return Swal.fire("Gagal", authError.message, "error");
-            
-            const { data: rbacData } = await supabaseClient.from('user_roles').select('*').eq('id', authData.user.id).single();
-            if (!rbacData) return Swal.fire("Gagal", "User terautentikasi namun hak akses peran (role) belum terdaftar.", "error");
-            
-            appAuthenticatedUserSession = rbacData;
-            renderSecuredWorkspace();
-            Swal.close();
-        }
-
-        function renderSecuredWorkspace() {
-            document.getElementById('authSection').classList.add('hidden');
-            document.getElementById('workspaceSection').classList.remove('hidden');
-            document.getElementById('btnLogout').classList.remove('hidden');
-            document.getElementById('lblUserEmail').innerText = appAuthenticatedUserSession.email;
-            document.getElementById('lblUserRole').innerText = appAuthenticatedUserSession.role;
-
-            const u = appAuthenticatedUserSession.akses_kanal, a = appAuthenticatedUserSession.role === 'admin';
-            if (u === 'all' || u === 'surat_sp' || a) document.getElementById('node_surat_sp').classList.remove('hidden');
-            if (u === 'all' || u === 'aduan' || a) document.getElementById('node_aduan').classList.remove('hidden');
-            if (u === 'all' || u === 'masalah_sp' || a) document.getElementById('node_masalah_sp').classList.remove('hidden');
-            if (u === 'all' || u === 'masalah_pps' || a) document.getElementById('node_masalah_pps').classList.remove('hidden');
-            if (a) document.getElementById('adminPanel').classList.remove('hidden');
-
-            fetchAndRenderSpatialMaster();
-            switchView('dashboard');
         }
 
         function handleLogout() { supabaseClient.auth.signOut(); window.location.reload(); }
 
-        function triggerOpenModal() {
-            if (!appCurrentActiveKanal) return Swal.fire("Peringatan", "Pilih salah satu kanal di sidebar navigasi terlebih dahulu.", "warning");
+        async function setupTableView(kanal) {
+            const config = SCHEMA_CONFIG[kanal];
+            document.getElementById('tableTitle').innerText = config.title;
             
-            // Reset Semua Input Form Utama & Kondisional
-            document.getElementById('formInputPrimaryDesc').value = "";
-            document.getElementById('formInputDesa').value = ""; document.getElementById('formInputNib').value = "";
-            document.getElementById('formInputNoHak').value = ""; document.getElementById('formInputNoSu').value = "";
-            document.getElementById('formInputX').value = ""; document.getElementById('formInputY').value = "";
-            document.getElementById('formFileNative').value = "";
-            
-            document.getElementById('formSuratNomor').value = ""; document.getElementById('formSuratPengirim').value = "";
-            document.getElementById('formSuratAlamat').value = ""; document.getElementById('formSuratKontak').value = "";
-            document.getElementById('formSuratOtorisasi').value = ""; document.getElementById('formSuratPic').value = "";
-            document.getElementById('formSuratIsi').value = ""; document.getElementById('formSuratTindakLanjut').value = "";
-            document.getElementById('formAduanPelapor').value = "";
-            document.getElementById('formRisikoSumber').value = ""; document.getElementById('formRisikoBendel').value = "";
-            document.getElementById('formPpsSumber').value = ""; document.getElementById('formPpsPerkara').value = ""; document.getElementById('formPpsPihak').value = "";
+            let headerHTML = `<th class="p-4 bg-white/60 backdrop-blur-md sticky left-0 z-20 shadow-[1px_0_0_rgba(0,0,0,0.05)] text-center">Aksi</th>`;
+            headerHTML += `<th class="p-4 min-w-[100px]">ID</th>`;
+            config.fields.forEach(f => {
+                headerHTML += `<th class="p-4 min-w-[150px]">${f.label}</th>`;
+            });
+            document.getElementById('tableHeaderRow').innerHTML = headerHTML;
+            document.getElementById('tableBody').innerHTML = `<tr><td colspan="${config.fields.length + 2}" class="p-8 text-center text-gray-400">Memuat Data...</td></tr>`;
 
-            document.getElementById('step1Upload').classList.remove('hidden');
-            document.getElementById('step2Form').classList.add('hidden');
-            document.getElementById('btnSubmitForm').classList.add('hidden'); 
-            
-            document.getElementById('modalFormTitle').innerText = `REGISTRASI BARU: ${document.getElementById('tableTitle').innerText.toUpperCase()}`;
-            
-            // Atur Visibilitas Konten Form Berdasarkan Kanal Aktif
-            document.getElementById('group_fields_surat').classList.add('hidden');
-            document.getElementById('group_fields_aduan').classList.add('hidden');
-            document.getElementById('group_fields_masalah_sp').classList.add('hidden');
-            document.getElementById('group_fields_masalah_pps').classList.add('hidden');
+            try {
+                const { data: mainData, error: errMain } = await supabaseClient.from(config.mainTable).select('*').order('created_at', { ascending: false }).limit(100);
+                if(errMain) throw errMain;
 
-            if (appCurrentActiveKanal === 'surat') {
-                document.getElementById('lblFormDesc').innerText = "Perihal Surat Masuk";
-                document.getElementById('group_fields_surat').classList.remove('hidden');
-            } else if (appCurrentActiveKanal === 'aduan') {
-                document.getElementById('lblFormDesc').innerText = "Isi Laporan / Aduan Masyarakat";
-                document.getElementById('group_fields_aduan').classList.remove('hidden');
-            } else if (appCurrentActiveKanal === 'masalah_sp') {
-                document.getElementById('lblFormDesc').innerText = "Deskripsi Permasalahan / Risiko SP";
-                document.getElementById('group_fields_masalah_sp').classList.remove('hidden');
-            } else if (appCurrentActiveKanal === 'masalah_pps') {
-                document.getElementById('lblFormDesc').innerText = "Deskripsi Permasalahan Sengketa PPS";
-                document.getElementById('group_fields_masalah_pps').classList.remove('hidden');
-            }
-            
-            document.getElementById('formModal').classList.remove('hidden');
+                const { data: spatialData } = await supabaseClient.from('grid_bidang_bermasalah').select('*').in(config.pk, mainData.map(d => d[config.pk]));
+                
+                loadedTableData = mainData.map(m => {
+                    let s = spatialData.find(sd => sd[config.pk] === m[config.pk]) || {};
+                    return { ...m, ...s, _mainId: m[config.pk], _spatialId: s.id_detail };
+                });
+
+                renderTableRows();
+            } catch(e) { document.getElementById('tableBody').innerHTML = `<tr><td colspan="${config.fields.length + 2}" class="text-center text-red-400 p-8">${e.message}</td></tr>`; }
         }
 
-        function triggerCloseModal() { document.getElementById('formModal').classList.add('hidden'); }
+        function renderTableRows() {
+            const config = SCHEMA_CONFIG[appCurrentActiveKanal];
+            let html = '';
+            if(loadedTableData.length === 0) {
+                html = `<tr><td colspan="${config.fields.length + 2}" class="p-8 text-center text-gray-400 font-light">Tidak ada rekam data.</td></tr>`;
+            } else {
+                loadedTableData.forEach((row, index) => {
+                    html += `<tr id="row-${index}">`;
+                    html += `
+                        <td class="p-3 bg-white/60 backdrop-blur-md sticky left-0 z-10 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
+                            <div class="flex gap-1.5 justify-center">
+                                <button onclick="editInlineRow(${index})" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:text-blue-600 hover:bg-blue-50 flex items-center justify-center transition-colors"><span class="material-symbols-rounded text-[18px]">edit</span></button>
+                            </div>
+                        </td>
+                        <td class="p-4 text-[12px] font-mono text-gray-400">#${String(row._mainId).substring(0,5)}</td>
+                    `;
+                    config.fields.forEach(f => { html += `<td class="p-4 truncate max-w-[200px]" title="${row[f.key] || '-'}">${row[f.key] || '-'}</td>`; });
+                    html += `</tr>`;
+                });
+            }
+            document.getElementById('tableBody').innerHTML = html;
+        }
+
+        function addNewInlineRow() {
+            const config = SCHEMA_CONFIG[appCurrentActiveKanal];
+            let tr = document.createElement('tr');
+            tr.id = "row-new";
+            tr.className = "bg-blue-50/30";
+            
+            let ocrBtn = appCurrentActiveKanal === 'surat' ? `<button onclick="document.getElementById('ocrPdfInput').click()" class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 hover:bg-orange-200 flex items-center justify-center" title="Ekstrak PDF"><span class="material-symbols-rounded text-[18px]">document_scanner</span></button>` : '';
+
+            let html = `
+                <td class="p-3 bg-white/80 sticky left-0 z-10 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
+                    <div class="flex gap-1.5 justify-center">
+                        <button onclick="saveInlineRow('new')" class="w-8 h-8 rounded-full bg-[#007AFF] text-white hover:bg-blue-600 flex items-center justify-center"><span class="material-symbols-rounded text-[18px]">save</span></button>
+                        <button onclick="renderTableRows()" class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 flex items-center justify-center"><span class="material-symbols-rounded text-[18px]">close</span></button>
+                        ${ocrBtn}
+                    </div>
+                </td>
+                <td class="p-4 text-[11px] text-blue-500 italic font-medium">Baru</td>
+            `;
+
+            config.fields.forEach(f => {
+                let val = (tempOcrData && tempOcrData[f.key]) ? tempOcrData[f.key] : "";
+                let ph = f.req ? "*Wajib" : "";
+                html += `<td class="p-2"><input type="${f.type}" data-key="${f.key}" data-spatial="${f.spatial?'true':'false'}" placeholder="${ph}" value="${val}" class="glass-input inline-field"></td>`;
+            });
+            tr.innerHTML = html;
+            
+            const tbody = document.getElementById('tableBody');
+            if(tbody.querySelector('td[colspan]')) tbody.innerHTML = '';
+            tbody.prepend(tr);
+        }
+
+        function editInlineRow(index) {
+            const config = SCHEMA_CONFIG[appCurrentActiveKanal];
+            const row = loadedTableData[index];
+            const tr = document.getElementById(`row-${index}`);
+            tr.className = "bg-blue-50/30";
+
+            let html = `
+                <td class="p-3 bg-white/80 sticky left-0 z-10 shadow-[1px_0_0_rgba(0,0,0,0.05)]">
+                    <div class="flex gap-1.5 justify-center">
+                        <button onclick="saveInlineRow(${index})" class="w-8 h-8 rounded-full bg-[#007AFF] text-white hover:bg-blue-600 flex items-center justify-center"><span class="material-symbols-rounded text-[18px]">save</span></button>
+                        <button onclick="renderTableRows()" class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 flex items-center justify-center"><span class="material-symbols-rounded text-[18px]">close</span></button>
+                    </div>
+                </td>
+                <td class="p-4 text-[12px] font-mono text-gray-400">#${String(row._mainId).substring(0,5)}</td>
+            `;
+
+            config.fields.forEach(f => {
+                let val = row[f.key] || '';
+                let ph = f.req ? "*Wajib" : "";
+                html += `<td class="p-2"><input type="${f.type}" data-key="${f.key}" data-spatial="${f.spatial?'true':'false'}" placeholder="${ph}" value="${val}" class="glass-input inline-field"></td>`;
+            });
+            tr.innerHTML = html;
+        }
+
+        async function saveInlineRow(indexOrNew) {
+            const config = SCHEMA_CONFIG[appCurrentActiveKanal];
+            const tr = document.getElementById(indexOrNew === 'new' ? 'row-new' : `row-${indexOrNew}`);
+            let mainPayload = {}; let spatialPayload = {};
+            let isUpdate = indexOrNew !== 'new';
+            let refRow = isUpdate ? loadedTableData[indexOrNew] : null;
+
+            tr.querySelectorAll('.inline-field').forEach(inp => {
+                let key = inp.getAttribute('data-key');
+                let val = inp.type === 'number' ? parseFloat(inp.value) : inp.value;
+                if(inp.value === '') val = null;
+
+                if(inp.getAttribute('data-spatial') === 'true') spatialPayload[key] = val;
+                else mainPayload[key] = val;
+            });
+
+            for(let f of config.fields) {
+                if(f.req && !mainPayload[f.key] && !spatialPayload[f.key]) {
+                    return Swal.fire("Perhatian", `Kolom ${f.label} wajib diisi.`, "warning");
+                }
+            }
+
+            Swal.fire({ title: 'Menyimpan...', didOpen: () => Swal.showLoading() });
+            try {
+                let mainId;
+                if(appCurrentActiveKanal === 'surat' && tempUploadedUrl && !isUpdate) { mainPayload.link_arsip = tempUploadedUrl; }
+
+                if (isUpdate) {
+                    mainId = refRow._mainId;
+                    const { error: err1 } = await supabaseClient.from(config.mainTable).update(mainPayload).eq(config.pk, mainId);
+                    if(err1) throw err1;
+
+                    if(refRow._spatialId) {
+                        const { error: err2 } = await supabaseClient.from('grid_bidang_bermasalah').update(spatialPayload).eq('id_detail', refRow._spatialId);
+                        if(err2) throw err2;
+                    } else {
+                        spatialPayload.sumber_kanal = getKanalEnum(appCurrentActiveKanal);
+                        spatialPayload[config.pk] = mainId;
+                        const { error: err2 } = await supabaseClient.from('grid_bidang_bermasalah').insert([spatialPayload]);
+                        if(err2) throw err2;
+                    }
+                } else {
+                    const { data: newRow, error: err1 } = await supabaseClient.from(config.mainTable).insert([mainPayload]).select().single();
+                    if(err1) throw err1;
+                    mainId = newRow[config.pk];
+
+                    spatialPayload.sumber_kanal = getKanalEnum(appCurrentActiveKanal);
+                    spatialPayload[config.pk] = mainId;
+                    const { error: err2 } = await supabaseClient.from('grid_bidang_bermasalah').insert([spatialPayload]);
+                    if(err2) throw err2;
+                }
+                
+                tempOcrData = null; tempUploadedUrl = null;
+                Swal.fire("Selesai", "Data berhasil disimpan.", "success");
+                setupTableView(appCurrentActiveKanal);
+            } catch(e) { Swal.fire("Gagal", e.message, "error"); }
+        }
+
+        function getKanalEnum(k) {
+            if(k === 'surat') return 'PERSURATAN';
+            if(k === 'aduan') return 'LAPORAN_MANDIRI';
+            if(k === 'masalah_sp') return 'SEKSI_1';
+            return 'SEKSI_5';
+        }
+
         function toBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result.split(',')[1]); reader.onerror = error => reject(error); }); }
 
-        document.getElementById('formFileNative').addEventListener('change', async function(e) {
-            const file = e.target.files[0]; if (!file) return;
-            document.getElementById('lblFileNameDisplay').innerText = file.name;
-            Swal.fire({ title: 'Menjalankan AI OCR Spasial...', didOpen: () => Swal.showLoading() });
+        async function processOcrUpload(element) {
+            const file = element.files[0]; if (!file) return;
+            Swal.fire({ title: 'Mengekstrak PDF...', didOpen: () => Swal.showLoading() });
             try {
                 const base64Data = await toBase64(file);
                 const response = await fetch(CONFIG_GAS_ENGINE_URL, { method: 'POST', body: JSON.stringify({ fileName: file.name, mimeType: file.type, fileBase64: base64Data }) });
                 const result = await response.json();
+                
                 if (result.status !== "success") throw new Error(result.message);
                 
                 if (result.ocrData) {
-                    document.getElementById('formInputPrimaryDesc').value = result.ocrData.deskripsi || '';
-                    document.getElementById('formInputDesa').value = result.ocrData.kode_desa || '';
-                    document.getElementById('formInputNib').value = result.ocrData.nib || '';
-                    
-                    if (appCurrentActiveKanal === 'surat') {
-                        document.getElementById('formSuratNomor').value = result.ocrData.nomor_dokumen || '';
-                        document.getElementById('formSuratPengirim').value = result.ocrData.pihak_terkait || '';
-                    } else if (appCurrentActiveKanal === 'aduan') {
-                        document.getElementById('formAduanPelapor').value = result.ocrData.pihak_terkait || '';
-                    } else if (appCurrentActiveKanal === 'masalah_sp') {
-                        document.getElementById('formRisikoBendel').value = result.ocrData.nomor_dokumen || '';
-                    } else if (appCurrentActiveKanal === 'masalah_pps') {
-                        document.getElementById('formPpsPerkara').value = result.ocrData.nomor_dokumen || '';
-                        document.getElementById('formPpsPihak').value = result.ocrData.pihak_terkait || '';
-                    }
+                    tempOcrData = {
+                        perihal: result.ocrData.deskripsi || '',
+                        desa: result.ocrData.kode_desa || '',
+                        nib: result.ocrData.nib || ''
+                    };
                 }
-                window.tempUploadedFileUrl = result.folderUrl; 
-                document.getElementById('step1Upload').classList.add('hidden');
-                document.getElementById('step2Form').classList.remove('hidden');
-                document.getElementById('btnSubmitForm').classList.remove('hidden');
-                Swal.fire({ title: "Warkah Diproses!", text: "Rincian dokumen berhasil diekstrak oleh AI. Sempurnakan isian bidang.", icon: "success" });
-            } catch (err) { Swal.fire("Gagal Engine OCR", err.message, "error"); }
-        });
-
-        async function executeSubmissionData() {
-            const txtPrimaryDesc = document.getElementById('formInputPrimaryDesc').value;
-            const txtDesa = document.getElementById('formInputDesa').value;
-            const txtNib = document.getElementById('formInputNib').value;
-            const txtNoHak = document.getElementById('formInputNoHak').value || null;
-            const txtNoSu = document.getElementById('formInputNoSu').value || null;
-            const numX = parseFloat(document.getElementById('formInputX').value) || null;
-            const numY = parseFloat(document.getElementById('formInputY').value) || null;
-
-            if (!txtPrimaryDesc || !txtDesa) return Swal.fire("Validasi Gagal", "Deskripsi Konten Utama dan Kode Desa wajib diisi.", "error");
-            
-            // Cek Tumpang Tindih Menggunakan RPC Lintas Kanal Sebelum Insert
-            const { data: dupData } = await supabaseClient.rpc('cek_riwayat_bidang', { 
-                p_kode_desa: txtDesa, 
-                p_nib: txtNib || null, 
-                p_no_hak: txtNoHak, 
-                p_no_su: txtNoSu 
-            });
-            if (dupData && dupData.length > 0) {
-                const mod = await Swal.fire({ title: 'Peringatan Tumpang Tindih!', text: 'Atribut spasial/hak terdeteksi memiliki relasi konflik/aktif di kanal lain. Tetap lanjutkan simpan berkas?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Bypass & Simpan', cancelButtonText: 'Batalkan' });
-                if(!mod.isConfirmed) return;
-            }
-
-            Swal.fire({ title: 'Sinkronisasi Cloud Supabase...', didOpen: () => Swal.showLoading() });
-            let uploadedFileUrl = window.tempUploadedFileUrl || ""; 
-            
-            try {
-                let mainRow, mainErr;
+                tempUploadedUrl = result.folderUrl; 
+                Swal.close();
                 
-                // KANAL 1: MANAJEMEN PERSURATAN SP
-                if (appCurrentActiveKanal === 'surat') {
-                    const paySurat = {
-                        nomor_surat: document.getElementById('formSuratNomor').value || null,
-                        pengirim: document.getElementById('formSuratPengirim').value || null,
-                        alamat_pengirim: document.getElementById('formSuratAlamat').value || null,
-                        kontak_pengirim: document.getElementById('formSuratKontak').value || null,
-                        otorisasi: document.getElementById('formSuratOtorisasi').value || null,
-                        perihal: txtPrimaryDesc,
-                        isi_surat: document.getElementById('formSuratIsi').value || null,
-                        tindak_lanjut: document.getElementById('formSuratTindakLanjut').value || null,
-                        pic: document.getElementById('formSuratPic').value || null,
-                        link_arsip: uploadedFileUrl
-                    };
-                    ({ data: mainRow, error: mainErr } = await supabaseClient.from('manajemen_persuratan_sp').insert([paySurat]).select().single());
-                    if(!mainErr) {
-                        await supabaseClient.from('detail_persuratan_sp').insert([{ 
-                            id_surat: mainRow.id_surat, kode_desa: txtDesa, nib: txtNib, no_hak: txtNoHak, no_su: txtNoSu, koordinat_x: numX, koordinat_y: numY 
-                        }]);
-                    }
-                } 
-                // KANAL 2: LAPORAN MANDIRI
-                else if (appCurrentActiveKanal === 'aduan') {
-                    const payAduan = {
-                        isi_laporan: txtPrimaryDesc,
-                        pelapor: document.getElementById('formAduanPelapor').value || null,
-                        link_arsip: uploadedFileUrl
-                    };
-                    ({ data: mainRow, error: mainErr } = await supabaseClient.from('laporan_mandiri').insert([payAduan]).select().single());
-                    if(!mainErr) {
-                        await supabaseClient.from('detail_laporan_mandiri').insert([{ 
-                            id_laporan: mainRow.id_laporan, kode_desa: txtDesa, nib: txtNib, no_hak: txtNoHak, no_su: txtNoSu, koordinat_x: numX, koordinat_y: numY 
-                        }]);
-                    }
-                } 
-                // KANAL 3: PENANGANAN RISIKO DAN PERMASALAHAN SP
-                else if (appCurrentActiveKanal === 'masalah_sp') {
-                    const payRisiko = {
-                        sumber_data_masalah: document.getElementById('formRisikoSumber').value || null,
-                        deskripsi_permasalahan: txtPrimaryDesc,
-                        kode_bendel_fisik: document.getElementById('formRisikoBendel').value || null,
-                        link_arsip: uploadedFileUrl
-                    };
-                    ({ data: mainRow, error: mainErr } = await supabaseClient.from('penanganan_risiko_permasalahan_sp').insert([payRisiko]).select().single());
-                    if(!mainErr) {
-                        await supabaseClient.from('detail_penanganan_risiko_permasalahan_sp').insert([{ 
-                            id_risiko_sp: mainRow.id_risiko_sp, kode_desa: txtDesa, nib: txtNib, no_hak: txtNoHak, no_su: txtNoSu, koordinat_x: numX, koordinat_y: numY 
-                        }]);
-                    }
-                } 
-                // KANAL 4: DATABASE PENGENDALIAN DAN PENANGANAN SENGKETA (PPS)
-                else if (appCurrentActiveKanal === 'masalah_pps') {
-                    const payPps = {
-                        sumber_data_masalah: document.getElementById('formPpsSumber').value || null,
-                        deskripsi_permasalahan: txtPrimaryDesc,
-                        nomor_perkara: document.getElementById('formPpsPerkara').value || null,
-                        pihak_bersengketa: document.getElementById('formPpsPihak').value || null,
-                        link_arsip: uploadedFileUrl
-                    };
-                    ({ data: mainRow, error: mainErr } = await supabaseClient.from('pengendalian_penanganan_sengketa').insert([payPps]).select().single());
-                    if(!mainErr) {
-                        await supabaseClient.from('detail_pengendalian_penanganan_sengketa').insert([{ 
-                            id_pps: mainRow.id_pps, kode_desa: txtDesa, nib: txtNib, no_hak: txtNoHak, no_su: txtNoSu, koordinat_x: numX, koordinat_y: numY 
-                        }]);
-                    }
-                }
-
-                if(mainErr) throw mainErr;
-                window.tempUploadedFileUrl = ""; 
-                Swal.fire("Berhasil Disimpan", "Rekod transaksional beserta relasi atribut spasial detail berhasil diverifikasi dan diunggah.", "success");
-                triggerCloseModal(); 
-                setupTableView(appCurrentActiveKanal);
-            } catch(dbErr) { Swal.fire("Error Postgre Cloud", dbErr.message, "error"); }
+                renderTableRows();
+                addNewInlineRow();
+                Swal.fire({title: "Ekstraksi Selesai", text: "Sebagian form telah diisi AI.", icon: "success", toast: true, position: 'top-end', showConfirmButton: false, timer: 3000});
+            } catch (err) { Swal.fire("Gagal", err.message, "error"); }
+            element.value = '';
         }
 
-        // FUNGSI 1: MENGAMBIL DAN MERENDER DATA MASTER DARI DATABASE UNTUK SEMUA USER
-        async function fetchAndRenderSpatialMaster() {
-            const { data, error } = await supabaseClient.rpc('ambil_master_bidang_geojson');
-            if (error || !data) return;
-            
-            const geoJson = { 
-                type: "FeatureCollection", 
-                features: data.map(i => ({ 
-                    type: "Feature", 
-                    properties: { 
-                        id: i.id_bidang, 
-                        kode_desa: i.kode_desa, 
-                        nib: i.nib,
-                        no_hak: i.no_hak, 
-                        no_su: i.no_su 
-                    }, 
-                    geometry: i.geom_json 
-                })) 
-            };
-            
-            layerGroupMasterBidang.clearLayers(); 
-            layerGroupMasterBidang.addData(geoJson);
-            
-            if (layerGroupMasterBidang.getLayers().length > 0) {
-                mapObject.fitBounds(layerGroupMasterBidang.getBounds());
-            }
-        }
-
-        // FUNGSI 2: MESIN BATCH UPLOAD GEOJSON
         async function processGeoJsonInput(element) {
             const file = element.files[0]; 
             if (!file) return;
 
-            Swal.fire({ 
-                title: 'Membaca File GeoJSON...', 
-                text: 'Memproses struktur atribut...', 
-                allowOutsideClick: false, 
-                didOpen: () => Swal.showLoading() 
-            });
+            Swal.fire({ title: 'Memeriksa Database...', didOpen: () => Swal.showLoading() });
+            const { count, error: countErr } = await supabaseClient.from('bidang_tanah').select('*', { count: 'exact', head: true });
+            if (countErr) { Swal.fire("Error Sistem", countErr.message, "error"); element.value = ''; return; }
 
+            if (count > 0) {
+                const confirmDelete = await Swal.fire({
+                    title: 'Peta Sudah Tersedia!',
+                    html: `Sistem mendeteksi ada <b>${count}</b> poligon di database.<br><br>Wajib menghapus peta lama sebelum mengunggah yang baru agar tidak terjadi penumpukan data.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#e5e7eb',
+                    confirmButtonText: 'Ya, Hapus Peta Lama',
+                    cancelButtonText: 'Batal',
+                    customClass: { popup: 'glass-panel rounded-[28px]' }
+                });
+
+                if (!confirmDelete.isConfirmed) { element.value = ''; return; }
+
+                Swal.fire({ title: 'Membersihkan Peta Lama...', didOpen: () => Swal.showLoading() });
+                const { error: delErr } = await supabaseClient.rpc('hapus_semua_bidang');
+                if (delErr) { Swal.fire("Gagal Menghapus Data", delErr.message, "error"); element.value = ''; return; }
+            }
+
+            Swal.fire({ title: 'Memproses GeoJSON...', didOpen: () => Swal.showLoading() });
             const reader = new FileReader();
             reader.onload = async (e) => {
                 try { 
                     const geojsonData = JSON.parse(e.target.result); 
-                    
-                    if (!geojsonData.features || geojsonData.features.length === 0) {
-                        throw new Error("Format GeoJSON tidak valid atau kosong.");
-                    }
-
-                    // Remapping atribut agar seragam masuk ke Supabase
-                    geojsonData.features.forEach(f => {
-                        const p = f.properties;
-                        f.properties = {
-                            kode_desa: (p.DESA || p.desa || '-').toString().trim(),
-                            nib: (p.NIB || p.nib || '-').toString().trim(),
-                            no_hak: (p.NOMORHAK || p.nomorhak || '-').toString().trim(),
-                            no_su: (p.SU || p.su || '-').toString().trim()
-                        };
-                    });
-
-                    // Pengaturan Batch: Memotong data agar server tidak OOM
-                    const BATCH_SIZE = 250;
                     const features = geojsonData.features;
+                    if (!features || features.length === 0) throw new Error("File GeoJSON kosong atau salah format.");
+
+                    const BATCH_SIZE = 250; 
                     const totalBatches = Math.ceil(features.length / BATCH_SIZE);
 
-                    // Eksekusi pengiriman bertahap
                     for (let i = 0; i < totalBatches; i++) {
-                        Swal.update({ 
-                            title: `Menyinkronkan Data Cloud...`,
-                            text: `Mengunggah kloter ${i + 1} dari ${totalBatches} (${features.length} total bidang)`
-                        });
-
-                        const batchFeatures = features.slice(i * BATCH_SIZE, (i + 1) * BATCH_SIZE);
-                        const batchGeoJson = { type: "FeatureCollection", features: batchFeatures };
-
-                        const { error } = await supabaseClient.rpc('upload_bulk_shapefile', { geojson_data: batchGeoJson });
-                        if (error) throw new Error(`Gagal pada kloter ${i + 1}: ${error.message}`);
+                        Swal.update({ title: `Upload Batch ${i + 1} dari ${totalBatches}...` });
+                        const batch = { type: "FeatureCollection", features: features.slice(i * BATCH_SIZE, (i + 1) * BATCH_SIZE) };
+                        const { error } = await supabaseClient.rpc('upload_bulk_shapefile', { geojson_data: batch });
+                        if (error) throw error;
                     }
                     
-                    await fetchAndRenderSpatialMaster();
-                    Swal.fire("Sinkronisasi Selesai!", `Seluruh ${features.length} bidang persil berhasil diunggah secara bertahap tanpa membebani server.`, "success"); 
-                } 
-                catch(err) { 
-                    Swal.fire("Gagal Eksekusi", err.message, "error"); 
+                    switchView('map');
+                    
+                    Swal.fire({ title: 'Merender Peta...', text: 'Menggambar poligon ke kanvas...', didOpen: () => Swal.showLoading() });
+                    
+                    setTimeout(async () => {
+                        await fetchAndRenderSpatialMaster();
+                        await calculateSmartIntersections();
+                        
+                        Swal.fire({
+                            title: "Selesai!", 
+                            text: "Data spasial terbaru langsung ditampilkan.", 
+                            icon: "success",
+                            customClass: { popup: 'glass-panel rounded-[28px]' }
+                        }); 
+                    }, 400);
+
+                } catch(err) { 
+                    Swal.fire("Gagal Upload", err.message, "error"); 
                 }
                 element.value = ''; 
             };
-            
             reader.readAsText(file);
         }
     </script>

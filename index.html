@@ -885,6 +885,7 @@
             element.value = '';
         }
 
+// --- ALGORITMA STREAMING PARSER OBOE.JS ---
         async function processGeoJsonInput(element) {
             const file = element.files[0]; 
             if (!file) return;
@@ -915,18 +916,24 @@
 
             Swal.fire({ 
                 title: 'Streaming Data Spasial', 
-                html: 'Membaca file besar tanpa membebani RAM komputer...<br><br><span class="text-blue-600 font-bold text-lg" id="st-prog">0</span> bidang tanah berhasil diproses.', 
+                html: 'Mengunggah pelan tapi pasti...<br><br><span class="text-blue-600 font-bold text-lg" id="st-prog">0</span> bidang tanah berhasil diamankan di Cloud.', 
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading() 
             });
 
             const fileUrl = URL.createObjectURL(file);
-            const BATCH_SIZE = 1000; 
+            
+            // KUNCI UTAMA: Tetesan kecil 50 poligon per paket. Dijamin tidak akan menabrak limit Payload!
+            const BATCH_SIZE = 50; 
             let batchFeatures = [];
             let totalProcessed = 0;
+            let isUploadFailed = false; // Bendera pengaman
 
             oboe(fileUrl)
                 .node('features.*', function(feature) {
+                    // Jika sebelumnya terdeteksi gagal dari Supabase, hentikan semua proses baca file
+                    if (isUploadFailed) return oboe.drop; 
+
                     batchFeatures.push(feature);
                     totalProcessed++;
                     
@@ -938,27 +945,37 @@
                         batchFeatures = [];
                         const oboeInstance = this;
                         
-                        oboeInstance.pause();
+                        oboeInstance.pause(); // Setop baca file, tunggu sampai Supabase menelan datanya
                         
                         supabaseClient.rpc('upload_bulk_shapefile', {
                             geojson_data: { type: "FeatureCollection", features: currentBatch }
                         }).then(({ error }) => {
                             if (error) throw error;
-                            oboeInstance.resume(); 
+                            oboeInstance.resume(); // Supabase berhasil menelan data, lanjut baca file
                         }).catch(err => {
-                            oboeInstance.abort();
-                            Swal.fire("Gagal Upload", err.message, "error");
+                            isUploadFailed = true; // Nyalakan sirine gagal
+                            oboeInstance.abort(); // Matikan Oboe
                             URL.revokeObjectURL(fileUrl);
+                            Swal.fire("Gagal Upload", "Upload terhenti karena masalah jaringan atau server. Detail: " + err.message, "error");
                             element.value = '';
                         });
                     }
-                    return oboe.drop; 
+                    return oboe.drop; // Kosongkan RAM Browser setiap satu poligon beres dibaca
                 })
                 .done(async function() {
+                    // Cegah pesan "Sukses" palsu jika nyatanya pernah gagal di tengah jalan
+                    if (isUploadFailed) return; 
+
+                    // Unggah sisa-sisa poligon terakhir (jika ada yang kurang dari 50)
                     if (batchFeatures.length > 0) {
-                        await supabaseClient.rpc('upload_bulk_shapefile', {
+                        const { error } = await supabaseClient.rpc('upload_bulk_shapefile', {
                             geojson_data: { type: "FeatureCollection", features: batchFeatures }
                         });
+                        
+                        if (error) {
+                            Swal.fire("Gagal Upload Sisa Data", error.message, "error");
+                            return;
+                        }
                     }
                     URL.revokeObjectURL(fileUrl);
                     
@@ -968,11 +985,12 @@
                     setTimeout(async () => {
                         await fetchAndRenderSpatialMaster();
                         await calculateSmartIntersections();
-                        Swal.fire({ title: "Sinkronisasi Sukses", text: `Selesai memproses ${totalProcessed} bidang tanah dengan lancar.`, icon: "success", confirmButtonColor: '#007AFF'}); 
+                        Swal.fire({ title: "Sinkronisasi Sukses", text: `Luar biasa! Seluruh ${totalProcessed} bidang tanah berhasil diunggah dengan aman.`, icon: "success", confirmButtonColor: '#007AFF'}); 
                     }, 400);
                 })
                 .fail(function(err) {
-                    Swal.fire("Gagal Membaca File", "Format file tidak valid atau rusak.", "error");
+                    if (isUploadFailed) return; // Jika gagal dari API, jangan timpa pesannya
+                    Swal.fire("Gagal Membaca File", "Format file GeoJSON tidak valid atau rusak.", "error");
                     URL.revokeObjectURL(fileUrl);
                     element.value = '';
                 });

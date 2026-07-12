@@ -10,7 +10,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://unpkg.com/shpjs@latest/dist/shp.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/oboe.js/2.1.5/oboe-browser.min.js"></script>
     
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/venn.js@0.2.20/build/venn.min.js"></script>
@@ -19,62 +20,23 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,0,0" />
 
     <style>
-        body { 
-            font-family: 'Inter', sans-serif;
-            font-weight: 300;
-            background-color: #f7f9fa;
-            overflow: hidden;
-            -webkit-tap-highlight-color: transparent; 
-        }
-
+        body { font-family: 'Inter', sans-serif; font-weight: 300; background-color: #f7f9fa; overflow: hidden; -webkit-tap-highlight-color: transparent; }
         .material-symbols-rounded { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
-
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            border-radius: 28px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
-        }
-        
-        .glass-input {
-            background: rgba(245, 247, 250, 0.7);
-            border: 1px solid rgba(220, 225, 230, 0.5);
-            border-radius: 9999px;
-            padding: 12px 20px;
-            font-size: 13px;
-            font-weight: 300;
-            color: #1f2937;
-            transition: all 0.3s ease;
-            width: 100%;
-            min-width: 140px;
-        }
-
-        .glass-input:focus {
-            background: rgba(255, 255, 255, 1);
-            outline: none;
-            border-color: #007AFF;
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-        }
-
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 28px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03); }
+        .glass-input { background: rgba(245, 247, 250, 0.7); border: 1px solid rgba(220, 225, 230, 0.5); border-radius: 9999px; padding: 12px 20px; font-size: 13px; font-weight: 300; color: #1f2937; transition: all 0.3s ease; width: 100%; min-width: 140px; }
+        .glass-input:focus { background: rgba(255, 255, 255, 1); outline: none; border-color: #007AFF; box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
         .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
-
         .leaflet-bottom.leaflet-right { bottom: 24px; right: 24px; z-index: 10; }
-        
         table { border-collapse: separate; border-spacing: 0; }
         th { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10; font-weight: 400; }
         tr { transition: background-color 0.2s; }
         tr:hover td { background: rgba(250,252,255,0.7); }
-
         .venn-circle path { fill-opacity: 0.15; stroke-width: 1.5; stroke-opacity: 0.8; }
         .venn-circle text { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; fill: #4b5563; }
-        
         .badge-kanal { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 500; }
         .bg-surat { background: #eef2ff; color: #4f46e5; border: 1px solid rgba(99, 102, 241, 0.2); }
         .bg-aduan { background: #fff7ed; color: #ea580c; border: 1px solid rgba(249, 115, 22, 0.2); }
@@ -91,9 +53,7 @@
     <div id="authSection" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/10 backdrop-blur-md p-4 transition-opacity duration-500">
         <div class="glass-panel p-10 w-full max-w-sm rounded-[36px]">
             <div class="text-center mb-10">
-                <div class="w-14 h-14 bg-white/60 text-[#007AFF] rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-white">
-                    <span class="material-symbols-rounded text-2xl">public</span>
-                </div>
+                <div class="w-14 h-14 bg-white/60 text-[#007AFF] rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-white"><span class="material-symbols-rounded text-2xl">public</span></div>
                 <h2 class="text-lg font-medium text-gray-800 tracking-wide">GRID SP</h2>
                 <p class="text-[13px] text-gray-500 mt-1 font-light">Sistem Spasial Terpadu</p>
             </div>
@@ -164,24 +124,15 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 shrink-0">
                 <div class="glass-panel p-6 rounded-3xl flex flex-col relative min-h-[400px]">
                     <div class="flex justify-between items-start w-full">
-                        <div>
-                            <h3 class="text-[15px] font-medium text-gray-800 tracking-wide flex items-center gap-2"><span class="material-symbols-rounded text-blue-500 text-[18px]">donut_large</span> Irisan Lintas Kanal</h3>
-                            <p class="text-[12px] text-gray-500 mt-0.5 font-light">Satu bidang yang tercatat di beberapa kanal sekaligus.</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-2xl font-light text-rose-500" id="stat_overlap_count">0</p>
-                            <p class="text-[10px] text-gray-400 font-medium mt-0.5 uppercase tracking-wider">Kasus Beririsan</p>
-                        </div>
+                        <div><h3 class="text-[15px] font-medium text-gray-800 tracking-wide flex items-center gap-2"><span class="material-symbols-rounded text-blue-500 text-[18px]">donut_large</span> Irisan Lintas Kanal</h3><p class="text-[12px] text-gray-500 mt-0.5 font-light">Satu bidang yang tercatat di beberapa kanal sekaligus.</p></div>
+                        <div class="text-right"><p class="text-2xl font-light text-rose-500" id="stat_overlap_count">0</p><p class="text-[10px] text-gray-400 font-medium mt-0.5 uppercase tracking-wider">Kasus Beririsan</p></div>
                     </div>
                     <div id="venn-container" class="mt-auto w-full h-[280px] flex justify-center items-center"></div>
                 </div>
 
                 <div class="glass-panel p-6 rounded-3xl flex flex-col h-[400px]">
                     <div class="flex justify-between items-center mb-4 shrink-0">
-                        <div>
-                            <h3 class="text-[15px] font-medium text-gray-800 tracking-wide flex items-center gap-2"><span class="material-symbols-rounded text-rose-500 text-[18px]">local_fire_department</span> Top Rated Bidang Tanah</h3>
-                            <p class="text-[12px] text-gray-500 mt-0.5 font-light">Bidang dengan frekuensi muncul terbanyak di semua data.</p>
-                        </div>
+                        <div><h3 class="text-[15px] font-medium text-gray-800 tracking-wide flex items-center gap-2"><span class="material-symbols-rounded text-rose-500 text-[18px]">local_fire_department</span> Top Rated Bidang Tanah</h3><p class="text-[12px] text-gray-500 mt-0.5 font-light">Bidang dengan frekuensi muncul terbanyak di semua data.</p></div>
                     </div>
                     <div id="topRatedList" class="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3">
                         <div class="text-center py-10 text-[12px] text-gray-400">Memindai relasi database...</div>
@@ -228,36 +179,19 @@
         let masterBidangKamus = []; 
         let globalDataMasalah = [];
 
-        // -----------------------------------------------------------
-        // INISIALISASI PETA BERSAMA STYLING (ABU-ABU vs MERAH HATCH)
-        // -----------------------------------------------------------
+        // Inisialisasi Leaflet
         const mapObject = L.map('map', { zoomControl: false }).setView([-8.6500, 115.2166], 11);
         L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 22, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'] }).addTo(mapObject);
         L.control.zoom({ position: 'bottomright' }).addTo(mapObject);
         
         let layerGroupMasterBidang = L.geoJSON(null, { 
             style: function(feature) {
-                // Beri warna merah hatch jika fitur memiliki data di tabel grid_bidang_bermasalah
                 if (feature.properties && feature.properties.is_bermasalah) {
-                    return { 
-                        color: '#ef4444',     // Merah outline
-                        weight: 2, 
-                        fillColor: '#ef4444', // Merah fill
-                        fillOpacity: 0.45, 
-                        dashArray: '5, 5'     // Garis putus-putus/hatch
-                    };
+                    return { color: '#ef4444', weight: 2, fillColor: '#ef4444', fillOpacity: 0.45, dashArray: '5, 5' };
                 }
-                // Jika normal, beri warna abu-abu transparan
-                return { 
-                    color: '#9ca3af', 
-                    weight: 1, 
-                    fillColor: '#f3f4f6', 
-                    fillOpacity: 0.05, 
-                    dashArray: '' 
-                };
+                return { color: '#9ca3af', weight: 1, fillColor: '#f3f4f6', fillOpacity: 0.05, dashArray: '' };
             },
             onEachFeature: function(feature, layer) {
-                // Event klik untuk membuka pop-up relasi antar kanal
                 layer.on('click', function() {
                     const p = feature.properties;
                     actionInfoKoneksi(p.kode_desa || '-', p.nib || '-', p.no_hak || '-', p.no_su || '-');
@@ -276,59 +210,22 @@
         ];
 
         const SCHEMA_CONFIG = {
-            surat: {
-                mainTable: 'manajemen_persuratan', pk: 'id_surat', title: 'Persuratan',
-                fields: [
-                    { key: 'nomor_surat', label: 'No Surat', type: 'text' },
-                    { key: 'tanggal_surat', label: 'Tgl Surat', type: 'date' },
-                    { key: 'tanggal_diterima', label: 'Tgl Diterima', type: 'date' },
-                    { key: 'pengirim', label: 'Pengirim', type: 'text' },
-                    { key: 'perihal', label: 'Perihal (Wajib)', type: 'text', req: true },
-                    { key: 'isi_surat', label: 'Isi Surat', type: 'text' },
-                    ...SPATIAL_FIELDS
-                ]
-            },
-            aduan: {
-                mainTable: 'laporan_mandiri', pk: 'id_laporan', title: 'Laporan Mandiri',
-                fields: [
-                    { key: 'pelapor', label: 'Pelapor', type: 'text' },
-                    { key: 'isi_laporan', label: 'Isi Laporan (Wajib)', type: 'text', req: true },
-                    ...SPATIAL_FIELDS
-                ]
-            },
-            masalah_sp: {
-                mainTable: 'seksi1_kasus', pk: 'id_kasus', title: 'Risiko Teknis (SP)',
-                fields: [
-                    { key: 'sumber_data_masalah', label: 'Sumber Masalah', type: 'text' },
-                    { key: 'kode_bendel_fisik', label: 'Kode Bendel', type: 'text' },
-                    { key: 'deskripsi_permasalahan', label: 'Deskripsi (Wajib)', type: 'text', req: true },
-                    ...SPATIAL_FIELDS
-                ]
-            },
-            masalah_pps: {
-                mainTable: 'seksi5_sengketa', pk: 'id_sengketa', title: 'Sengketa Hukum (PPS)',
-                fields: [
-                    { key: 'nomor_perkara', label: 'Nomor Perkara', type: 'text' },
-                    { key: 'pihak_bersengketa', label: 'Pihak Bersengketa', type: 'text' },
-                    { key: 'deskripsi_permasalahan', label: 'Deskripsi (Wajib)', type: 'text', req: true },
-                    ...SPATIAL_FIELDS
-                ]
-            }
+            surat: { mainTable: 'manajemen_persuratan', pk: 'id_surat', title: 'Persuratan', fields: [ { key: 'nomor_surat', label: 'No Surat', type: 'text' }, { key: 'tanggal_surat', label: 'Tgl Surat', type: 'date' }, { key: 'tanggal_diterima', label: 'Tgl Diterima', type: 'date' }, { key: 'pengirim', label: 'Pengirim', type: 'text' }, { key: 'perihal', label: 'Perihal (Wajib)', type: 'text', req: true }, { key: 'isi_surat', label: 'Isi Surat', type: 'text' }, ...SPATIAL_FIELDS ] },
+            aduan: { mainTable: 'laporan_mandiri', pk: 'id_laporan', title: 'Laporan Mandiri', fields: [ { key: 'pelapor', label: 'Pelapor', type: 'text' }, { key: 'isi_laporan', label: 'Isi Laporan (Wajib)', type: 'text', req: true }, ...SPATIAL_FIELDS ] },
+            masalah_sp: { mainTable: 'seksi1_kasus', pk: 'id_kasus', title: 'Risiko Teknis (SP)', fields: [ { key: 'sumber_data_masalah', label: 'Sumber Masalah', type: 'text' }, { key: 'kode_bendel_fisik', label: 'Kode Bendel', type: 'text' }, { key: 'deskripsi_permasalahan', label: 'Deskripsi (Wajib)', type: 'text', req: true }, ...SPATIAL_FIELDS ] },
+            masalah_pps: { mainTable: 'seksi5_sengketa', pk: 'id_sengketa', title: 'Sengketa Hukum (PPS)', fields: [ { key: 'nomor_perkara', label: 'Nomor Perkara', type: 'text' }, { key: 'pihak_bersengketa', label: 'Pihak Bersengketa', type: 'text' }, { key: 'deskripsi_permasalahan', label: 'Deskripsi (Wajib)', type: 'text', req: true }, ...SPATIAL_FIELDS ] }
         };
 
-        // Fungsi pintar pendeteksi relasi masalah berdasarkan NIB/HAK/SU
         function cekApakahBermasalah(props) {
             if (!globalDataMasalah || globalDataMasalah.length === 0) return false;
             return globalDataMasalah.some(row => {
                 if (!row.desa || !props.kode_desa) return false;
                 if (String(row.desa).toLowerCase().trim() !== String(props.kode_desa).toLowerCase().trim()) return false;
-                
                 let match = false;
                 if (row.nib && props.nib && String(row.nib).trim() === String(props.nib).trim()) match = true;
                 if (row.no_hak && props.no_hak && String(row.no_hak).trim() === String(props.no_hak).trim()) match = true;
                 if (row.no_su && props.no_su && String(row.no_su).trim() === String(props.no_su).trim()) match = true;
                 if (row.nibel && props.nibel && String(row.nibel).trim() === String(props.nibel).trim()) match = true;
-                
                 return match;
             });
         }
@@ -336,7 +233,6 @@
         async function actionInfoKoneksi(desa, nib, no_hak, no_su) {
             if (!desa || desa === '-') return Swal.fire("Perhatian", "Data desa belum lengkap.", "warning");
             Swal.fire({ title: 'Melacak Relasi...', didOpen: () => Swal.showLoading() });
-            
             const { data, error } = await supabaseClient.rpc('cek_riwayat_bidang', { p_kode_desa: desa, p_nib: nib!=='-'?nib:null, p_no_hak: no_hak!=='-'?no_hak:null, p_no_su: no_su!=='-'?no_su:null });
             if(error) return Swal.fire("Error", "Gagal memuat relasi.", "error");
             
@@ -350,17 +246,13 @@
 
         async function calculateSmartIntersections() {
             if (masterBidangKamus.length === 0) await fetchAndRenderSpatialMaster();
-
             const { data, error } = await supabaseClient.from('grid_bidang_bermasalah').select('*');
             if (error || !data) return;
 
             let groups = {};
-
             data.forEach(row => {
                 if (!row.desa) return;
-
-                let matchedId = null;
-                let master = null;
+                let matchedId = null; let master = null;
 
                 if (masterBidangKamus.length > 0) {
                     master = masterBidangKamus.find(m => {
@@ -372,20 +264,13 @@
                         if (row.nibel && m.nibel && String(m.nibel).trim() === String(row.nibel).trim()) match = true;
                         return match;
                     });
-                    
                     if (master) matchedId = master.id; 
                 }
 
-                if (!matchedId) {
-                    matchedId = "UNMAPPED_" + row.desa + "_" + (row.nib || row.no_hak || row.no_su || row.nibel || Math.random());
-                }
+                if (!matchedId) matchedId = "UNMAPPED_" + row.desa + "_" + (row.nib || row.no_hak || row.no_su || row.nibel || Math.random());
 
                 if (!groups[matchedId]) {
-                    groups[matchedId] = {
-                        desa: master ? master.desa : row.desa,
-                        kanals: new Set(), nibs: new Set(), haks: new Set(), sus: new Set(), count: 0
-                    };
-                    
+                    groups[matchedId] = { desa: master ? master.desa : row.desa, kanals: new Set(), nibs: new Set(), haks: new Set(), sus: new Set(), count: 0 };
                     if (master) {
                         if (master.nib && master.nib !== '-') groups[matchedId].nibs.add(master.nib);
                         if (master.no_hak && master.no_hak !== '-') groups[matchedId].haks.add(master.no_hak);
@@ -395,7 +280,6 @@
 
                 let g = groups[matchedId];
                 g.kanals.add(row.sumber_kanal); 
-                
                 if(row.nib && row.nib !== '-') g.nibs.add(row.nib);
                 if(row.no_hak && row.no_hak !== '-') g.haks.add(row.no_hak);
                 if(row.no_su && row.no_su !== '-') g.sus.add(row.no_su);
@@ -403,7 +287,6 @@
             });
 
             let groupArray = Object.values(groups);
-
             const overlapList = groupArray.filter(item => item.kanals.size > 1);
             document.getElementById('stat_overlap_count').innerText = overlapList.length;
 
@@ -414,30 +297,22 @@
             groupArray.forEach(g => {
                 let kArray = Array.from(g.kanals).map(k => kanalMap[k] || k).sort();
                 let subsets = getSubsets(kArray);
-                subsets.forEach(sub => {
-                    let key = sub.join('||');
-                    vennCounts[key] = (vennCounts[key] || 0) + 1; 
-                });
+                subsets.forEach(sub => { let key = sub.join('||'); vennCounts[key] = (vennCounts[key] || 0) + 1; });
             });
 
             let vennData = Object.keys(vennCounts).map(k => ({ sets: k.split('||'), size: vennCounts[k] }));
-
             document.getElementById('venn-container').innerHTML = '';
             if(vennData.length > 0) {
                 var chart = venn.VennDiagram().width(350).height(250);
                 d3.select("#venn-container").datum(vennData).call(chart);
-                
-                d3.selectAll("#venn-container .venn-circle path")
-                  .style("fill-opacity", 0.15).style("stroke-width", 1.5).style("stroke-opacity", 0.8);
-                d3.selectAll("#venn-container text")
-                  .style("font-family", "Inter").style("font-size", "11px").style("font-weight", "500").style("fill", "#1f2937");
+                d3.selectAll("#venn-container .venn-circle path").style("fill-opacity", 0.15).style("stroke-width", 1.5).style("stroke-opacity", 0.8);
+                d3.selectAll("#venn-container text").style("font-family", "Inter").style("font-size", "11px").style("font-weight", "500").style("fill", "#1f2937");
             } else {
                 document.getElementById('venn-container').innerHTML = '<p class="text-[12px] text-gray-400">Tidak ada irisan data lintas kanal.</p>';
             }
 
             groupArray.sort((a, b) => b.count - a.count);
             let topRatedHtml = '';
-            
             if(groupArray.length === 0) {
                 topRatedHtml = `<div class="text-center py-10 text-[12px] text-gray-400 border border-dashed border-gray-200 rounded-2xl">Belum ada rekam bidang tanah.</div>`;
             } else {
@@ -481,39 +356,34 @@
             document.getElementById('stat_aduan').innerText = await fetchCount('laporan_mandiri');
             document.getElementById('stat_masalah_sp').innerText = await fetchCount('seksi1_kasus');
             document.getElementById('stat_masalah_pps').innerText = await fetchCount('seksi5_sengketa');
-            
             calculateSmartIntersections();
         }
 
+        // --- PENGAMBILAN DATA PETA BERTINGKAT (PAGINASI) ---
         async function fetchAndRenderSpatialMaster() {
             try {
-                // 1. Tarik data masalah terlebih dahulu untuk pencocokan style peta
                 const { data: masalahData } = await supabaseClient.from('grid_bidang_bermasalah').select('*');
                 globalDataMasalah = masalahData || [];
 
-                // --- 2. TEKNIK PAGINASI (MENARIK DATA SECARA BERTAHAP) ---
                 let allFeatures = [];
                 let startPos = 0;
-                const limitStep = 999; // Tarik maksimal 1000 baris per putaran
+                const limitStep = 999; 
                 let keepFetching = true;
 
-                // Tampilkan loading khusus untuk memproses ribuan data
                 if (!document.querySelector('.swal2-container')) {
-                    Swal.fire({ title: 'Menyusun Peta...', text: 'Mengunduh data spasial skala besar', didOpen: () => Swal.showLoading() });
+                    Swal.fire({ title: 'Menyusun Peta...', text: 'Mengunduh data spasial dari Cloud', didOpen: () => Swal.showLoading() });
                 }
 
                 while (keepFetching) {
                     const { data, error } = await supabaseClient
                         .rpc('ambil_master_bidang_geojson')
-                        .range(startPos, startPos + limitStep); // Minta data dari baris ke-X hingga ke-Y
+                        .range(startPos, startPos + limitStep); 
                     
                     if (error) throw error;
                     
                     if (data && data.length > 0) {
-                        allFeatures = allFeatures.concat(data); // Gabungkan kepingan data
-                        startPos += limitStep + 1; // Maju ke putaran 1000 berikutnya
-                        
-                        // Jika data yang ditarik kurang dari limit, artinya ini halaman terakhir
+                        allFeatures = allFeatures.concat(data); 
+                        startPos += limitStep + 1; 
                         if (data.length <= limitStep) keepFetching = false; 
                     } else {
                         keepFetching = false;
@@ -522,20 +392,18 @@
 
                 if (allFeatures.length === 0) {
                     layerGroupMasterBidang.clearLayers();
+                    Swal.close();
                     return;
                 }
 
                 masterBidangKamus = [];
 
-                // 3. Rakit FeatureCollection GeoJSON di sisi Client (Browser)
                 const geoJsonFeatures = allFeatures.map(row => {
                     masterBidangKamus.push({
                         id: row.id_bidang, desa: row.kode_desa, nib: row.nib,
                         no_hak: row.no_hak, no_su: row.no_su, nibel: row.nibel 
                     });
-                    
                     let isProblem = cekApakahBermasalah(row);
-                    
                     return {
                         type: "Feature",
                         properties: { ...row, is_bermasalah: isProblem },
@@ -545,7 +413,6 @@
 
                 const finalGeoJson = { type: "FeatureCollection", features: geoJsonFeatures };
                 
-                // 4. Gambar ke peta Leaflet
                 layerGroupMasterBidang.clearLayers(); 
                 layerGroupMasterBidang.addData(finalGeoJson);
                 
@@ -553,12 +420,8 @@
                     mapObject.invalidateSize(); 
                     mapObject.fitBounds(layerGroupMasterBidang.getBounds());
                 }
-                
-                Swal.close(); // Tutup loading jika berhasil
-            } catch (err) {
-                console.error("Kesalahan Rendering Peta:", err);
-                Swal.fire("Gagal Memuat Peta", err.message, "error");
-            }
+                Swal.close(); 
+            } catch (err) { console.error(err); }
         }
 
         async function handleLogin() {
@@ -592,25 +455,21 @@
             if (role === 'admin') {
                 document.getElementById('btn_nav_dashboard').style.display = 'flex';
                 ['node_surat_sp','node_masalah_sp','node_masalah_pps','adminPanel'].forEach(id => {
-                    document.getElementById(id).classList.remove('hidden');
-                    document.getElementById(id).classList.add('flex');
+                    document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex');
                 });
             } 
             else if (role === 'kasi_sp') {
                 document.getElementById('btn_nav_dashboard').style.display = 'flex';
                 ['node_surat_sp','node_masalah_sp','node_masalah_pps'].forEach(id => {
-                    document.getElementById(id).classList.remove('hidden');
-                    document.getElementById(id).classList.add('flex');
+                    document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex');
                 });
             } 
             else if (role === 'kasi_pps') {
-                document.getElementById('node_masalah_pps').classList.remove('hidden');
-                document.getElementById('node_masalah_pps').classList.add('flex');
+                document.getElementById('node_masalah_pps').classList.remove('hidden'); document.getElementById('node_masalah_pps').classList.add('flex');
             }
 
             await fetchAndRenderSpatialMaster();
             switchView('dashboard'); 
-            Swal.close();
         }
 
         function switchView(viewName, kanalName = null) {
@@ -649,9 +508,7 @@
             
             let headerHTML = `<th class="p-4 bg-white/60 backdrop-blur-md sticky left-0 z-20 shadow-[1px_0_0_rgba(0,0,0,0.05)] text-center">Aksi</th>`;
             headerHTML += `<th class="p-4 min-w-[100px]">ID</th>`;
-            config.fields.forEach(f => {
-                headerHTML += `<th class="p-4 min-w-[150px]">${f.label}</th>`;
-            });
+            config.fields.forEach(f => { headerHTML += `<th class="p-4 min-w-[150px]">${f.label}</th>`; });
             document.getElementById('tableHeaderRow').innerHTML = headerHTML;
             document.getElementById('tableBody').innerHTML = `<tr><td colspan="${config.fields.length + 2}" class="p-8 text-center text-gray-400">Memuat Data...</td></tr>`;
 
@@ -698,7 +555,6 @@
             let tr = document.createElement('tr');
             tr.id = "row-new";
             tr.className = "bg-blue-50/30";
-            
             let ocrBtn = appCurrentActiveKanal === 'surat' ? `<button onclick="document.getElementById('ocrPdfInput').click()" class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 hover:bg-orange-200 flex items-center justify-center" title="Ekstrak PDF"><span class="material-symbols-rounded text-[18px]">document_scanner</span></button>` : '';
 
             let html = `
@@ -822,26 +678,19 @@
                 const base64Data = await toBase64(file);
                 const response = await fetch(CONFIG_GAS_ENGINE_URL, { method: 'POST', body: JSON.stringify({ fileName: file.name, mimeType: file.type, fileBase64: base64Data }) });
                 const result = await response.json();
-                
                 if (result.status !== "success") throw new Error(result.message);
-                
                 if (result.ocrData) {
-                    tempOcrData = {
-                        perihal: result.ocrData.deskripsi || '',
-                        desa: result.ocrData.kode_desa || '',
-                        nib: result.ocrData.nib || ''
-                    };
+                    tempOcrData = { perihal: result.ocrData.deskripsi || '', desa: result.ocrData.kode_desa || '', nib: result.ocrData.nib || '' };
                 }
                 tempUploadedUrl = result.folderUrl; 
                 Swal.close();
-                
-                renderTableRows();
-                addNewInlineRow();
+                renderTableRows(); addNewInlineRow();
                 Swal.fire({title: "Ekstraksi Selesai", text: "Sebagian form telah diisi AI.", icon: "success", toast: true, position: 'top-end', showConfirmButton: false, timer: 3000});
             } catch (err) { Swal.fire("Gagal", err.message, "error"); }
             element.value = '';
         }
 
+        // --- ALGORITMA STREAMING PARSER OBOE.JS ---
         async function processGeoJsonInput(element) {
             const file = element.files[0]; 
             if (!file) return;
@@ -853,7 +702,7 @@
             if (count > 0) {
                 const confirmDelete = await Swal.fire({
                     title: 'Peta Sudah Tersedia!',
-                    html: `Sistem mendeteksi ada <b>${count}</b> poligon di database.<br><br>Wajib menghapus peta lama sebelum mengunggah yang baru agar tidak terjadi penumpukan data.`,
+                    html: `Ada <b>${count}</b> poligon di database.<br>Hapus peta lama untuk menghindari duplikat?`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
@@ -870,46 +719,72 @@
                 if (delErr) { Swal.fire("Gagal Menghapus Data", delErr.message, "error"); element.value = ''; return; }
             }
 
-            Swal.fire({ title: 'Memproses GeoJSON...', didOpen: () => Swal.showLoading() });
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try { 
-                    const geojsonData = JSON.parse(e.target.result); 
-                    const features = geojsonData.features;
-                    if (!features || features.length === 0) throw new Error("File GeoJSON kosong atau salah format.");
+            Swal.fire({ 
+                title: 'Streaming GeoJSON...', 
+                html: 'Membaca file besar tanpa membocorkan RAM...<br><b id="st-prog">0</b> bidang diproses.', 
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading() 
+            });
 
-                    const BATCH_SIZE = 250; 
-                    const totalBatches = Math.ceil(features.length / BATCH_SIZE);
+            const fileUrl = URL.createObjectURL(file);
+            const BATCH_SIZE = 2500; // Batch besar agar minim panggilan RPC
+            let batchFeatures = [];
+            let totalProcessed = 0;
 
-                    for (let i = 0; i < totalBatches; i++) {
-                        Swal.update({ title: `Upload Batch ${i + 1} dari ${totalBatches}...` });
-                        const batch = { type: "FeatureCollection", features: features.slice(i * BATCH_SIZE, (i + 1) * BATCH_SIZE) };
-                        const { error } = await supabaseClient.rpc('upload_bulk_shapefile', { geojson_data: batch });
-                        if (error) throw error;
+            oboe(fileUrl)
+                .node('features.*', function(feature) {
+                    batchFeatures.push(feature);
+                    totalProcessed++;
+                    
+                    let pTxt = document.getElementById('st-prog');
+                    if (pTxt) pTxt.innerText = totalProcessed;
+
+                    if (batchFeatures.length >= BATCH_SIZE) {
+                        const currentBatch = [...batchFeatures];
+                        batchFeatures = [];
+                        const oboeInstance = this;
+                        
+                        // Jeda (pause) membaca file agar RAM bernafas
+                        oboeInstance.pause();
+                        
+                        supabaseClient.rpc('upload_bulk_shapefile', {
+                            geojson_data: { type: "FeatureCollection", features: currentBatch }
+                        }).then(({ error }) => {
+                            if (error) throw error;
+                            oboeInstance.resume(); // Lanjutkan membaca file setelah sukses
+                        }).catch(err => {
+                            oboeInstance.abort();
+                            Swal.fire("Gagal Upload", err.message, "error");
+                            URL.revokeObjectURL(fileUrl);
+                            element.value = '';
+                        });
                     }
+
+                    // DROP MEMORY: Hapus fitur ini dari RAM browser seketika!
+                    return oboe.drop; 
+                })
+                .done(async function() {
+                    if (batchFeatures.length > 0) {
+                        await supabaseClient.rpc('upload_bulk_shapefile', {
+                            geojson_data: { type: "FeatureCollection", features: batchFeatures }
+                        });
+                    }
+                    URL.revokeObjectURL(fileUrl);
                     
                     switchView('map');
-                    
                     Swal.fire({ title: 'Merender Peta...', text: 'Menggambar poligon ke kanvas...', didOpen: () => Swal.showLoading() });
                     
                     setTimeout(async () => {
                         await fetchAndRenderSpatialMaster();
                         await calculateSmartIntersections();
-                        
-                        Swal.fire({
-                            title: "Selesai!", 
-                            text: "Data spasial terbaru langsung ditampilkan.", 
-                            icon: "success",
-                            customClass: { popup: 'glass-panel rounded-[28px]' }
-                        }); 
+                        Swal.fire({ title: "Super Cepat!", text: `Selesai memproses ${totalProcessed} bidang tanah tanpa membuat browser hang.`, icon: "success", customClass: { popup: 'glass-panel rounded-[28px]' }}); 
                     }, 400);
-
-                } catch(err) { 
-                    Swal.fire("Gagal Upload", err.message, "error"); 
-                }
-                element.value = ''; 
-            };
-            reader.readAsText(file);
+                })
+                .fail(function(err) {
+                    Swal.fire("Gagal Membaca File", "Format file tidak valid atau rusak.", "error");
+                    URL.revokeObjectURL(fileUrl);
+                    element.value = '';
+                });
         }
     </script>
 </body>

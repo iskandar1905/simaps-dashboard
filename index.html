@@ -3,18 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GRID SP | Enterprise Workspace</title>
+    <title>GRID SP | Geospatial Risk and Integrated Data </title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <!-- Pustaka Oboe.js: Streaming JSON Anti-Crash -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/oboe.js/2.1.5/oboe-browser.min.js"></script>
-    
-    <!-- Library Diagram Venn -->
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/venn.js@0.2.20/build/venn.min.js"></script>
 
@@ -24,75 +20,69 @@
     <style>
         body { font-family: 'Inter', sans-serif; font-weight: 300; background-color: #ffffff; overflow: hidden; -webkit-tap-highlight-color: transparent; }
         .material-symbols-rounded { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
-        
         .flat-input { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #111827; transition: all 0.2s; width: 100%; min-width: 140px; }
         .flat-input:focus { background: #ffffff; outline: none; border-color: #007AFF; box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1); }
-        
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-        
         .leaflet-bottom.leaflet-right { bottom: 24px; right: 24px; z-index: 10; }
-        
-        /* Tabel Edge-to-Edge styling */
         table { border-collapse: separate; border-spacing: 0; width: 100%; }
         th { background: #f8fafc; position: sticky; top: 0; z-index: 20; font-weight: 600; color: #4b5563; }
         tr:hover td { background-color: #f8fafc; }
-
         .venn-circle path { fill-opacity: 0.15; stroke-width: 1.5; stroke-opacity: 0.8; }
         .venn-circle text { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; fill: #374151; }
-        
         .badge-kanal { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; border: 1px solid transparent; }
+        #mapLoadingIndicator { transition: opacity 0.3s ease; }
     </style>
 </head>
 <body class="flex flex-col h-screen w-screen bg-gray-50 text-gray-800 select-none">
 
-    <!-- 1. OVERLAY LOGIN -->
-    <div id="authSection" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/40 backdrop-blur-sm p-4 transition-opacity duration-500">
-        <div class="bg-white p-10 w-full max-w-sm rounded-[24px] shadow-2xl">
+    <!-- Auth Section -->
+    <div id="authSection" class="fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity duration-500 bg-cover bg-center bg-no-repeat" style="background-image:url('https://lnmypoqzhzbwcyhuvuqg.supabase.co/storage/v1/object/public/Logo/6679953.jpg');">
+        <div class="absolute inset-0 bg-black/35"></div>
+        <div class="relative w-full max-w-md rounded-[30px] bg-white/12 border border-white/25 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.35)] p-10">
             <div class="text-center mb-8">
-                <div class="w-14 h-14 bg-blue-50 text-[#007AFF] rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span class="material-symbols-rounded text-2xl">public</span>
-                </div>
-                <h2 class="text-xl font-semibold text-gray-900 tracking-tight">GRID SP</h2>
-                <p class="text-sm text-gray-500 mt-1">Badan Pertanahan Nasional</p>
+                <img src="https://lnmypoqzhzbwcyhuvuqg.supabase.co/storage/v1/object/public/Logo/ChatGPT%20Image%20Jul%2012,%202026,%2009_31_24%20PM.png" alt="GRID SP Logo" class="w-54 h-54 object-contain mx-auto drop-shadow-2xl mb-4">
+                <p class="text-sm text-white/90 font-medium mt-2">Geospatial Risk &amp; Integrated Data</p>
+                <p class="text-xs text-white/70 mt-1 tracking-wide">SP Kantah Badung</p>
             </div>
             <div class="space-y-4">
-                <input type="email" id="txtEmail" placeholder="Email instansi" class="flat-input">
-                <input type="password" id="txtPassword" placeholder="Kata sandi" class="flat-input">
-                <button onclick="handleLogin()" class="w-full bg-[#007AFF] text-white font-medium py-3.5 px-4 rounded-xl hover:bg-blue-600 active:scale-[0.98] transition-transform mt-2 text-[14px]">Autentikasi</button>
+                <input type="email" id="txtEmail" placeholder="Email instansi" class="w-full rounded-xl border border-white/20 bg-white/15 text-white placeholder-white/60 px-4 py-3 outline-none focus:ring-2 focus:ring-[#007AFF] backdrop-blur-md">
+                <input type="password" id="txtPassword" placeholder="Kata sandi" class="w-full rounded-xl border border-white/20 bg-white/15 text-white placeholder-white/60 px-4 py-3 outline-none focus:ring-2 focus:ring-[#007AFF] backdrop-blur-md">
+                <button onclick="handleLogin()" class="w-full py-3.5 rounded-xl bg-[#007AFF] hover:bg-blue-600 text-white font-semibold transition-all duration-300 shadow-lg hover:shadow-blue-500/40">Jelajahi</button>
             </div>
         </div>
     </div>
 
-    <!-- 2. TOOLBAR MENU -->
+    <!-- Header / Nav -->
     <header id="floatingMenu" class="hidden bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shrink-0 z-50 shadow-sm">
-        <div class="flex items-center gap-2 shrink-0">
-            <span class="material-symbols-rounded text-[#007AFF] text-[24px]">public</span>
-            <h1 class="text-[14px] font-semibold text-gray-900 tracking-wide uppercase">GRID SP</h1>
+        <div class="flex items-center gap-3 shrink-0">
+            <span class="material-symbols-rounded text-[#007AFF] text-[28px]">public</span>
+            <div class="flex flex-col leading-tight">
+                <h1 class="text-[15px] font-bold text-gray-900">GRID SP</h1>
+                <h2 class="text-[12px] font-medium text-gray-600">Geospatial Risk & Integrated Data</h2>
+                <h3 class="text-[11px] font-medium text-gray-500">SP Kantah Badung</h3>
+            </div>
         </div>
         
         <nav class="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar pl-4 ml-auto">
             <button onclick="switchView('dashboard')" id="btn_nav_dashboard" class="nav-btn flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">space_dashboard</span> Statistik</button>
-            <button onclick="switchView('map')" id="btn_nav_map" class="nav-btn flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">map</span> Peta Spasial</button>
-            
+            <button onclick="switchView('map')" id="btn_nav_map" class="nav-btn flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">map</span> Peta Bidang Tanah</button>
             <div class="w-[1px] h-5 bg-gray-200 mx-2 hidden sm:block"></div>
             
-            <button id="node_surat_sp" onclick="switchView('table', 'surat')" class="nav-btn hidden items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-colors whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">mark_email_unread</span> Persuratan</button>
-            <button id="node_aduan" onclick="switchView('table', 'aduan')" class="nav-btn hidden items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-gray-600 hover:text-orange-600 hover:bg-orange-50 transition-colors whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">campaign</span> Laporan</button>
-            <button id="node_masalah_sp" onclick="switchView('table', 'masalah_sp')" class="nav-btn hidden items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-gray-600 hover:text-rose-600 hover:bg-rose-50 transition-colors whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">folder_open</span> Risiko SP</button>
-            <button id="node_masalah_pps" onclick="switchView('table', 'masalah_pps')" class="nav-btn hidden items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-gray-600 hover:text-violet-600 hover:bg-violet-50 transition-colors whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">gavel</span> Sengketa</button>
+            <button id="node_surat_sp" onclick="switchView('table', 'surat')" class="nav-btn hidden items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-colors whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">mark_email_unread</span> Manajemen Persuratan SP</button>
+            <button id="node_aduan" onclick="switchView('table', 'aduan')" class="nav-btn hidden items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-gray-600 hover:text-orange-600 hover:bg-orange-50 transition-colors whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">campaign</span> Laporan Mandiri</button>
+            <button id="node_masalah_sp" onclick="switchView('table', 'masalah_sp')" class="nav-btn hidden items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-gray-600 hover:text-rose-600 hover:bg-rose-50 transition-colors whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">folder_open</span> Potensi Permasalahan SP</button>
+            <button id="node_masalah_pps" onclick="switchView('table', 'masalah_pps')" class="nav-btn hidden items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-gray-600 hover:text-violet-600 hover:bg-violet-50 transition-colors whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">gavel</span> PPS</button>
             
             <div id="adminPanel" class="hidden items-center">
                 <div class="w-[1px] h-5 bg-gray-200 mx-2"></div>
-                <button onclick="document.getElementById('uploadFileGeojson').click()" class="nav-btn flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">upload_file</span> Update Spasial</button>
+                <button onclick="document.getElementById('uploadFileGeojson').click()" class="nav-btn flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">upload_file</span> Update Data Spasial</button>
                 <input type="file" id="uploadFileGeojson" accept=".geojson,.json" class="hidden" onchange="processGeoJsonInput(this)">
             </div>
-            
             <div class="w-[1px] h-5 bg-gray-200 mx-2"></div>
-            
             <div class="flex items-center gap-3 shrink-0 pl-2">
                 <div class="text-right hidden md:block">
                     <p class="text-[12px] font-medium text-gray-900" id="lblUserEmail">staf@bpn.go.id</p>
@@ -103,19 +93,55 @@
         </nav>
     </header>
 
-    <!-- 3. KONTEN UTAMA (RUANG KERJA) -->
     <main class="flex-1 relative overflow-hidden bg-gray-50 flex flex-col">
-        
-        <!-- PETA SPASIAL -->
+        <!-- Sidebar Map -->
+        <div id="mapSidebar" class="absolute top-0 right-0 h-full w-[380px] bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.05)] transform translate-x-full transition-transform duration-300 z-[60] flex flex-col border-l border-gray-100">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 shrink-0">
+                <div>
+                    <h2 class="text-[15px] font-semibold text-gray-900">Informasi Bidang</h2>
+                    <p class="text-[11px] text-[#007AFF] font-mono mt-0.5 font-medium" id="sb_subtitle">Desa - | NIB -</p>
+                </div>
+                <button onclick="tutupSidebarPeta()" class="w-8 h-8 rounded-full bg-white border border-gray-200 text-gray-500 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors"><span class="material-symbols-rounded text-[18px]">close_fullscreen</span></button>
+            </div>
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-5 bg-gray-50/30" id="sidebarContent"></div>
+        </div>
+
+        <!-- View: MAP -->
         <div id="viewMap" class="absolute inset-0 z-10 hidden bg-[#eef1f5]">
             <div id="map" class="w-full h-full z-0"></div>
+            
+            <div id="mapSearchPanel" class="absolute top-6 left-6 z-[40] bg-white/95 backdrop-blur-md p-5 rounded-[20px] shadow-xl border border-gray-200/60 w-72 transition-all">
+                <h3 class="text-[14px] font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <span class="material-symbols-rounded text-[#007AFF] text-[18px]">travel_explore</span> Lacak Bidang Tanah
+                </h3>
+                <div class="space-y-2.5">
+                    <input type="text" id="srcDesa" placeholder="Nama Desa..." class="flat-input text-xs py-2.5">
+                    <input type="text" id="srcNIB" placeholder="NIB..." class="flat-input text-xs py-2.5">
+                    <input type="text" id="srcHak" placeholder="No Hak..." class="flat-input text-xs py-2.5">
+                    <div class="flex gap-2 pt-1">
+                        <button onclick="bersihkanPencarian()" class="w-1/3 bg-gray-100 text-gray-600 text-xs font-medium py-2.5 rounded-xl hover:bg-gray-200 transition-colors">Reset</button>
+                        <button id="btnCariPeta" onclick="eksekusiCariPeta()" class="w-2/3 bg-[#007AFF] text-white text-xs font-medium py-2.5 rounded-xl shadow-md shadow-blue-500/20 hover:bg-blue-600 transition-colors">Cari Peta</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="zoomWarning" class="absolute top-6 left-1/2 -translate-x-1/2 z-[40] bg-white/90 backdrop-blur-md px-5 py-2.5 rounded-full shadow-lg border border-gray-200 flex items-center gap-2 transition-opacity">
+                <span class="material-symbols-rounded text-orange-500 text-[20px]">zoom_in</span>
+                <span class="text-sm font-medium text-gray-700">Perbesar area (Zoom In) untuk memuat poligon.</span>
+            </div>
+            
+            <div id="mapLoadingIndicator" class="absolute top-6 left-1/2 -translate-x-1/2 z-[40] bg-blue-600 px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 opacity-0 pointer-events-none transition-opacity">
+                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <span class="text-sm font-medium text-white">Memuat area...</span>
+            </div>
+
             <div id="mapControlsLaporan" class="absolute bottom-8 right-8 z-[40] hidden flex-col gap-3 items-end">
                 <button onclick="switchView('table', 'aduan')" class="bg-white text-gray-600 w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 active:scale-95 transition-transform"><span class="material-symbols-rounded">list</span></button>
-                <button onclick="openLaporanMandiriInput()" class="bg-[#007AFF] text-white px-5 py-3.5 rounded-full shadow-lg shadow-blue-500/30 font-medium text-sm flex items-center gap-2 hover:bg-blue-600 active:scale-95 transition-transform"><span class="material-symbols-rounded">campaign</span> Lapor Lapangan</button>
+                <button onclick="openLaporanMandiriInput()" class="bg-[#007AFF] text-white px-5 py-3.5 rounded-full shadow-lg shadow-blue-500/30 font-medium text-sm flex items-center gap-2 hover:bg-blue-600 active:scale-95 transition-transform"><span class="material-symbols-rounded">campaign</span> Laporan Mandiri</button>
             </div>
         </div>
 
-        <!-- DASHBOARD -->
+        <!-- View: DASHBOARD -->
         <div id="viewDashboard" class="absolute inset-0 z-20 hidden overflow-y-auto custom-scrollbar bg-gray-50 p-6 lg:p-10 flex-col gap-6">
             <div class="shrink-0 mb-2">
                 <h2 class="text-2xl font-semibold text-gray-900 tracking-tight">Tinjauan Sistem</h2>
@@ -125,7 +151,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 shrink-0">
                 <div class="bg-white border border-gray-200 p-6 rounded-2xl flex flex-col justify-between shadow-sm">
                     <span class="material-symbols-rounded text-indigo-500 text-[28px] mb-4 block">mark_email_unread</span>
-                    <div><p class="text-[11px] text-gray-500 font-medium mb-1 uppercase tracking-wider">Persuratan</p><p class="text-3xl font-semibold text-gray-900" id="stat_surat">0</p></div>
+                    <div><p class="text-[11px] text-gray-500 font-medium mb-1 uppercase tracking-wider">Manajemen Persuratan SP</p><p class="text-3xl font-semibold text-gray-900" id="stat_surat">0</p></div>
                 </div>
                 <div class="bg-white border border-gray-200 p-6 rounded-2xl flex flex-col justify-between shadow-sm">
                     <span class="material-symbols-rounded text-orange-500 text-[28px] mb-4 block">campaign</span>
@@ -133,11 +159,11 @@
                 </div>
                 <div class="bg-white border border-gray-200 p-6 rounded-2xl flex flex-col justify-between shadow-sm">
                     <span class="material-symbols-rounded text-rose-500 text-[28px] mb-4 block">folder_open</span>
-                    <div><p class="text-[11px] text-gray-500 font-medium mb-1 uppercase tracking-wider">Risiko Teknis SP</p><p class="text-3xl font-semibold text-gray-900" id="stat_masalah_sp">0</p></div>
+                    <div><p class="text-[11px] text-gray-500 font-medium mb-1 uppercase tracking-wider">Potensi Permasalahan SP</p><p class="text-3xl font-semibold text-gray-900" id="stat_masalah_sp">0</p></div>
                 </div>
                 <div class="bg-white border border-gray-200 p-6 rounded-2xl flex flex-col justify-between shadow-sm">
                     <span class="material-symbols-rounded text-violet-500 text-[28px] mb-4 block">gavel</span>
-                    <div><p class="text-[11px] text-gray-500 font-medium mb-1 uppercase tracking-wider">Sengketa PPS</p><p class="text-3xl font-semibold text-gray-900" id="stat_masalah_pps">0</p></div>
+                    <div><p class="text-[11px] text-gray-500 font-medium mb-1 uppercase tracking-wider">PPS</p><p class="text-3xl font-semibold text-gray-900" id="stat_masalah_pps">0</p></div>
                 </div>
             </div>
 
@@ -161,16 +187,22 @@
             </div>
         </div>
 
-        <!-- TABEL EDGE-TO-EDGE -->
+        <!-- View: TABLE -->
         <div id="viewTable" class="absolute inset-0 z-30 hidden flex-col bg-white">
             <div class="px-6 md:px-8 py-5 border-b border-gray-200 flex flex-col md:flex-row md:justify-between md:items-center gap-4 shrink-0 bg-white z-20">
                 <div>
                     <h2 class="text-xl font-semibold text-gray-900 tracking-tight" id="tableTitle">Kanal Data</h2>
-                    <p class="text-sm text-gray-500 mt-1">Manajemen rekam jejak atribut dan tautan spasial.</p>
+                    <p class="text-sm text-gray-500 mt-1">Manajemen rekam jejak atribut dokumen utama.</p>
                 </div>
-                <div class="flex gap-2">
-                    <input type="file" id="ocrPdfInput" accept=".pdf" class="hidden" onchange="processOcrUpload(this)">
-                    <button id="btnTableTambahData" onclick="addNewInlineRow()" class="bg-[#007AFF] hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg text-[13px] font-medium transition-colors shadow-sm flex items-center justify-center gap-2"><span class="material-symbols-rounded text-[18px]">add</span> Tambah Baris Baru</button>
+                <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto mt-3 md:mt-0">
+                    <div class="relative w-full sm:w-64">
+                        <span class="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]">search</span>
+                        <input type="text" id="tableSearchInput" onkeyup="renderTableRows()" placeholder="Pencarian bebas..." class="flat-input pl-9 w-full">
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="file" id="ocrPdfInput" accept=".pdf" class="hidden" onchange="processOcrUpload(this)">
+                        <button id="btnTableTambahData" onclick="addNewInlineRow()" class="bg-[#007AFF] hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg text-[13px] font-medium transition-colors shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto whitespace-nowrap"><span class="material-symbols-rounded text-[18px]">add</span> Tambah Baris</button>
+                    </div>
                 </div>
             </div>
 
@@ -185,6 +217,56 @@
         </div>
     </main>
 
+    <!-- MODAL 1:N OBJEK SPASIAL -->
+    <div id="modalBidang" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white rounded-[20px] w-full max-w-3xl flex flex-col max-h-[85vh] shadow-2xl overflow-hidden transform transition-transform">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <div>
+                    <h3 class="text-[16px] font-semibold text-gray-900 flex items-center gap-2"><span class="material-symbols-rounded text-[#007AFF]">map</span> Kelola Tautan Spasial</h3>
+                    <p class="text-[12px] text-gray-500 mt-0.5" id="lblModalDocId">Menghubungkan bidang tanah ke dokumen.</p>
+                </div>
+                <button onclick="tutupModalBidang()" class="w-8 h-8 rounded-full bg-white border border-gray-200 text-gray-500 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors"><span class="material-symbols-rounded text-[18px]">close</span></button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto flex-1 bg-white custom-scrollbar">
+                
+                <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-4 mb-6">
+                    <h4 class="text-[12px] font-semibold text-gray-800 mb-3">Tambah Bidang Baru</h4>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input type="text" id="m_desa" placeholder="Desa (Wajib)" class="flat-input flex-1 py-2 text-[12px]">
+                        <input type="text" id="m_nib" placeholder="NIB (Opsional)" class="flat-input flex-1 py-2 text-[12px]">
+                        <input type="text" id="m_hak" placeholder="No Hak (Opsional)" class="flat-input flex-1 py-2 text-[12px]">
+                        <input type="text" id="m_su" placeholder="No SU (Opsional)" class="flat-input flex-1 py-2 text-[12px]">
+                        <button onclick="tambahBidangKeList()" class="bg-[#007AFF] hover:bg-blue-600 text-white font-medium rounded-lg px-4 py-2 text-[12px] shadow-sm transition-colors shrink-0">Tambah Data</button>
+                    </div>
+                </div>
+
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-[12px]">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-600 uppercase tracking-wider font-semibold border-b border-gray-200">
+                                <th class="p-3">Desa</th>
+                                <th class="p-3">NIB</th>
+                                <th class="p-3">No Hak</th>
+                                <th class="p-3">No SU</th>
+                                <th class="p-3 text-center">Aksi Lacak & Hapus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listBidangBody" class="divide-y divide-gray-100 text-gray-700">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0">
+                <button onclick="tutupModalBidang()" class="px-5 py-2.5 text-[13px] font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 rounded-xl transition-colors shadow-sm">Batal</button>
+                <button onclick="simpanBidangKeDb()" class="px-5 py-2.5 text-[13px] font-medium bg-[#007AFF] text-white rounded-xl hover:bg-blue-600 shadow-sm shadow-blue-500/30 transition-colors flex items-center gap-2">
+                    <span class="material-symbols-rounded text-[18px]">save</span> Simpan Perubahan Spasial
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const CONFIG_SUPABASE_URL = "https://lnmypoqzhzbwcyhuvuqg.supabase.co";
         const CONFIG_SUPABASE_KEY = "sb_publishable_RIPbaAwHEdGTv5V1826ZMA_NQIjQ52f";
@@ -197,53 +279,336 @@
         let tempOcrData = null; 
         let tempUploadedUrl = null;
         
-        let masterBidangKamus = []; 
         let globalDataMasalah = [];
+        let clickedMapLayer = null;
 
-        const mapObject = L.map('map', { zoomControl: false }).setView([-8.6500, 115.2166], 11);
+        // Modal 1:N State
+        let currentEditingMainId = null;
+        let tempModalBidangList = [];
+
+        // --- SISTEM NOTIFIKASI TOAST (KIRI BAWAH) ---
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'bottom-start',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            customClass: { popup: 'rounded-xl shadow-xl border border-gray-100 text-sm bg-white text-gray-800' }
+        });
+
+        function showLoadingToast(msg) {
+            Swal.fire({
+                toast: true, position: 'bottom-start', showConfirmButton: false,
+                title: msg,
+                customClass: { popup: 'rounded-xl shadow-xl border border-gray-100 text-sm font-medium bg-white text-gray-800' },
+                didOpen: () => Swal.showLoading()
+            });
+        }
+
+        const mapObject = L.map('map', { zoomControl: false, preferCanvas: true }).setView([-8.6500, 115.2166], 11);
         L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 22, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'] }).addTo(mapObject);
         L.control.zoom({ position: 'bottomright' }).addTo(mapObject);
         
         let layerGroupMasterBidang = L.geoJSON(null, { 
             style: function(feature) {
-                // Jika bidang terkoneksi dengan 4 kanal (Bermasalah) -> MERAH
                 if (feature.properties && feature.properties.is_bermasalah) {
-                    return { 
-                        color: '#ef4444',       // Garis luar merah terang
-                        weight: 2,              // Garis sedikit lebih tebal
-                        fillColor: '#ef4444',   // Isian merah
-                        fillOpacity: 0.45,      // Transparansi isian merah
-                        dashArray: '5, 5'       // Garis putus-putus/hatch (hapus baris ini jika ingin garis solid)
-                    };
+                    return { color: '#ef4444', weight: 2, fillColor: '#ef4444', fillOpacity: 0.45, dashArray: '5, 5' };
                 }
-                // Jika bidang normal (Tidak terkoneksi) -> BIRU MUDA TIPIS
-                return { 
-                    color: '#60a5fa',           // Garis luar biru muda (Tailwind blue-400)
-                    weight: 1,                  // Garis tipis
-                    fillColor: '#93c5fd',       // Isian biru sangat muda (Tailwind blue-300)
-                    fillOpacity: 0.15,          // Sangat transparan agar satelit tetap terlihat
-                    dashArray: ''               // Garis solid biasa
-                };
+                return { color: '#60a5fa', weight: 1, fillColor: '#93c5fd', fillOpacity: 0.15, dashArray: '' };
             },
             onEachFeature: function(feature, layer) {
-                layer.on('click', function() {
-                    const p = feature.properties;
-                    actionInfoKoneksi(p.kode_desa || '-', p.nib || '-', p.no_hak || '-', p.no_su || '-');
-                });
+                layer.on('click', function(e) { highlightPoligon(e.target); });
             }
         }).addTo(mapObject);
 
-        const SPATIAL_FIELDS = [
-            { key: 'desa', label: 'Kode Desa', type: 'text', spatial: true, req: true },
-            { key: 'nibel', label: 'NIBEL', type: 'text', spatial: true },
-            { key: 'nib', label: 'NIB', type: 'text', spatial: true },
-            { key: 'no_hak', label: 'No Hak', type: 'text', spatial: true },
-            { key: 'no_su', label: 'No SU', type: 'text', spatial: true },
-            { key: 'koordinat_x', label: 'X (Lng)', type: 'number', spatial: true },
-            { key: 'koordinat_y', label: 'Y (Lat)', type: 'number', spatial: true },
-            { key: 'tingkat_risiko', label: 'Tingkat Risiko', type: 'text', spatial: true },
-            { key: 'catatan_peta', label: 'Catatan Peta', type: 'text', spatial: true }
-        ];
+        let layerSearchHighlight = L.geoJSON(null, {
+            style: function(feature) {
+                let isProb = cekApakahBermasalah(feature.properties);
+                if (isProb) return { color: '#f87171', weight: 4, fillColor: '#fca5a5', fillOpacity: 0.6, dashArray: '5, 5' };
+                return { color: '#fb923c', weight: 4, fillColor: '#fcd34d', fillOpacity: 0.6 };
+            },
+            onEachFeature: function(feature, layer) {
+                layer._isSearchLayer = true;
+                layer.on('click', function(e) { highlightPoligon(e.target); });
+            }
+        }).addTo(mapObject);
+
+        function matchAtributSpasial(masalahRow, polygonProps) {
+            let mDesa = String(masalahRow.desa || '').toLowerCase().trim();
+            let pDesa = String(polygonProps.kode_desa || polygonProps.desa || '').toLowerCase().trim();
+            if (!mDesa || !pDesa || mDesa !== pDesa) return false;
+
+            const cleanStr = (s) => String(s || '').toLowerCase().trim().replace(/^[-]+$/, '');
+            let mNib = cleanStr(masalahRow.nib); let pNib = cleanStr(polygonProps.nib);
+            if (mNib && pNib && mNib === pNib) return true;
+
+            let mHak = cleanStr(masalahRow.no_hak); let pHak = cleanStr(polygonProps.no_hak);
+            if (mHak && pHak && mHak === pHak) return true;
+
+            let mSu = cleanStr(masalahRow.no_su); let pSu = cleanStr(polygonProps.no_su);
+            if (mSu && pSu && mSu === pSu) return true;
+
+            let mNibel = cleanStr(masalahRow.nibel); let pNibel = cleanStr(polygonProps.nibel);
+            if (mNibel && pNibel && mNibel === pNibel) return true;
+
+            return false;
+        }
+
+        function cekRelasiLain(spatialRow) {
+            let count = 0;
+            globalDataMasalah.forEach(g => {
+                if (g.id_detail === spatialRow.id_detail) return; 
+                if (matchAtributSpasial(g, spatialRow)) count++;
+            });
+            return count;
+        }
+
+        function cekApakahBermasalah(props) {
+            if (!globalDataMasalah || globalDataMasalah.length === 0) return false;
+            return globalDataMasalah.some(row => matchAtributSpasial(row, props));
+        }
+
+        function highlightPoligon(layer, triggerSidebar = true) {
+            if (clickedMapLayer) {
+                try {
+                    if (clickedMapLayer._isSearchLayer) layerSearchHighlight.resetStyle(clickedMapLayer);
+                    else layerGroupMasterBidang.resetStyle(clickedMapLayer);
+                } catch(err) { console.log(err); }
+            }
+            
+            clickedMapLayer = layer;
+            clickedMapLayer.setStyle({ color: '#eab308', weight: 5, fillColor: '#fef08a', fillOpacity: 0.5, dashArray: '' });
+
+            if (triggerSidebar) actionInfoKoneksi(layer.feature.properties);
+        }
+
+        function tutupSidebarPeta() {
+            document.getElementById('mapSidebar').classList.add('translate-x-full');
+            if (clickedMapLayer) {
+                try {
+                    if (clickedMapLayer._isSearchLayer) layerSearchHighlight.resetStyle(clickedMapLayer);
+                    else layerGroupMasterBidang.resetStyle(clickedMapLayer);
+                } catch(e){}
+                clickedMapLayer = null;
+            }
+        }
+
+        // TAMPILKAN SIDEBAR TANPA PINDAH KE VIEW MAP
+        window.actionInfoKoneksiLokal = function(spatialId) {
+            let row = globalDataMasalah.find(g => g.id_detail === spatialId);
+            if(!row) return;
+            
+            tutupModalBidang();
+            
+            // Perhatikan: switchView('map') dihapus di sini
+            actionInfoKoneksi(row);
+        }
+
+        async function actionInfoKoneksi(props) {
+            const sidebarSubtitle = document.getElementById('sb_subtitle');
+            const content = document.getElementById('sidebarContent');
+            
+            let desa = props.kode_desa || props.desa || '-';
+            let nib = props.nib || '-';
+            let no_hak = props.no_hak || '-';
+            let no_su = props.no_su || '-';
+            
+            document.getElementById('mapSidebar').classList.remove('translate-x-full');
+            
+            let ids = [];
+            if(nib && nib!=='-') ids.push(`NIB ${nib}`);
+            if(no_hak && no_hak!=='-') ids.push(`HAK ${no_hak}`);
+            if(no_su && no_su!=='-') ids.push(`SU ${no_su}`);
+            sidebarSubtitle.innerText = `Desa ${desa} | ${ids.join(' • ') || 'Atribut Kosong'}`;
+            
+            content.innerHTML = `<div class="flex flex-col items-center justify-center py-12 gap-3"><svg class="animate-spin h-6 w-6 text-[#007AFF]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="text-[12px] text-gray-500 font-medium">Menarik rincian utuh dari Cloud...</span></div>`;
+
+            let matches = globalDataMasalah.filter(g => matchAtributSpasial(g, props));
+
+            if (matches.length === 0) {
+                content.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-16 text-center">
+                        <div class="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-4"><span class="material-symbols-rounded text-3xl">verified_user</span></div>
+                        <h3 class="text-[14px] font-semibold text-gray-900">Area Bersih</h3>
+                        <p class="text-[12px] text-gray-500 mt-1.5 px-2 font-light">Tidak ada catatan sengketa, aduan, atau persuratan yang terhubung pada bidang tanah ini.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let idSurat = matches.filter(m => m.id_surat).map(m => m.id_surat);
+            let idLaporan = matches.filter(m => m.id_laporan).map(m => m.id_laporan);
+            let idKasus = matches.filter(m => m.id_kasus).map(m => m.id_kasus);
+            let idSengketa = matches.filter(m => m.id_sengketa).map(m => m.id_sengketa);
+
+            let promises = [];
+            if(idSurat.length > 0) promises.push(supabaseClient.from('manajemen_persuratan').select('*').in('id_surat', idSurat).then(res => ({kanal: 'PERSURATAN', data: res.data})));
+            if(idLaporan.length > 0) promises.push(supabaseClient.from('laporan_mandiri').select('*').in('id_laporan', idLaporan).then(res => ({kanal: 'LAPORAN_MANDIRI', data: res.data})));
+            if(idKasus.length > 0) promises.push(supabaseClient.from('seksi1_kasus').select('*').in('id_kasus', idKasus).then(res => ({kanal: 'SEKSI_1', data: res.data})));
+            if(idSengketa.length > 0) promises.push(supabaseClient.from('seksi5_sengketa').select('*').in('id_sengketa', idSengketa).then(res => ({kanal: 'SEKSI_5', data: res.data})));
+
+            const results = await Promise.all(promises);
+
+            let resume = { 'PERSURATAN': 0, 'LAPORAN_MANDIRI': 0, 'SEKSI_1': 0, 'SEKSI_5': 0 };
+            let htmlDetails = '';
+
+            results.forEach(res => {
+                if(res.data) {
+                    resume[res.kanal] += res.data.length;
+                    res.data.forEach(item => { htmlDetails += buildDetailCard(res.kanal, item); });
+                }
+            });
+
+            let html = `
+                <h3 class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 pl-1">Resume Terhubung</h3>
+                <div class="grid grid-cols-2 gap-2.5 mb-8">
+                    <div class="bg-blue-50/70 border border-blue-100 rounded-2xl p-3"><p class="text-[10px] text-blue-600 font-medium mb-0.5">Persuratan</p><p class="text-[22px] font-semibold text-blue-700">${resume['PERSURATAN']}</p></div>
+                    <div class="bg-orange-50/70 border border-orange-100 rounded-2xl p-3"><p class="text-[10px] text-orange-600 font-medium mb-0.5">Laporan</p><p class="text-[22px] font-semibold text-orange-700">${resume['LAPORAN_MANDIRI']}</p></div>
+                    <div class="bg-rose-50/70 border border-rose-100 rounded-2xl p-3"><p class="text-[10px] text-rose-600 font-medium mb-0.5">Risiko SP</p><p class="text-[22px] font-semibold text-rose-700">${resume['SEKSI_1']}</p></div>
+                    <div class="bg-purple-50/70 border border-purple-100 rounded-2xl p-3"><p class="text-[10px] text-purple-600 font-medium mb-0.5">Sengketa</p><p class="text-[22px] font-semibold text-purple-700">${resume['SEKSI_5']}</p></div>
+                </div>
+                <h3 class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 pl-1">Rincian Lengkap Dokumen</h3>
+                <div class="space-y-4">
+            `;
+            html += htmlDetails + `</div>`;
+            content.innerHTML = html;
+        }
+
+        function buildDetailCard(kanal, item) {
+            let badgeColor, lbl, isi;
+            if (kanal === 'PERSURATAN') {
+                badgeColor = 'bg-blue-50 text-blue-600 border-blue-200'; lbl = 'Surat Masuk';
+                isi = `
+                    <div class="mb-2.5"><span class="text-[10px] text-gray-400 block mb-0.5">Nomor & Tanggal Surat</span><span class="text-[12px] font-medium text-gray-800">${item.nomor_surat || '-'} / ${item.tanggal_surat || '-'}</span></div>
+                    <div class="mb-2.5"><span class="text-[10px] text-gray-400 block mb-0.5">Pengirim</span><span class="text-[12px] font-medium text-gray-800">${item.pengirim || '-'}</span></div>
+                    <div class="mb-2.5"><span class="text-[10px] text-gray-400 block mb-0.5">Perihal</span><span class="text-[12px] font-medium text-gray-800">${item.perihal || '-'}</span></div>
+                `;
+            } else if (kanal === 'LAPORAN_MANDIRI') {
+                badgeColor = 'bg-orange-50 text-orange-600 border-orange-200'; lbl = 'Laporan Lapangan';
+                isi = `
+                    <div class="mb-2.5"><span class="text-[10px] text-gray-400 block mb-0.5">Pelapor</span><span class="text-[12px] font-medium text-gray-800">${item.pelapor || '-'}</span></div>
+                    <div class="mb-2.5"><span class="text-[10px] text-gray-400 block mb-0.5">Status Laporan</span><span class="text-[12px] font-medium text-gray-800">${item.status || '-'}</span></div>
+                `;
+            } else if (kanal === 'SEKSI_1') {
+                badgeColor = 'bg-rose-50 text-rose-600 border-rose-200'; lbl = 'Risiko Teknis SP';
+                isi = `
+                    <div class="mb-2.5"><span class="text-[10px] text-gray-400 block mb-0.5">Sumber Identifikasi / Status</span><span class="text-[12px] font-medium text-gray-800">${item.sumber_data_masalah || '-'} [ ${item.status || '-'} ]</span></div>
+                    <div class="mb-2.5"><span class="text-[10px] text-gray-400 block mb-0.5">Deskripsi Lengkap Risiko</span><span class="text-[12px] font-medium text-gray-800">${item.deskripsi_permasalahan || '-'}</span></div>
+                `;
+            } else {
+                badgeColor = 'bg-purple-50 text-purple-600 border-purple-200'; lbl = 'Sengketa Hukum (PPS)';
+                isi = `
+                    <div class="mb-2.5"><span class="text-[10px] text-gray-400 block mb-0.5">Nomor Perkara / Status</span><span class="text-[12px] font-medium text-gray-800">${item.nomor_perkara || '-'} [ ${item.status || '-'} ]</span></div>
+                    <div class="mb-2.5"><span class="text-[10px] text-gray-400 block mb-0.5">Pihak Bersengketa</span><span class="text-[12px] font-medium text-gray-800">${item.pihak_bersengketa || '-'}</span></div>
+                `;
+            }
+
+            return `
+                <div class="bg-white border border-gray-200 p-4 rounded-[16px] shadow-sm relative overflow-hidden transition-all hover:shadow-md hover:border-gray-300 group">
+                    <div class="absolute top-0 left-0 w-1.5 h-full ${badgeColor.split(' ')[0]}"></div>
+                    <div class="ml-1.5">
+                        <div class="inline-block px-2 py-1 rounded-md text-[9px] font-bold border ${badgeColor} mb-3.5 tracking-wide uppercase">${lbl}</div>
+                        ${isi}
+                        ${item.link_arsip ? `<div class="mt-4 pt-3 border-t border-gray-100"><a href="${item.link_arsip}" target="_blank" class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#007AFF] hover:text-blue-700 transition-colors bg-blue-50/50 px-3 py-1.5 rounded-lg"><span class="material-symbols-rounded text-[14px]">link</span> Buka Arsip Dokumen</a></div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        mapObject.on('moveend', fetchMapInView);
+
+        async function fetchMapInView() {
+            if (document.getElementById('viewMap').classList.contains('hidden')) return;
+
+            const zoomLevel = mapObject.getZoom();
+            const warningBox = document.getElementById('zoomWarning');
+            const loadingBox = document.getElementById('mapLoadingIndicator');
+
+            if (zoomLevel < 15) {
+                layerGroupMasterBidang.clearLayers();
+                warningBox.classList.remove('opacity-0');
+                loadingBox.classList.add('opacity-0');
+                return;
+            }
+
+            warningBox.classList.add('opacity-0');
+            loadingBox.classList.remove('opacity-0');
+
+            const bounds = mapObject.getBounds();
+            try {
+                const { data, error } = await supabaseClient.rpc('ambil_bidang_by_bbox', {
+                    p_min_x: bounds.getWest(), p_min_y: bounds.getSouth(), p_max_x: bounds.getEast(), p_max_y: bounds.getNorth()
+                });
+
+                if (error) throw error;
+                let geoJsonObj = typeof data === 'string' ? JSON.parse(data) : data;
+
+                if (geoJsonObj && geoJsonObj.features) {
+                    geoJsonObj.features.forEach(f => {
+                        f.properties.is_bermasalah = cekApakahBermasalah(f.properties);
+                    });
+                }
+
+                layerGroupMasterBidang.clearLayers();
+                layerGroupMasterBidang.addData(geoJsonObj);
+                
+                if (clickedMapLayer && !clickedMapLayer._isSearchLayer) {
+                    let oldId = clickedMapLayer.feature.properties.id_bidang;
+                    layerGroupMasterBidang.eachLayer(function(l) {
+                        if(l.feature.properties.id_bidang === oldId) { highlightPoligon(l, false); }
+                    });
+                }
+            } catch (error) { console.error("Gagal BBOX:", error); } 
+            finally { loadingBox.classList.add('opacity-0'); }
+        }
+
+        function bersihkanPencarian() {
+            document.getElementById('srcDesa').value = '';
+            document.getElementById('srcNIB').value = '';
+            document.getElementById('srcHak').value = '';
+            layerSearchHighlight.clearLayers();
+            tutupSidebarPeta();
+        }
+
+        async function eksekusiCariPeta() {
+            const desa = document.getElementById('srcDesa').value.trim();
+            const nib = document.getElementById('srcNIB').value.trim();
+            const hak = document.getElementById('srcHak').value.trim();
+
+            if (!desa && !nib && !hak) {
+                return Toast.fire({icon: 'warning', title: 'Isi minimal salah satu kolom pencarian.'});
+            }
+
+            const btn = document.getElementById('btnCariPeta');
+            btn.innerHTML = '<svg class="animate-spin h-4 w-4 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+            btn.disabled = true;
+
+            try {
+                const { data, error } = await supabaseClient.rpc('cari_bidang_spasial', { p_desa: desa, p_nib: nib, p_hak: hak });
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    layerSearchHighlight.clearLayers();
+                    let geoJsonFeatures = data.map(row => {
+                        let geom = null;
+                        try { geom = typeof row.geom_json === 'string' ? JSON.parse(row.geom_json) : row.geom_json; } catch(e){}
+                        return { type: "Feature", properties: row, geometry: geom };
+                    });
+                    
+                    layerSearchHighlight.addData({ type: "FeatureCollection", features: geoJsonFeatures });
+                    mapObject.fitBounds(layerSearchHighlight.getBounds(), { padding: [100, 100], animate: true, duration: 1.5 });
+                    
+                    let firstLayer = null;
+                    layerSearchHighlight.eachLayer(l => { if(!firstLayer) firstLayer = l; });
+                    if(firstLayer) highlightPoligon(firstLayer, true);
+
+                    Toast.fire({icon: 'success', title: 'Layar diarahkan ke lokasi objek pertanahan.'});
+                } else {
+                    Toast.fire({icon: 'info', title: 'Data tidak ditemukan atau geometri rusak.'});
+                }
+            } catch (e) { Toast.fire({icon: 'error', title: e.message}); } 
+            finally { btn.innerHTML = 'Cari Peta'; btn.disabled = false; }
+        }
 
         const SCHEMA_CONFIG = {
             surat: { 
@@ -256,16 +621,14 @@
                     { key: 'isi_surat', label: 'Isi Surat', type: 'text' }, { key: 'tindak_lanjut', label: 'Tindak Lanjut', type: 'text' },
                     { key: 'pic', label: 'P I C', type: 'text' }, { key: 'status', label: 'Status', type: 'text' },
                     { key: 'tgl_ke_pic', label: 'Tgl Ke PIC', type: 'date' }, { key: 'tgl_selesai', label: 'Tgl Selesai', type: 'date' },
-                    { key: 'link_arsip', label: 'Link Arsip', type: 'text' }, { key: 'upload_arsip', label: 'Upload Arsip', type: 'text' },
-                    ...SPATIAL_FIELDS 
+                    { key: 'link_arsip', label: 'Link Arsip', type: 'text' }, { key: 'upload_arsip', label: 'Upload Arsip', type: 'text' }
                 ] 
             },
             aduan: { 
                 mainTable: 'laporan_mandiri', pk: 'id_laporan', title: 'Data Laporan Mandiri', 
                 fields: [ 
                     { key: 'pelapor', label: 'Pelapor', type: 'text' }, { key: 'isi_laporan', label: 'Isi Laporan (Wajib)', type: 'text', req: true }, 
-                    { key: 'status', label: 'Status', type: 'text' }, { key: 'link_arsip', label: 'Link Arsip', type: 'text' },
-                    ...SPATIAL_FIELDS 
+                    { key: 'status', label: 'Status', type: 'text' }, { key: 'link_arsip', label: 'Link Arsip', type: 'text' }
                 ] 
             },
             masalah_sp: { 
@@ -273,8 +636,7 @@
                 fields: [ 
                     { key: 'sumber_data_masalah', label: 'Sumber Masalah', type: 'text' }, { key: 'kode_bendel_fisik', label: 'Kode Bendel', type: 'text' }, 
                     { key: 'deskripsi_permasalahan', label: 'Deskripsi Masalah (Wajib)', type: 'text', req: true }, { key: 'status', label: 'Status', type: 'text' },
-                    { key: 'link_arsip', label: 'Link Arsip', type: 'text' },
-                    ...SPATIAL_FIELDS 
+                    { key: 'link_arsip', label: 'Link Arsip', type: 'text' }
                 ] 
             },
             masalah_pps: { 
@@ -282,113 +644,20 @@
                 fields: [ 
                     { key: 'sumber_data_masalah', label: 'Sumber Masalah', type: 'text' }, { key: 'nomor_perkara', label: 'No Perkara', type: 'text' }, 
                     { key: 'pihak_bersengketa', label: 'Pihak Bersengketa', type: 'text' }, { key: 'deskripsi_permasalahan', label: 'Deskripsi Sengketa (Wajib)', type: 'text', req: true }, 
-                    { key: 'status', label: 'Status', type: 'text' }, { key: 'link_arsip', label: 'Link Arsip', type: 'text' },
-                    ...SPATIAL_FIELDS 
+                    { key: 'status', label: 'Status', type: 'text' }, { key: 'link_arsip', label: 'Link Arsip', type: 'text' }
                 ] 
             }
         };
 
-        function getEarlyWarnings(row) {
-            let warnings = [];
-            let rDesa = (row.desa || '').toLowerCase().trim();
-            if (!rDesa || rDesa === '-') return warnings;
-
-            let matchesMap = masterBidangKamus.some(m => {
-                if (String(m.desa).toLowerCase().trim() !== rDesa) return false;
-                if (row.nib && m.nib && String(m.nib).trim() === String(row.nib).trim()) return true;
-                if (row.no_hak && m.no_hak && String(m.no_hak).trim() === String(row.no_hak).trim()) return true;
-                if (row.no_su && m.no_su && String(m.no_su).trim() === String(row.no_su).trim()) return true;
-                if (row.nibel && m.nibel && String(m.nibel).trim() === String(row.nibel).trim()) return true;
-                return false;
-            });
-            if (matchesMap) warnings.push({ label: 'Terpetakan', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' });
-
-            let relatedKanals = new Set();
-            globalDataMasalah.forEach(g => {
-                if (g.id_detail === row._spatialId) return; 
-                if (String(g.desa).toLowerCase().trim() !== rDesa) return;
-
-                let match = false;
-                if (row.nib && g.nib && String(g.nib).trim() === String(row.nib).trim()) match = true;
-                if (row.no_hak && g.no_hak && String(g.no_hak).trim() === String(row.no_hak).trim()) match = true;
-                if (row.no_su && g.no_su && String(g.no_su).trim() === String(row.no_su).trim()) match = true;
-                if (row.nibel && g.nibel && String(g.nibel).trim() === String(row.nibel).trim()) match = true;
-
-                if (match) relatedKanals.add(g.sumber_kanal);
-            });
-
-            if (relatedKanals.has('SEKSI_5')) warnings.push({ label: 'Sengketa PPS', color: 'bg-purple-100 text-purple-800 border-purple-200' });
-            if (relatedKanals.has('SEKSI_1')) warnings.push({ label: 'Risiko SP', color: 'bg-rose-100 text-rose-800 border-rose-200' });
-            if (relatedKanals.has('LAPORAN_MANDIRI')) warnings.push({ label: 'Laporan Masuk', color: 'bg-orange-100 text-orange-800 border-orange-200' });
-            if (relatedKanals.has('PERSURATAN')) warnings.push({ label: 'Ada Persuratan', color: 'bg-blue-100 text-blue-800 border-blue-200' });
-
-            return warnings;
-        }
-
-        function cekApakahBermasalah(props) {
-            if (!globalDataMasalah || globalDataMasalah.length === 0) return false;
-            return globalDataMasalah.some(row => {
-                if (!row.desa || !props.kode_desa) return false;
-                if (String(row.desa).toLowerCase().trim() !== String(props.kode_desa).toLowerCase().trim()) return false;
-                let match = false;
-                if (row.nib && props.nib && String(row.nib).trim() === String(props.nib).trim()) match = true;
-                if (row.no_hak && props.no_hak && String(row.no_hak).trim() === String(props.no_hak).trim()) match = true;
-                if (row.no_su && props.no_su && String(row.no_su).trim() === String(props.no_su).trim()) match = true;
-                if (row.nibel && props.nibel && String(row.nibel).trim() === String(props.nibel).trim()) match = true;
-                return match;
-            });
-        }
-
-        async function actionInfoKoneksi(desa, nib, no_hak, no_su) {
-            if (!desa || desa === '-') return Swal.fire("Perhatian", "Data desa belum lengkap.", "warning");
-            Swal.fire({ title: 'Melacak Relasi...', didOpen: () => Swal.showLoading() });
-            const { data, error } = await supabaseClient.rpc('cek_riwayat_bidang', { p_kode_desa: desa, p_nib: nib!=='-'?nib:null, p_no_hak: no_hak!=='-'?no_hak:null, p_no_su: no_su!=='-'?no_su:null });
-            if(error) return Swal.fire("Error", "Gagal memuat relasi.", "error");
-            
-            if(data && data.length > 0) {
-                let html = `<div class="space-y-3 mt-4 text-left text-sm max-h-[40vh] overflow-auto custom-scrollbar pr-2">`;
-                data.forEach(item => { html += `<div class="p-4 bg-gray-50 border border-gray-200 rounded-xl"><span class="font-semibold text-[11px] tracking-wide text-[#007AFF] uppercase block mb-1.5">${item.kanal_sumber.replace('_',' ')}</span> <span class="text-gray-700 leading-relaxed text-sm">${item.informasi_tambahan}</span></div>`; });
-                html += `</div>`;
-                Swal.fire({ title: 'Relasi Ditemukan', html: html, width: '500px', confirmButtonColor: '#007AFF' });
-            } else { Swal.fire({ title: "Bersih", text: "Tidak ada relasi atau masalah di kanal lain.", icon: "success", confirmButtonColor: '#007AFF'}); }
-        }
-
         async function calculateSmartIntersections() {
-            if (masterBidangKamus.length === 0) {
-                // Biarkan jalan jika tidak ada peta
-            }
             const { data, error } = await supabaseClient.from('grid_bidang_bermasalah').select('*');
             if (error || !data) return;
 
             let groups = {};
             data.forEach(row => {
                 if (!row.desa) return;
-                let matchedId = null; let master = null;
-
-                if (masterBidangKamus.length > 0) {
-                    master = masterBidangKamus.find(m => {
-                        if (String(m.desa).toLowerCase().trim() !== String(row.desa).toLowerCase().trim()) return false;
-                        let match = false;
-                        if (row.nib && m.nib && String(m.nib).trim() === String(row.nib).trim()) match = true;
-                        if (row.no_hak && m.no_hak && String(m.no_hak).trim() === String(row.no_hak).trim()) match = true;
-                        if (row.no_su && m.no_su && String(m.no_su).trim() === String(row.no_su).trim()) match = true;
-                        if (row.nibel && m.nibel && String(m.nibel).trim() === String(row.nibel).trim()) match = true;
-                        return match;
-                    });
-                    if (master) matchedId = master.id; 
-                }
-
-                if (!matchedId) matchedId = "UNMAPPED_" + row.desa + "_" + (row.nib || row.no_hak || row.no_su || row.nibel || Math.random());
-
-                if (!groups[matchedId]) {
-                    groups[matchedId] = { desa: master ? master.desa : row.desa, kanals: new Set(), nibs: new Set(), haks: new Set(), sus: new Set(), count: 0 };
-                    if (master) {
-                        if (master.nib && master.nib !== '-') groups[matchedId].nibs.add(master.nib);
-                        if (master.no_hak && master.no_hak !== '-') groups[matchedId].haks.add(master.no_hak);
-                        if (master.no_su && master.no_su !== '-') groups[matchedId].sus.add(master.no_su);
-                    }
-                }
-
+                let matchedId = "KASUS_" + row.desa + "_" + (row.nib || row.no_hak || row.no_su || row.nibel || Math.random());
+                if (!groups[matchedId]) groups[matchedId] = { desa: row.desa, kanals: new Set(), nibs: new Set(), haks: new Set(), sus: new Set(), count: 0 };
                 let g = groups[matchedId];
                 g.kanals.add(row.sumber_kanal); 
                 if(row.nib && row.nib !== '-') g.nibs.add(row.nib);
@@ -398,8 +667,7 @@
             });
 
             let groupArray = Object.values(groups);
-            const overlapList = groupArray.filter(item => item.kanals.size > 1);
-            document.getElementById('stat_overlap_count').innerText = overlapList.length;
+            document.getElementById('stat_overlap_count').innerText = groupArray.filter(item => item.kanals.size > 1).length;
 
             let kanalMap = { 'PERSURATAN':'Surat', 'LAPORAN_MANDIRI':'Lapor', 'SEKSI_1':'Risiko', 'SEKSI_5':'Sengketa' };
             function getSubsets(array) { return array.reduce((subs, val) => subs.concat(subs.map(set => [val,...set])), [[]]).filter(s => s.length > 0); }
@@ -418,22 +686,18 @@
                 d3.select("#venn-container").datum(vennData).call(chart);
                 d3.selectAll("#venn-container .venn-circle path").style("fill-opacity", 0.15).style("stroke-width", 1.5).style("stroke-opacity", 0.8);
                 d3.selectAll("#venn-container text").style("font-family", "Inter").style("font-size", "11px").style("font-weight", "500").style("fill", "#374151");
-            } else {
-                document.getElementById('venn-container').innerHTML = '<p class="text-[13px] text-gray-500">Tidak ada irisan data lintas kanal.</p>';
-            }
+            } else { document.getElementById('venn-container').innerHTML = '<p class="text-[13px] text-gray-500">Tidak ada irisan data lintas kanal.</p>'; }
 
             groupArray.sort((a, b) => b.count - a.count);
             let topRatedHtml = '';
             if(groupArray.length === 0) {
-                topRatedHtml = `<div class="text-center py-10 text-[13px] text-gray-500">Belum ada rekam bidang tanah.</div>`;
+                topRatedHtml = `<div class="text-center py-10 text-[13px] text-gray-500">Belum ada rekam bidang bermasalah.</div>`;
             } else {
                 groupArray.slice(0, 10).forEach(g => {
                     let ids = [];
                     if(g.nibs.size > 0) ids.push(`NIB ${Array.from(g.nibs).join(', ')}`);
                     if(g.haks.size > 0) ids.push(`Hak ${Array.from(g.haks).join(', ')}`);
                     if(g.sus.size > 0) ids.push(`SU ${Array.from(g.sus).join(', ')}`);
-                    let idText = ids.length > 0 ? ids.join(' • ') : 'Identitas Peta Belum Lengkap';
-
                     let badgesHtml = '';
                     g.kanals.forEach(kanal => {
                         let bg = 'bg-gray-100 text-gray-600', lbl = kanal;
@@ -443,15 +707,11 @@
                         else if(kanal === 'SEKSI_5') { bg = 'bg-sengketa'; lbl = 'Sengketa'; }
                         badgesHtml += `<span class="badge-kanal ${bg}">${lbl}</span>`;
                     });
-
                     topRatedHtml += `
                         <div class="bg-gray-50 rounded-xl p-4 flex justify-between items-center hover:bg-gray-100 transition-colors cursor-default border border-transparent hover:border-gray-200">
                             <div class="overflow-hidden">
-                                <div class="flex items-center gap-2 mb-1.5">
-                                    <span class="text-[13px] font-semibold text-gray-900 truncate max-w-[150px]">Desa ${g.desa}</span>
-                                    <span class="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-md font-medium shrink-0">Muncul ${g.count}x</span>
-                                </div>
-                                <p class="text-[11px] text-gray-500 truncate max-w-[280px] mb-2.5 font-mono">${idText}</p>
+                                <div class="flex items-center gap-2 mb-1.5"><span class="text-[13px] font-semibold text-gray-900 truncate max-w-[150px]">Desa ${g.desa}</span><span class="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-md font-medium shrink-0">Muncul ${g.count}x</span></div>
+                                <p class="text-[11px] text-gray-500 truncate max-w-[280px] mb-2.5 font-mono">${ids.join(' • ') || 'Atribut Kosong'}</p>
                                 <div class="flex gap-1.5 flex-wrap">${badgesHtml}</div>
                             </div>
                         </div>
@@ -467,110 +727,26 @@
             document.getElementById('stat_aduan').innerText = await fetchCount('laporan_mandiri');
             document.getElementById('stat_masalah_sp').innerText = await fetchCount('seksi1_kasus');
             document.getElementById('stat_masalah_pps').innerText = await fetchCount('seksi5_sengketa');
+            
+            const { data: masalahData } = await supabaseClient.from('grid_bidang_bermasalah').select('*');
+            globalDataMasalah = masalahData || [];
             calculateSmartIntersections();
-        }
-
-        // --- FUNGSI PAGINASI ANTI-MACET DENGAN LIMIT & OFFSET EKSPLISIT ---
-        async function fetchAndRenderSpatialMaster() {
-            try {
-                if (!Swal.isVisible() || Swal.getTitle()?.textContent !== 'Streaming Data Spasial') {
-                    Swal.fire({ title: 'Memuat Peta...', text: 'Mengunduh data spasial dari Cloud', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                }
-
-                const { data: masalahData } = await supabaseClient.from('grid_bidang_bermasalah').select('*');
-                globalDataMasalah = masalahData || [];
-
-                let allFeatures = []; 
-                let startPos = 0; 
-                const limitStep = 2000; 
-                let keepFetching = true;
-
-                while (keepFetching) {
-                    // Panggilan RPC dengan parameter yang aman dan dipaksa
-                    const { data, error } = await supabaseClient.rpc('ambil_master_bidang_geojson', {
-                        p_limit: limitStep,
-                        p_offset: startPos
-                    }); 
-                    
-                    if (error) throw error;
-                    
-                    if (data && data.length > 0) {
-                        allFeatures = allFeatures.concat(data); 
-                        startPos += limitStep; 
-                        
-                        if (data.length < limitStep) {
-                            keepFetching = false; 
-                        }
-                    } else { 
-                        keepFetching = false; 
-                    }
-                }
-
-                if (allFeatures.length === 0) {
-                    layerGroupMasterBidang.clearLayers();
-                    if (Swal.getTitle()?.textContent === 'Memuat Peta...') Swal.close();
-                    return;
-                }
-
-                masterBidangKamus = [];
-                let validFeatures = [];
-
-                allFeatures.forEach(row => {
-                    masterBidangKamus.push({
-                        id: row.id_bidang, desa: row.kode_desa, nib: row.nib,
-                        no_hak: row.no_hak, no_su: row.no_su, nibel: row.nibel 
-                    });
-                    
-                    let isProblem = cekApakahBermasalah(row);
-                    let geometryObj = null;
-                    
-                    try {
-                        geometryObj = typeof row.geom_json === 'string' ? JSON.parse(row.geom_json) : row.geom_json;
-                    } catch(e) { } // Abaikan jika ada 1 baris rusak agar tak menghentikan sistem
-
-                    if (geometryObj) {
-                        validFeatures.push({
-                            type: "Feature", properties: { ...row, is_bermasalah: isProblem },
-                            geometry: geometryObj
-                        });
-                    }
-                });
-
-                const finalGeoJson = { type: "FeatureCollection", features: validFeatures };
-                layerGroupMasterBidang.clearLayers(); 
-                layerGroupMasterBidang.addData(finalGeoJson);
-                
-                if (!document.getElementById('viewMap').classList.contains('hidden')) {
-                    if (layerGroupMasterBidang.getLayers().length > 0) {
-                        mapObject.invalidateSize(); 
-                        mapObject.fitBounds(layerGroupMasterBidang.getBounds());
-                    }
-                }
-                
-                // Matikan loading hanya jika ini adalah loading pembukaan peta
-                if (Swal.getTitle()?.textContent === 'Memuat Peta...') Swal.close(); 
-            } catch (err) { 
-                console.error("Kesalahan Peta:", err);
-                Swal.fire("Gagal Memuat Peta", "Silakan perbarui Skrip SQL di Supabase terlebih dahulu. Detail: " + err.message, "error"); 
-            }
         }
 
         async function handleLogin() {
             const email = document.getElementById('txtEmail').value, password = document.getElementById('txtPassword').value;
             if(!email || !password) return;
-            Swal.fire({ title: 'Memproses...', didOpen: () => Swal.showLoading() });
+            showLoadingToast('Memproses login...');
             
             const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (authError) return Swal.fire("Gagal", authError.message, "error");
+            if (authError) return Toast.fire({icon: 'error', title: authError.message});
             
             const { data: rbacData } = await supabaseClient.from('user_roles').select('*').eq('id', authData.user.id).single();
-            if (!rbacData) return Swal.fire("Gagal", "Hak akses tidak ditemukan.", "error");
+            if (!rbacData) return Toast.fire({icon: 'error', title: 'Hak akses tidak ditemukan.'});
             
             appAuthenticatedUserSession = rbacData;
             document.getElementById('authSection').classList.add('opacity-0', 'pointer-events-none');
-            document.getElementById('floatingMenu').classList.remove('hidden'); 
-            document.getElementById('floatingMenu').classList.add('flex'); 
-            
+            document.getElementById('floatingMenu').classList.remove('hidden'); document.getElementById('floatingMenu').classList.add('flex'); 
             document.getElementById('lblUserEmail').innerText = appAuthenticatedUserSession.email;
             
             let displayRole = "Pegawai Lapangan";
@@ -580,7 +756,6 @@
             document.getElementById('lblUserRole').innerText = displayRole;
 
             const role = rbacData.role.toLowerCase();
-            
             ['node_surat_sp','node_masalah_sp','node_masalah_pps','adminPanel'].forEach(id => {
                 document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex');
             });
@@ -597,15 +772,20 @@
                 document.getElementById('node_masalah_pps').classList.remove('hidden'); document.getElementById('node_masalah_pps').classList.add('flex');
             }
 
-            await fetchAndRenderSpatialMaster();
+            const { data: rpcData } = await supabaseClient.from('grid_bidang_bermasalah').select('*');
+            globalDataMasalah = rpcData || [];
+
             switchView('dashboard'); 
+            Swal.close();
         }
 
         function switchView(viewName, kanalName = null) {
+            const srcInput = document.getElementById('tableSearchInput');
+            if (srcInput) srcInput.value = '';
+
             ['viewDashboard', 'viewTable', 'viewMap'].forEach(id => {
                 document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex');
             });
-            
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('text-blue-600', 'bg-blue-50'); btn.classList.add('text-gray-600');
             });
@@ -619,7 +799,7 @@
                     document.getElementById('mapControlsLaporan').classList.remove('hidden'); document.getElementById('mapControlsLaporan').classList.add('flex');
                 } else { document.getElementById('mapControlsLaporan').classList.add('hidden'); }
                 
-                setTimeout(() => { mapObject.invalidateSize(); if (layerGroupMasterBidang.getLayers().length > 0) mapObject.fitBounds(layerGroupMasterBidang.getBounds()); }, 300);
+                setTimeout(() => { mapObject.invalidateSize(); fetchMapInView(); }, 300);
 
             } else if (viewName === 'dashboard') {
                 document.getElementById('mapControlsLaporan').classList.add('hidden');
@@ -630,18 +810,55 @@
             } else if (viewName === 'table') {
                 document.getElementById('mapControlsLaporan').classList.add('hidden');
                 document.getElementById('viewTable').classList.remove('hidden'); document.getElementById('viewTable').classList.add('flex');
-                
                 appCurrentActiveKanal = kanalName;
                 setupTableView(kanalName);
-                
                 const btnId = kanalName === 'surat' ? 'node_surat_sp' : kanalName === 'aduan' ? 'node_aduan' : kanalName === 'masalah_sp' ? 'node_masalah_sp' : 'node_masalah_pps';
                 document.getElementById(btnId).classList.remove('text-gray-600'); document.getElementById(btnId).classList.add('text-blue-600', 'bg-blue-50');
             }
         }
 
-        function handleLogout() { supabaseClient.auth.signOut(); window.location.reload(); }
+        // TOMBOL PIN LOKASI KLIK KE PETA
+        async function terbangKePetaSpesifik(desaStr, nibStr, hakStr) {
+            const desa = desaStr || '';
+            const nib = nibStr === '-' ? '' : nibStr;
+            const hak = hakStr === '-' ? '' : hakStr;
+            
+            if (!desa) return Toast.fire({icon: 'warning', title: 'Data belum memiliki informasi Desa.'});
+            
+            tutupModalBidang();
+            showLoadingToast('Melacak Lokasi Spasial...');
+            
+            try {
+                const { data, error } = await supabaseClient.rpc('cari_bidang_spasial', { p_desa: desa, p_nib: nib, p_hak: hak });
+                if (error) throw error;
+                
+                if (data && data.length > 0) {
+                    let targetData = data[0]; 
+                    for (let d of data) {
+                        if ((nib && d.nib === nib) || (hak && d.no_hak === hak)) { targetData = d; break; }
+                    }
 
-        function openLaporanMandiriInput() { appCurrentActiveKanal = 'aduan'; switchView('table', 'aduan'); setTimeout(() => addNewInlineRow(), 500); }
+                    switchView('map');
+                    layerSearchHighlight.clearLayers();
+                    
+                    let geom = null;
+                    try { geom = typeof targetData.geom_json === 'string' ? JSON.parse(targetData.geom_json) : targetData.geom_json; } catch(e){}
+                    
+                    let geoJsonObj = { type: "FeatureCollection", features: [{ type: "Feature", properties: targetData, geometry: geom }] };
+                    layerSearchHighlight.addData(geoJsonObj);
+                    
+                    mapObject.fitBounds(layerSearchHighlight.getBounds(), { padding: [100, 100], animate: true, duration: 1.5 });
+                    
+                    let firstLayer = null;
+                    layerSearchHighlight.eachLayer(l => { if(!firstLayer) firstLayer = l; });
+                    if(firstLayer) highlightPoligon(firstLayer, true);
+
+                    Swal.close();
+                } else { 
+                    Toast.fire({icon: 'info', title: 'Poligon tidak tersedia di database.'}); 
+                }
+            } catch (e) { Toast.fire({icon: 'error', title: e.message}); }
+        }
 
         async function setupTableView(kanal) {
             const config = SCHEMA_CONFIG[kanal];
@@ -652,50 +869,89 @@
             else document.getElementById('btnTableTambahData').classList.remove('hidden');
             
             let headerHTML = `<th class="p-4 text-center border-b border-gray-200 sticky left-0 z-30 shadow-[2px_0_4px_rgba(0,0,0,0.05)] bg-gray-50/90 backdrop-blur-md">Tindakan</th>`;
-            headerHTML += `<th class="p-4 min-w-[220px] border-b border-gray-200">Early Warning System</th>`;
+            headerHTML += `<th class="p-4 min-w-[200px] border-b border-gray-200">Objek Spasial</th>`;
+            headerHTML += `<th class="p-4 min-w-[180px] border-b border-gray-200">Early Warning System</th>`;
             headerHTML += `<th class="p-4 min-w-[100px] border-b border-gray-200">ID System</th>`;
-            
             config.fields.forEach(f => { headerHTML += `<th class="p-4 min-w-[180px] border-b border-gray-200">${f.label}</th>`; });
             
             document.getElementById('tableHeaderRow').innerHTML = headerHTML;
-            document.getElementById('tableBody').innerHTML = `<tr><td colspan="${config.fields.length + 3}" class="p-10 text-center text-gray-500">Memuat Data dari Cloud...</td></tr>`;
+            document.getElementById('tableBody').innerHTML = `<tr><td colspan="${config.fields.length + 4}" class="p-10 text-center text-gray-500">Memuat Data dari Cloud...</td></tr>`;
 
             try {
-                const { data: mainData, error: errMain } = await supabaseClient.from(config.mainTable).select('*').order('created_at', { ascending: false }).limit(100);
+                const { data: mainData, error: errMain } = await supabaseClient.from(config.mainTable).select('*').order('created_at', { ascending: false }).limit(200);
                 if(errMain) throw errMain;
 
                 const { data: spatialData } = await supabaseClient.from('grid_bidang_bermasalah').select('*').in(config.pk, mainData.map(d => d[config.pk]));
                 
                 loadedTableData = mainData.map(m => {
-                    let s = spatialData.find(sd => sd[config.pk] === m[config.pk]) || {};
-                    return { ...m, ...s, _mainId: m[config.pk], _spatialId: s.id_detail };
+                    let sArray = spatialData.filter(sd => sd[config.pk] === m[config.pk]) || [];
+                    return { ...m, spatial_details: sArray, _mainId: m[config.pk] };
                 });
 
                 renderTableRows();
-            } catch(e) { document.getElementById('tableBody').innerHTML = `<tr><td colspan="${config.fields.length + 3}" class="text-center text-red-500 p-10">${e.message}</td></tr>`; }
+            } catch(e) { document.getElementById('tableBody').innerHTML = `<tr><td colspan="${config.fields.length + 4}" class="text-center text-red-500 p-10">${e.message}</td></tr>`; }
         }
 
         function renderTableRows() {
             const config = SCHEMA_CONFIG[appCurrentActiveKanal];
-            let html = '';
-            if(loadedTableData.length === 0) {
-                html = `<tr><td colspan="${config.fields.length + 3}" class="p-10 text-center text-gray-500">Tidak ada rekam data pada kanal ini.</td></tr>`;
-            } else {
-                loadedTableData.forEach((row, index) => {
-                    let warnings = getEarlyWarnings(row);
-                    let badges = warnings.map(w => `<span class="badge-kanal inline-block bg-white ${w.color} mr-1.5 mb-1.5 shadow-sm">${w.label}</span>`).join('');
-                    if(!badges) badges = '<span class="text-gray-400 italic text-[11px]">- Area Bersih -</span>';
+            const searchQ = (document.getElementById('tableSearchInput').value || '').toLowerCase();
+            
+            let dataToRender = loadedTableData.map((row, index) => ({ ...row, _origIndex: index }));
+            
+            if (searchQ) {
+                dataToRender = dataToRender.filter(row => {
+                    let matchMain = Object.values(row).some(val => String(val).toLowerCase().includes(searchQ));
+                    let matchSpatial = false;
+                    if (row.spatial_details) {
+                        matchSpatial = row.spatial_details.some(sd => Object.values(sd).some(sval => String(sval).toLowerCase().includes(searchQ)));
+                    }
+                    return matchMain || matchSpatial;
+                });
+            }
 
-                    html += `<tr id="row-${index}" class="hover:bg-gray-50 transition-colors group">`;
+            let html = '';
+            if(dataToRender.length === 0) {
+                html = `<tr><td colspan="${config.fields.length + 4}" class="p-10 text-center text-gray-500">Tidak ada rekam data yang sesuai.</td></tr>`;
+            } else {
+                dataToRender.forEach((row) => {
+                    
+                    let totalWarnings = 0;
+                    let firstWarningSpatialId = null;
+                    if (row.spatial_details && row.spatial_details.length > 0) {
+                        row.spatial_details.forEach(sd => { 
+                            let relasiLain = cekRelasiLain(sd);
+                            if (relasiLain > 0) {
+                                totalWarnings += relasiLain;
+                                if (!firstWarningSpatialId) firstWarningSpatialId = sd.id_detail;
+                            }
+                        });
+                    }
+                    
+                    let ewHtml = '';
+                    if (totalWarnings > 0) {
+                        ewHtml = `<button onclick="actionInfoKoneksiLokal('${firstWarningSpatialId}')" class="bg-red-50 hover:bg-red-500 hover:text-white text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all shadow-sm whitespace-nowrap"><span class="material-symbols-rounded text-[14px]">warning</span> Ada ${totalWarnings} Kasus</button>`;
+                    } else {
+                        ewHtml = `<span class="text-gray-400 italic text-[11px] flex items-center gap-1 whitespace-nowrap"><span class="material-symbols-rounded text-[14px] text-emerald-500">check_circle</span> Area Bersih</span>`;
+                    }
+
+                    let jmlBidang = row.spatial_details ? row.spatial_details.length : 0;
+                    let btnSpasial = `
+                        <button onclick="bukaModalBidang(${row._origIndex})" class="relative bg-blue-50 text-blue-600 border border-blue-200 px-3 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all shadow-sm whitespace-nowrap hover:bg-blue-600 hover:text-white">
+                            <span class="material-symbols-rounded text-[14px]">map</span> ${jmlBidang} Bidang Terhubung
+                        </button>
+                    `;
+
+                    html += `<tr id="row-${row._origIndex}" class="hover:bg-gray-50 transition-colors group">`;
                     html += `
                         <td class="p-3 bg-white group-hover:bg-gray-50 sticky left-0 z-20 shadow-[2px_0_4px_rgba(0,0,0,0.02)] border-b border-gray-100 transition-colors">
                             <div class="flex gap-2 justify-center">
-                                <button onclick="editInlineRow(${index})" class="w-8 h-8 rounded-md bg-white border border-gray-200 text-gray-500 hover:text-[#007AFF] hover:border-[#007AFF] flex items-center justify-center transition-all shadow-sm" title="Ubah Data"><span class="material-symbols-rounded text-[18px]">edit</span></button>
-                                <button onclick="deleteInlineRow(${index})" class="w-8 h-8 rounded-md bg-white border border-gray-200 text-gray-500 hover:text-red-500 hover:border-red-500 flex items-center justify-center transition-all shadow-sm" title="Hapus Data"><span class="material-symbols-rounded text-[18px]">delete</span></button>
+                                <button onclick="editInlineRow(${row._origIndex})" class="w-8 h-8 rounded-md bg-white border border-gray-200 text-gray-500 hover:text-[#007AFF] hover:border-[#007AFF] flex items-center justify-center transition-all shadow-sm" title="Ubah Data"><span class="material-symbols-rounded text-[18px]">edit</span></button>
+                                <button onclick="deleteInlineRow(${row._origIndex})" class="w-8 h-8 rounded-md bg-white border border-gray-200 text-gray-500 hover:text-red-500 hover:border-red-500 flex items-center justify-center transition-all shadow-sm" title="Hapus Data"><span class="material-symbols-rounded text-[18px]">delete</span></button>
                             </div>
                         </td>
                     `;
-                    html += `<td class="p-4 border-b border-gray-100 align-top"><div class="flex flex-wrap w-full">${badges}</div></td>`;
+                    html += `<td class="p-4 border-b border-gray-100 align-middle">${btnSpasial}</td>`;
+                    html += `<td class="p-4 border-b border-gray-100 align-middle">${ewHtml}</td>`;
                     html += `<td class="p-4 text-[12px] font-mono text-gray-400 border-b border-gray-100">#${String(row._mainId).substring(0,6)}</td>`;
                     
                     config.fields.forEach(f => { html += `<td class="p-4 truncate max-w-[250px] border-b border-gray-100" title="${row[f.key] || '-'}">${row[f.key] || '-'}</td>`; });
@@ -705,32 +961,167 @@
             document.getElementById('tableBody').innerHTML = html;
         }
 
+        function bukaModalBidang(index) {
+            const row = loadedTableData[index];
+            currentEditingMainId = row._mainId;
+            tempModalBidangList = row.spatial_details ? [...row.spatial_details] : [];
+            
+            document.getElementById('lblModalDocId').innerText = `Menghubungkan ke Dokumen #${String(currentEditingMainId).substring(0,6)}`;
+            
+            renderModalList();
+            
+            const modal = document.getElementById('modalBidang');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { modal.style.opacity = '1'; }, 10);
+        }
+
+        function tutupModalBidang() {
+            const modal = document.getElementById('modalBidang');
+            modal.style.opacity = '0';
+            setTimeout(() => { 
+                modal.classList.add('hidden'); modal.classList.remove('flex'); 
+                document.getElementById('m_desa').value = '';
+                document.getElementById('m_nib').value = '';
+                document.getElementById('m_hak').value = '';
+                document.getElementById('m_su').value = '';
+            }, 300);
+        }
+
+        function tambahBidangKeList() {
+            const desa = document.getElementById('m_desa').value.trim();
+            const nib = document.getElementById('m_nib').value.trim() || '-';
+            const hak = document.getElementById('m_hak').value.trim() || '-';
+            const su = document.getElementById('m_su').value.trim() || '-';
+
+            if (!desa) return Toast.fire({icon: 'warning', title: 'Kolom Desa tidak boleh kosong.'});
+
+            tempModalBidangList.push({
+                desa: desa, nib: nib, no_hak: hak, no_su: su, _isNew: true
+            });
+
+            document.getElementById('m_desa').value = '';
+            document.getElementById('m_nib').value = '';
+            document.getElementById('m_hak').value = '';
+            document.getElementById('m_su').value = '';
+
+            renderModalList();
+        }
+
+        function hapusBidangDariList(index) {
+            tempModalBidangList.splice(index, 1);
+            renderModalList();
+        }
+
+        function renderModalList() {
+            const tbody = document.getElementById('listBidangBody');
+            let html = '';
+            
+            if (tempModalBidangList.length === 0) {
+                html = `<tr><td colspan="5" class="p-6 text-center text-gray-500 italic">Belum ada objek bidang tanah yang ditautkan.</td></tr>`;
+            } else {
+                tempModalBidangList.forEach((b, idx) => {
+                    let mapBtn = `<button onclick="terbangKePetaSpesifik('${b.desa}', '${b.nib}', '${b.no_hak}')" class="w-7 h-7 rounded bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white flex items-center justify-center transition-colors shadow-sm" title="Lacak di Peta"><span class="material-symbols-rounded text-[16px]">location_on</span></button>`;
+                    
+                    if(b.id_detail) {
+                        let ewCount = cekRelasiLain(b);
+                        if(ewCount > 0) {
+                             mapBtn += `<button onclick="actionInfoKoneksiLokal('${b.id_detail}')" class="w-7 h-7 rounded bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-colors shadow-sm" title="Lihat ${ewCount} Irisan Risiko"><span class="material-symbols-rounded text-[16px]">warning</span></button>`;
+                        }
+                    }
+
+                    html += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-3 font-medium text-gray-900">${b.desa}</td>
+                            <td class="p-3 font-mono text-gray-500">${b.nib}</td>
+                            <td class="p-3 font-mono text-gray-500">${b.no_hak}</td>
+                            <td class="p-3 font-mono text-gray-500">${b.no_su}</td>
+                            <td class="p-3 flex justify-center gap-2">
+                                ${mapBtn}
+                                <button onclick="hapusBidangDariList(${idx})" class="w-7 h-7 rounded bg-white border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-500 flex items-center justify-center transition-colors shadow-sm" title="Cabut Tautan"><span class="material-symbols-rounded text-[16px]">delete</span></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            tbody.innerHTML = html;
+        }
+
+        async function simpanBidangKeDb() {
+            if(!currentEditingMainId) return;
+
+            const config = SCHEMA_CONFIG[appCurrentActiveKanal];
+            const pkField = config.pk;
+
+            showLoadingToast('Menyimpan Tautan Spasial...');
+            
+            try {
+                const { error: errDel } = await supabaseClient
+                    .from('grid_bidang_bermasalah')
+                    .delete()
+                    .eq(pkField, currentEditingMainId);
+                
+                if(errDel) throw errDel;
+
+                if (tempModalBidangList.length > 0) {
+                    const insertPayload = tempModalBidangList.map(b => {
+                        let obj = {
+                            sumber_kanal: getKanalEnum(appCurrentActiveKanal),
+                            desa: b.desa,
+                            nib: b.nib,
+                            no_hak: b.no_hak,
+                            no_su: b.no_su
+                        };
+                        obj[pkField] = currentEditingMainId;
+                        return obj;
+                    });
+
+                    const { error: errIns } = await supabaseClient
+                        .from('grid_bidang_bermasalah')
+                        .insert(insertPayload);
+
+                    if(errIns) throw errIns;
+                }
+
+                tutupModalBidang();
+                Toast.fire({icon: 'success', title: 'Tautan spasial berhasil diperbarui.'});
+                
+                const { data: rpcData } = await supabaseClient.from('grid_bidang_bermasalah').select('*');
+                globalDataMasalah = rpcData || [];
+
+                await setupTableView(appCurrentActiveKanal);
+            } catch (e) {
+                Toast.fire({icon: 'error', title: e.message});
+            }
+        }
+
         function addNewInlineRow() {
             const config = SCHEMA_CONFIG[appCurrentActiveKanal];
             let tr = document.createElement('tr');
             tr.id = "row-new";
             tr.className = "bg-blue-50/40";
-            let ocrBtn = appCurrentActiveKanal === 'surat' ? `<button onclick="document.getElementById('ocrPdfInput').click()" class="w-8 h-8 rounded-md bg-orange-100 text-orange-600 hover:bg-orange-200 flex items-center justify-center shadow-sm" title="Ekstrak PDF AI"><span class="material-symbols-rounded text-[18px]">document_scanner</span></button>` : '';
+            let ocrBtn = appCurrentActiveKanal === 'surat' ? `<button onclick="document.getElementById('ocrPdfInput').click()" class="w-8 h-8 rounded-md bg-orange-100 text-orange-600 hover:bg-orange-200 flex items-center justify-center shadow-sm" title="Ekstrak PDF"><span class="material-symbols-rounded text-[18px]">document_scanner</span></button>` : '';
 
             let html = `
                 <td class="p-3 bg-white sticky left-0 z-20 shadow-[2px_0_4px_rgba(0,0,0,0.02)] border-b border-gray-100">
                     <div class="flex gap-2 justify-center">
-                        <button onclick="saveInlineRow('new')" class="w-8 h-8 rounded-md bg-[#007AFF] text-white hover:bg-blue-600 flex items-center justify-center shadow-sm" title="Simpan"><span class="material-symbols-rounded text-[18px]">save</span></button>
-                        <button onclick="renderTableRows()" class="w-8 h-8 rounded-md bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 flex items-center justify-center shadow-sm" title="Batal"><span class="material-symbols-rounded text-[18px]">close</span></button>
+                        <div class="w-8 h-8"></div>
+                        <button onclick="saveInlineRow('new')" class="w-8 h-8 rounded-md bg-[#007AFF] text-white hover:bg-blue-600 flex items-center justify-center shadow-sm"><span class="material-symbols-rounded text-[18px]">save</span></button>
+                        <button onclick="renderTableRows()" class="w-8 h-8 rounded-md bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 flex items-center justify-center shadow-sm"><span class="material-symbols-rounded text-[18px]">close</span></button>
                         ${ocrBtn}
                     </div>
                 </td>
-                <td class="p-4 border-b border-gray-100 text-center"><span class="text-[10px] text-gray-400 italic">Pengecekan otomatis...</span></td>
+                <td class="p-4 border-b border-gray-100 text-center"><span class="text-[10px] text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded">Simpan dokumen dulu</span></td>
+                <td class="p-4 border-b border-gray-100 text-center"><span class="text-[10px] text-gray-400 italic">-</span></td>
                 <td class="p-4 text-[12px] text-blue-600 font-medium border-b border-gray-100">Baru</td>
             `;
 
             config.fields.forEach(f => {
                 let val = (tempOcrData && tempOcrData[f.key]) ? tempOcrData[f.key] : "";
                 let ph = f.req ? "*Wajib" : "";
-                html += `<td class="p-3 border-b border-gray-100"><input type="${f.type}" data-key="${f.key}" data-spatial="${f.spatial?'true':'false'}" placeholder="${ph}" value="${val}" class="flat-input inline-field"></td>`;
+                html += `<td class="p-3 border-b border-gray-100"><input type="${f.type}" data-key="${f.key}" placeholder="${ph}" value="${val}" class="flat-input inline-field"></td>`;
             });
             tr.innerHTML = html;
-            
             const tbody = document.getElementById('tableBody');
             if(tbody.querySelector('td[colspan]')) tbody.innerHTML = '';
             tbody.prepend(tr);
@@ -745,18 +1136,20 @@
             let html = `
                 <td class="p-3 bg-white sticky left-0 z-20 shadow-[2px_0_4px_rgba(0,0,0,0.02)] border-b border-gray-100">
                     <div class="flex gap-2 justify-center">
-                        <button onclick="saveInlineRow(${index})" class="w-8 h-8 rounded-md bg-[#007AFF] text-white hover:bg-blue-600 flex items-center justify-center shadow-sm" title="Simpan"><span class="material-symbols-rounded text-[18px]">save</span></button>
-                        <button onclick="renderTableRows()" class="w-8 h-8 rounded-md bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 flex items-center justify-center shadow-sm" title="Batal"><span class="material-symbols-rounded text-[18px]">close</span></button>
+                        <div class="w-8 h-8"></div>
+                        <button onclick="saveInlineRow(${index})" class="w-8 h-8 rounded-md bg-[#007AFF] text-white hover:bg-blue-600 flex items-center justify-center shadow-sm"><span class="material-symbols-rounded text-[18px]">save</span></button>
+                        <button onclick="renderTableRows()" class="w-8 h-8 rounded-md bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 flex items-center justify-center shadow-sm"><span class="material-symbols-rounded text-[18px]">close</span></button>
                     </div>
                 </td>
-                <td class="p-4 border-b border-gray-100 text-center"><span class="text-[10px] text-gray-400 italic">Pengecekan otomatis...</span></td>
+                <td class="p-4 border-b border-gray-100 text-center"><span class="text-[10px] text-gray-400 italic">Disabled Edit Mode</span></td>
+                <td class="p-4 border-b border-gray-100 text-center"><span class="text-[10px] text-gray-400 italic">-</span></td>
                 <td class="p-4 text-[12px] font-mono text-gray-500 border-b border-gray-100">#${String(row._mainId).substring(0,6)}</td>
             `;
 
             config.fields.forEach(f => {
                 let val = row[f.key] || '';
                 let ph = f.req ? "*Wajib" : "";
-                html += `<td class="p-3 border-b border-gray-100"><input type="${f.type}" data-key="${f.key}" data-spatial="${f.spatial?'true':'false'}" placeholder="${ph}" value="${val}" class="flat-input inline-field"></td>`;
+                html += `<td class="p-3 border-b border-gray-100"><input type="${f.type}" data-key="${f.key}" placeholder="${ph}" value="${val}" class="flat-input inline-field"></td>`;
             });
             tr.innerHTML = html;
         }
@@ -764,7 +1157,7 @@
         async function saveInlineRow(indexOrNew) {
             const config = SCHEMA_CONFIG[appCurrentActiveKanal];
             const tr = document.getElementById(indexOrNew === 'new' ? 'row-new' : `row-${indexOrNew}`);
-            let mainPayload = {}; let spatialPayload = {};
+            let mainPayload = {}; 
             let isUpdate = indexOrNew !== 'new';
             let refRow = isUpdate ? loadedTableData[indexOrNew] : null;
 
@@ -772,53 +1165,31 @@
                 let key = inp.getAttribute('data-key');
                 let val = inp.type === 'number' ? parseFloat(inp.value) : inp.value;
                 if(inp.value === '') val = null;
-
-                if(inp.getAttribute('data-spatial') === 'true') spatialPayload[key] = val;
-                else mainPayload[key] = val;
+                mainPayload[key] = val;
             });
 
             for(let f of config.fields) {
-                if(f.req && !mainPayload[f.key] && !spatialPayload[f.key]) {
-                    return Swal.fire("Perhatian", `Kolom [ ${f.label} ] wajib diisi.`, "warning");
+                if(f.req && !mainPayload[f.key]) {
+                    return Toast.fire({icon: 'warning', title: `Kolom [ ${f.label} ] wajib diisi.`});
                 }
             }
 
-            Swal.fire({ title: 'Menyimpan ke Cloud...', didOpen: () => Swal.showLoading() });
+            showLoadingToast('Menyimpan ke Cloud...');
             try {
-                let mainId;
-                if(appCurrentActiveKanal === 'surat' && tempUploadedUrl && !isUpdate) { mainPayload.link_arsip = tempUploadedUrl; }
-
                 if (isUpdate) {
-                    mainId = refRow._mainId;
-                    const { error: err1 } = await supabaseClient.from(config.mainTable).update(mainPayload).eq(config.pk, mainId);
+                    const { error: err1 } = await supabaseClient.from(config.mainTable).update(mainPayload).eq(config.pk, refRow._mainId);
                     if(err1) throw err1;
-
-                    if(refRow._spatialId) {
-                        const { error: err2 } = await supabaseClient.from('grid_bidang_bermasalah').update(spatialPayload).eq('id_detail', refRow._spatialId);
-                        if(err2) throw err2;
-                    } else {
-                        spatialPayload.sumber_kanal = getKanalEnum(appCurrentActiveKanal);
-                        spatialPayload[config.pk] = mainId;
-                        const { error: err2 } = await supabaseClient.from('grid_bidang_bermasalah').insert([spatialPayload]);
-                        if(err2) throw err2;
-                    }
                 } else {
-                    const { data: newRow, error: err1 } = await supabaseClient.from(config.mainTable).insert([mainPayload]).select().single();
+                    if(appCurrentActiveKanal === 'surat' && tempUploadedUrl) { mainPayload.link_arsip = tempUploadedUrl; }
+                    const { error: err1 } = await supabaseClient.from(config.mainTable).insert([mainPayload]);
                     if(err1) throw err1;
-                    mainId = newRow[config.pk];
-
-                    spatialPayload.sumber_kanal = getKanalEnum(appCurrentActiveKanal);
-                    spatialPayload[config.pk] = mainId;
-                    const { error: err2 } = await supabaseClient.from('grid_bidang_bermasalah').insert([spatialPayload]);
-                    if(err2) throw err2;
                 }
                 
                 tempOcrData = null; tempUploadedUrl = null;
-                Swal.fire({title: "Berhasil", text: "Data berhasil disimpan dan disinkronkan.", icon: "success", confirmButtonColor: '#007AFF'});
+                Toast.fire({icon: 'success', title: 'Data tersimpan.'});
                 
-                await fetchAndRenderSpatialMaster(); 
                 await setupTableView(appCurrentActiveKanal);
-            } catch(e) { Swal.fire("Gagal", e.message, "error"); }
+            } catch(e) { Toast.fire({icon: 'error', title: e.message}); }
         }
 
         async function deleteInlineRow(index) {
@@ -826,175 +1197,117 @@
             const row = loadedTableData[index];
 
             const result = await Swal.fire({
-                title: 'Hapus Data?',
-                html: "Data yang dihapus <b>tidak dapat dikembalikan</b>.<br>Seluruh rekam jejak spasialnya juga akan dihilangkan.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#e5e7eb',
-                confirmButtonText: 'Ya, Hapus Permanen!',
-                cancelButtonText: '<span class="text-gray-800">Batal</span>',
-                customClass: { popup: 'rounded-2xl' }
+                title: 'Hapus Data?', html: "Dokumen dan semua daftar tautan spasialnya juga akan dihapus.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Hapus!', customClass: { popup: 'rounded-2xl' }
             });
 
             if (result.isConfirmed) {
-                Swal.fire({ title: 'Menghapus Data...', didOpen: () => Swal.showLoading() });
+                showLoadingToast('Menghapus Data...');
                 try {
-                    if (row._spatialId) {
-                        const { error: err1 } = await supabaseClient.from('grid_bidang_bermasalah').delete().eq('id_detail', row._spatialId);
-                        if (err1) throw err1;
-                    }
+                    const { error: err1 } = await supabaseClient.from('grid_bidang_bermasalah').delete().eq(config.pk, row._mainId);
+                    if (err1) throw err1;
+                    
                     const { error: err2 } = await supabaseClient.from(config.mainTable).delete().eq(config.pk, row._mainId);
                     if (err2) throw err2;
 
-                    Swal.fire({title: "Terhapus!", text: "Data beserta rekam jejaknya berhasil dibersihkan.", icon: "success", confirmButtonColor: '#007AFF'});
+                    Toast.fire({icon: 'success', title: 'Data terhapus!'});
                     
-                    await fetchAndRenderSpatialMaster();
+                    const { data: rpcData } = await supabaseClient.from('grid_bidang_bermasalah').select('*');
+                    globalDataMasalah = rpcData || [];
+
                     await setupTableView(appCurrentActiveKanal);
-                } catch(e) {
-                    Swal.fire("Gagal Menghapus", e.message, "error");
-                }
+                } catch(e) { Toast.fire({icon: 'error', title: e.message}); }
             }
         }
 
         function getKanalEnum(k) {
-            if(k === 'surat') return 'PERSURATAN';
-            if(k === 'aduan') return 'LAPORAN_MANDIRI';
-            if(k === 'masalah_sp') return 'SEKSI_1';
-            return 'SEKSI_5';
+            if(k === 'surat') return 'PERSURATAN'; if(k === 'aduan') return 'LAPORAN_MANDIRI'; if(k === 'masalah_sp') return 'SEKSI_1'; return 'SEKSI_5';
         }
 
         function toBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result.split(',')[1]); reader.onerror = error => reject(error); }); }
 
         async function processOcrUpload(element) {
             const file = element.files[0]; if (!file) return;
-            Swal.fire({ title: 'Mengekstrak PDF...', didOpen: () => Swal.showLoading() });
+            showLoadingToast('Mengekstrak PDF...');
             try {
                 const base64Data = await toBase64(file);
                 const response = await fetch(CONFIG_GAS_ENGINE_URL, { method: 'POST', body: JSON.stringify({ fileName: file.name, mimeType: file.type, fileBase64: base64Data }) });
                 const result = await response.json();
                 if (result.status !== "success") throw new Error(result.message);
-                if (result.ocrData) {
-                    tempOcrData = { perihal: result.ocrData.deskripsi || '', desa: result.ocrData.kode_desa || '', nib: result.ocrData.nib || '' };
-                }
+                if (result.ocrData) tempOcrData = { perihal: result.ocrData.deskripsi || '', desa: result.ocrData.kode_desa || '', nib: result.ocrData.nib || '' };
                 tempUploadedUrl = result.folderUrl; 
-                Swal.close();
                 renderTableRows(); addNewInlineRow();
-                Swal.fire({title: "Ekstraksi Selesai", text: "Sebagian form telah diisi otomatis oleh AI.", icon: "success", toast: true, position: 'top-end', showConfirmButton: false, timer: 3000});
-            } catch (err) { Swal.fire("Gagal", err.message, "error"); }
+                Toast.fire({icon: 'info', title: 'PDF terekstrak! Tautkan NIB via Kelola Bidang.', timer: 6000});
+            } catch (err) { Toast.fire({icon: 'error', title: err.message}); }
             element.value = '';
         }
 
-// --- ALGORITMA STREAMING PARSER OBOE.JS ---
         async function processGeoJsonInput(element) {
-            const file = element.files[0]; 
-            if (!file) return;
-
-            Swal.fire({ title: 'Memeriksa Database...', didOpen: () => Swal.showLoading() });
+            const file = element.files[0]; if (!file) return;
+            showLoadingToast('Memeriksa Database...');
             const { count, error: countErr } = await supabaseClient.from('bidang_tanah').select('*', { count: 'exact', head: true });
-            if (countErr) { Swal.fire("Error Sistem", countErr.message, "error"); element.value = ''; return; }
+            if (countErr) { Toast.fire({icon: 'error', title: countErr.message}); element.value = ''; return; }
 
             if (count > 0) {
-                const confirmDelete = await Swal.fire({
-                    title: 'Peta Lama Terdeteksi',
-                    html: `Ada <b>${count}</b> poligon di database.<br>Harap konfirmasi penghapusan peta lama untuk menghindari duplikat. Relasi data Anda akan tetap aman.`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#e5e7eb',
-                    confirmButtonText: 'Hapus & Timpa Peta Baru',
-                    cancelButtonText: '<span class="text-gray-800">Batal</span>',
-                    customClass: { popup: 'rounded-2xl' }
-                });
-
+                const confirmDelete = await Swal.fire({ title: 'Peta Lama Terdeteksi', html: `Ada <b>${count}</b> poligon di database. Hapus peta lama?`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Hapus & Timpa Baru', customClass: { popup: 'rounded-2xl' } });
                 if (!confirmDelete.isConfirmed) { element.value = ''; return; }
-
-                Swal.fire({ title: 'Membersihkan Peta Lama...', didOpen: () => Swal.showLoading() });
+                showLoadingToast('Membersihkan Peta Lama...');
                 const { error: delErr } = await supabaseClient.rpc('hapus_semua_bidang');
-                if (delErr) { Swal.fire("Gagal Menghapus Data", delErr.message, "error"); element.value = ''; return; }
+                if (delErr) { Toast.fire({icon: 'error', title: delErr.message}); element.value = ''; return; }
             }
 
-            Swal.fire({ 
-                title: 'Streaming Data Spasial', 
-                html: 'Mengunggah pelan tapi pasti...<br><br><span class="text-blue-600 font-bold text-lg" id="st-prog">0</span> bidang tanah berhasil diamankan di Cloud.', 
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading() 
+            Swal.fire({
+                toast: true, position: 'bottom-start', showConfirmButton: false,
+                title: 'Sinkronisasi Cloud...',
+                html: '<span id="st-prog" class="font-bold text-blue-600">0</span> bidang',
+                customClass: { popup: 'rounded-xl shadow-xl border border-gray-100 bg-white text-gray-800' },
+                didOpen: () => Swal.showLoading()
             });
 
             const fileUrl = URL.createObjectURL(file);
-            
-            // KUNCI UTAMA: Tetesan kecil 50 poligon per paket. Dijamin tidak akan menabrak limit Payload!
-            const BATCH_SIZE = 50; 
-            let batchFeatures = [];
-            let totalProcessed = 0;
-            let isUploadFailed = false; // Bendera pengaman
+            const BATCH_SIZE = 1000;
+            let batchFeatures = []; let uploadQueue = []; let isUploading = false; let isOboeFinished = false; let uploadedCount = 0; let isUploadFailed = false; let oboeInstance = null;
 
-            oboe(fileUrl)
-                .node('features.*', function(feature) {
-                    // Jika sebelumnya terdeteksi gagal dari Supabase, hentikan semua proses baca file
-                    if (isUploadFailed) return oboe.drop; 
-
-                    batchFeatures.push(feature);
-                    totalProcessed++;
-                    
-                    let pTxt = document.getElementById('st-prog');
-                    if (pTxt) pTxt.innerText = totalProcessed;
-
-                    if (batchFeatures.length >= BATCH_SIZE) {
-                        const currentBatch = [...batchFeatures];
-                        batchFeatures = [];
-                        const oboeInstance = this;
-                        
-                        oboeInstance.pause(); // Setop baca file, tunggu sampai Supabase menelan datanya
-                        
-                        supabaseClient.rpc('upload_bulk_shapefile', {
-                            geojson_data: { type: "FeatureCollection", features: currentBatch }
-                        }).then(({ error }) => {
-                            if (error) throw error;
-                            oboeInstance.resume(); // Supabase berhasil menelan data, lanjut baca file
-                        }).catch(err => {
-                            isUploadFailed = true; // Nyalakan sirine gagal
-                            oboeInstance.abort(); // Matikan Oboe
-                            URL.revokeObjectURL(fileUrl);
-                            Swal.fire("Gagal Upload", "Upload terhenti karena masalah jaringan atau server. Detail: " + err.message, "error");
-                            element.value = '';
-                        });
+            async function processQueue() {
+                if (isUploading || isUploadFailed) return; isUploading = true;
+                while (uploadQueue.length > 0) {
+                    const batch = uploadQueue.shift();
+                    try {
+                        const { error } = await supabaseClient.rpc('upload_bulk_shapefile', { geojson_data: { type: "FeatureCollection", features: batch } });
+                        if (error) throw error;
+                        uploadedCount += batch.length;
+                        let pTxt = document.getElementById('st-prog'); if (pTxt) pTxt.innerText = uploadedCount;
+                        if (uploadQueue.length <= 1 && oboeInstance && !isOboeFinished) oboeInstance.resume();
+                    } catch (err) {
+                        isUploadFailed = true; if (oboeInstance) oboeInstance.abort();
+                        Toast.fire({icon: 'error', title: "Kesalahan server Supabase: " + err.message}); break;
                     }
-                    return oboe.drop; // Kosongkan RAM Browser setiap satu poligon beres dibaca
-                })
-                .done(async function() {
-                    // Cegah pesan "Sukses" palsu jika nyatanya pernah gagal di tengah jalan
-                    if (isUploadFailed) return; 
+                }
+                isUploading = false;
+                if (isOboeFinished && uploadQueue.length === 0 && !isUploadFailed) {
+                    URL.revokeObjectURL(fileUrl); switchView('dashboard');
+                    Toast.fire({icon: 'success', title: `Sukses. ${uploadedCount} bidang tersinkronisasi.`}); 
+                }
+            }
 
-                    // Unggah sisa-sisa poligon terakhir (jika ada yang kurang dari 50)
-                    if (batchFeatures.length > 0) {
-                        const { error } = await supabaseClient.rpc('upload_bulk_shapefile', {
-                            geojson_data: { type: "FeatureCollection", features: batchFeatures }
-                        });
-                        
-                        if (error) {
-                            Swal.fire("Gagal Upload Sisa Data", error.message, "error");
-                            return;
-                        }
-                    }
-                    URL.revokeObjectURL(fileUrl);
-                    
-                    switchView('map');
-                    Swal.fire({ title: 'Merender Peta...', text: 'Menggambar poligon ke kanvas...', didOpen: () => Swal.showLoading() });
-                    
-                    setTimeout(async () => {
-                        await fetchAndRenderSpatialMaster();
-                        await calculateSmartIntersections();
-                        Swal.fire({ title: "Sinkronisasi Sukses", text: `Luar biasa! Seluruh ${totalProcessed} bidang tanah berhasil diunggah dengan aman.`, icon: "success", confirmButtonColor: '#007AFF'}); 
-                    }, 400);
-                })
-                .fail(function(err) {
-                    if (isUploadFailed) return; // Jika gagal dari API, jangan timpa pesannya
-                    Swal.fire("Gagal Membaca File", "Format file GeoJSON tidak valid atau rusak.", "error");
-                    URL.revokeObjectURL(fileUrl);
-                    element.value = '';
-                });
+            oboeInstance = oboe(fileUrl).node('features.*', function(feature) {
+                if (isUploadFailed) return oboe.drop;
+                batchFeatures.push(feature);
+                if (batchFeatures.length >= BATCH_SIZE) {
+                    uploadQueue.push([...batchFeatures]); batchFeatures = [];
+                    if (uploadQueue.length > 1) this.pause(); processQueue();
+                }
+                return oboe.drop;
+            }).done(function() {
+                isOboeFinished = true;
+                if (batchFeatures.length > 0) { uploadQueue.push([...batchFeatures]); batchFeatures = []; }
+                processQueue();
+            }).fail(function() {
+                Toast.fire({icon: 'error', title: "File GeoJSON rusak atau tidak valid."}); 
+                URL.revokeObjectURL(fileUrl); element.value = '';
+            });
         }
+
+        function openLaporanMandiriInput() { appCurrentActiveKanal = 'aduan'; switchView('table', 'aduan'); setTimeout(() => addNewInlineRow(), 500); }
     </script>
 </body>
 </html>
